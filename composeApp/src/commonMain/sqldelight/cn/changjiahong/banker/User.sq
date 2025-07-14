@@ -1,0 +1,44 @@
+CREATE TABLE User (
+    id INTEGER PRIMARY KEY NOT NULL ,
+    name TEXT NOT NULL,                  -- 姓名
+    idNumber  TEXT UNIQUE NOT NULL ,      -- 身份证号
+    phone TEXT UNIQUE,                   -- 手机号码
+    address TEXT,                        -- 居住地址
+    businessRelated INTEGER NOT NULL DEFAULT 0,
+    created INTEGER NOT NULL DEFAULT (strftime('%s','now')) -- 时间戳格式
+);
+
+
+selectAll:
+SELECT * FROM User;
+
+selectById:
+SELECT * FROM User WHERE id = ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+insertUser:
+INSERT INTO User (
+    id,
+    name,
+    idNumber,
+    phone,
+    address,
+    businessRelated
+) VALUES (?,?, ?, ?, ?,?);
+
+updateUser:
+UPDATE User SET
+    name = ?,
+    idNumber = ?,
+    phone = ?,
+    address = ?,
+    businessRelated = ?
+WHERE id = ?;
+
+deleteById:
+DELETE FROM User WHERE id = ?;
+
+deleteAll:
+DELETE FROM User;

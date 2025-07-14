@@ -1,0 +1,8 @@
+CREATE TABLE UserExtendField (
+    id INTEGER PRIMARY KEY NOT NULL ,
+    fieldName  TEXT UNIQUE NOT NULL,
+    fieldType  TEXT NOT NULL ,
+    description     TEXT    NOT NULL ,
+    validationRule  TEXT    ,
+    created INTEGER NOT NULL DEFAULT (strftime('%s','now')) -- 时间戳格式
+);

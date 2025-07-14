@@ -1,0 +1,22 @@
+CREATE TABLE EPay (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    uid INTEGER NOT NULL REFERENCES User(id),
+    businessAddress TEXT NOT NULL,
+    businessScope  TEXT NOT NULL ,
+    bankCardNumber TEXT NOT NULL ,
+    createdTime INTEGER NOT NULL DEFAULT (strftime('%s','now')) -- 时间戳格式
+);
+
+selectMerchantEPayByUserIdNumber:
+SELECT *
+FROM EPay e
+JOIN User u ON u.id = e.uid
+WHERE u.idNumber = ?;
+
+insertEPay:
+INSERT INTO EPay (
+    uid,
+    businessAddress,
+    businessScope,
+    bankCardNumber
+) VALUES (?, ?, ?, ?);

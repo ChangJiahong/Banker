@@ -1,0 +1,13 @@
+CREATE TABLE BusinessFieldValue (
+ id           INTEGER  NOT NULL ,
+ uid          INTEGER  NOT NULL REFERENCES  User(id),
+ businessId  INTEGER  NOT NULL REFERENCES Business(id),
+ fieldId     INTEGER  NOT NULL REFERENCES BusinessField(id),
+ fieldValue  TEXT     NOT NULL ,
+ created      INTEGER,
+ PRIMARY KEY (uid,businessId,fieldId)
+);
+
+insertBusinessFieldValues:
+INSERT INTO BusinessFieldValue(id,uid,businessId,fieldId,fieldValue)
+VALUES (?,?,?,?,?);
