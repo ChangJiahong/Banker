@@ -39,7 +39,6 @@ class BusinessServiceImpl(
                 name = username,
                 idNumber = idNumber,
                 phone = phone,
-                address = "",
                 businessRelated = BusinessRelated.EPay
             )
             businessRepository.insertBusinessFieldValues(uid, businessId, fieldValues)

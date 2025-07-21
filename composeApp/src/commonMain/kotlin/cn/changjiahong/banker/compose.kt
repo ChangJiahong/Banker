@@ -5,7 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,10 +18,13 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -28,19 +34,77 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import banker.composeapp.generated.resources.Res
+import banker.composeapp.generated.resources.cancel
 import banker.composeapp.generated.resources.home
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+
+@Composable
+fun TipDialog(tipText: String, onDismissRequest: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = { Button(onClick = { onDismissRequest() }) { Text("确定") } },
+        title = { Text("提示") },
+        text = { Text(tipText) })
+}
+
+@Composable
+fun PopupDialog(
+    title: String = "",
+    modifier: Modifier = Modifier,
+    onDismissRequest: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    Dialog(
+        onDismissRequest = { },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Card(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // 左侧
+                    Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+
+                    }
+                    // 中间
+                    Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        Text(title)
+                    }
+                    // 右侧
+                    Box(Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
+
+                        IconButton({ onDismissRequest() }, modifier = Modifier) {
+                            Icon(
+                                painter = painterResource(Res.drawable.cancel),
+                                contentDescription = ""
+                            )
+                        }
+                    }
+
+                }
+                content()
+            }
+        }
+    }
+}
 
 
 @Preview
@@ -65,7 +129,7 @@ fun FoldersButton(text: String, icon: Painter, onClick: () -> Unit = {}) {
                 contentDescription = null,
                 modifier = Modifier.size(80.dp)
             )
-            Text(text, fontSize = 14.sp, modifier = Modifier.padding{paddingTop(5.dp)})
+            Text(text, fontSize = 14.sp, modifier = Modifier.padding { paddingTop(5.dp) })
         }
     }
 }
@@ -74,7 +138,7 @@ fun FoldersButton(text: String, icon: Painter, onClick: () -> Unit = {}) {
 @Composable
 fun InputView(
     modifier: Modifier = Modifier,
-    value: TextFieldValue ,
+    value: TextFieldValue,
     label: String = "",
     errorText: String = "",
     leadingIcon: Painter? = null,

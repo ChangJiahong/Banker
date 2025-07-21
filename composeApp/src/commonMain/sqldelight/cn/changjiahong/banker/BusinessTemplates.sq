@@ -1,0 +1,7 @@
+CREATE TABLE BusinessTemplates (
+    id INTEGER NOT NULL ,
+    businessId INTEGER NOT NULL REFERENCES Business(id),
+    templateId INTEGER NOT NULL REFERENCES DocTemplate(id),
+    created INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+    PRIMARY KEY (businessId,templateId)
+);

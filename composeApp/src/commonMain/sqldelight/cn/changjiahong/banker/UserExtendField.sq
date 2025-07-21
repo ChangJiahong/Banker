@@ -1,5 +1,6 @@
 CREATE TABLE UserExtendField (
     id INTEGER PRIMARY KEY NOT NULL ,
+    uid INTEGER REFERENCES User(id),
     fieldName  TEXT UNIQUE NOT NULL,
     fieldType  TEXT NOT NULL ,
     description     TEXT    NOT NULL ,

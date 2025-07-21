@@ -2,8 +2,7 @@ CREATE TABLE User (
     id INTEGER PRIMARY KEY NOT NULL ,
     name TEXT NOT NULL,                  -- 姓名
     idNumber  TEXT UNIQUE NOT NULL ,      -- 身份证号
-    phone TEXT UNIQUE,                   -- 手机号码
-    address TEXT,                        -- 居住地址
+    phone TEXT UNIQUE NOT NULL ,                   -- 手机号码
     businessRelated INTEGER NOT NULL DEFAULT 0,
     created INTEGER NOT NULL DEFAULT (strftime('%s','now')) -- 时间戳格式
 );
@@ -15,6 +14,13 @@ SELECT * FROM User;
 selectById:
 SELECT * FROM User WHERE id = ?;
 
+selectUserFieldsMapById:
+SELECT UEF.*, UEFV.*
+FROM UserExtendField UEF
+         INNER JOIN UserExtendFieldValue UEFV ON UEF.uid = UEFV.uid AND UEF.id = UEFV.fieldId
+WHERE UEF.uid = ?;
+
+
 lastInsertRowId:
 SELECT last_insert_rowid();
 
@@ -24,16 +30,14 @@ INSERT INTO User (
     name,
     idNumber,
     phone,
-    address,
     businessRelated
-) VALUES (?,?, ?, ?, ?,?);
+) VALUES (?,?, ?, ?,?);
 
 updateUser:
 UPDATE User SET
     name = ?,
     idNumber = ?,
     phone = ?,
-    address = ?,
     businessRelated = ?
 WHERE id = ?;
 

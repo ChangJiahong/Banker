@@ -5,7 +5,7 @@ CREATE TABLE BusinessField (
  fieldType       TEXT     NOT NULL ,
  description     TEXT     NOT NULL ,
  validationRule  TEXT          ,
- groupId INTEGER NOT NULL ,
+ groupId         INTEGER  NOT NULL REFERENCES FieldGroup(id),
  created         INTEGER  NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
@@ -20,7 +20,12 @@ SELECT groupId,
        validationRule,
        bf.created
 FROM BusinessField bf
-         LEFT JOIN Business b ON bf.businessId = b.id
          LEFT JOIN FieldGroup g ON g.id = groupId
-WHERE b.id = ?;
+WHERE bf.businessId = ?;
 -- GROUP BY groupId;
+
+selectBusinessFieldsMapById:
+SELECT BF.*, BFV.*
+FROM BusinessField BF
+         INNER JOIN BusinessFieldValue BFV ON BF.businessId = BFV.businessId AND BF.id = BFV.fieldId
+WHERE BFV.uid = ? AND BF.businessId = ?;

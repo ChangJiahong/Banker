@@ -1,6 +1,6 @@
 CREATE TABLE UserExtendFieldValue (
     id INTEGER NOT NULL ,
-    uid INTEGER REFERENCES User(id),
+    uid INTEGER NOT NULL REFERENCES User(id),
     fieldId     INTEGER  NOT NULL REFERENCES UserExtendField(id),
     fieldValue  TEXT  NOT NULL,
     created INTEGER NOT NULL DEFAULT (strftime('%s','now')), -- 时间戳格式

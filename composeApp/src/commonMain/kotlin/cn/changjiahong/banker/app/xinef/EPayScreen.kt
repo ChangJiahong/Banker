@@ -44,6 +44,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cn.changjiahong.banker.FoldersButton
 import cn.changjiahong.banker.InputView
+import cn.changjiahong.banker.PopupDialog
 import cn.changjiahong.banker.app.DirScreen
 import cn.changjiahong.banker.model.UserDO
 import kotlinx.datetime.Instant
@@ -245,52 +246,3 @@ fun formatInstantToYMD(instant: Instant): String {
 
     return "${localDateTime.year}年${localDateTime.monthNumber}月${localDateTime.dayOfMonth}日"
 }
-
-@Composable
-fun PopupDialog(
-    title: String = "",
-    modifier: Modifier = Modifier,
-    onDismissRequest: () -> Unit,
-    content: @Composable () -> Unit
-) {
-    Dialog(
-        onDismissRequest = { },
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        Card(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            Column {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    // 左侧
-                    Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-
-                    }
-                    // 中间
-                    Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        Text(title)
-                    }
-                    // 右侧
-                    Box(Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-
-                        IconButton({ onDismissRequest() }, modifier = Modifier) {
-                            Icon(
-                                painter = painterResource(Res.drawable.cancel),
-                                contentDescription = ""
-                            )
-                        }
-                    }
-
-                }
-                content()
-            }
-        }
-    }
-}
-

@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Factory
 
 sealed interface DirUiEvent : UiEvent {
-    class ClickBusiness(val index: Int) : DirUiEvent
+    class ClickBusiness(val item: Business) : DirUiEvent
 
 }
 
@@ -30,7 +30,7 @@ class DirScreenModel(val businessService: BusinessService) : MviScreenModel() {
 
         when (event) {
             is DirUiEvent.ClickBusiness -> {
-                GoDIREffect(RR.BUSINESS_HANDLER(businessList.value[event.index])).trigger()
+                GoDIREffect(RR.BUSINESS_HANDLER(event.item)).trigger()
             }
         }
     }

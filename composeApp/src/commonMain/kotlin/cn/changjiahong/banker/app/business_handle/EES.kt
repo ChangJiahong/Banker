@@ -1,6 +1,7 @@
 package cn.changjiahong.banker.app.business_handle
 
 import androidx.compose.runtime.Stable
+import cn.changjiahong.banker.DocTemplate
 import cn.changjiahong.banker.model.BusinessFields
 import cn.changjiahong.banker.model.UserDO
 import cn.changjiahong.banker.mvi.UiEffect
@@ -39,7 +40,7 @@ sealed interface BhUIEvent : UiEvent {
 
     data class SelectedClientele(val userDO: UserDO) : BhUIEvent
 
-    data class GoPreTemplate(val name: String) : BhUIEvent
+    data class GoPreTemplate(val businessId: Long,val template: DocTemplate,val userId: Long) : BhUIEvent
 
 }
 

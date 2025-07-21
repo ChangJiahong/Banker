@@ -11,9 +11,7 @@ import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.mvi.UiState
 import cn.changjiahong.banker.service.EPayService
 import cn.changjiahong.banker.service.UserService
-import cn.changjiahong.banker.uieffect.DIREffect
 import cn.changjiahong.banker.uieffect.GoDIREffect
-import cn.changjiahong.banker.uieffect.GoDIREvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -86,7 +84,6 @@ class EPayScreenModel(val userService: UserService, val ePayService: EPayService
                         "张三2",
                         "123213",
                         created = Clock.System.now(),
-                        address = "",
                         phone = "",
                         businessRelated = BusinessRelated.EPay
                     )
@@ -123,7 +120,7 @@ class EPayScreenModel(val userService: UserService, val ePayService: EPayService
             }
 
             is EPayUIEvent.GoPreTemplate ->{
-                GoDIREffect(RR.PDF_TEMPLATE).trigger()
+//                GoDIREffect(RR.TEMPLATE).trigger()
             }
 
             EPayUIEvent.SaveEPayDetail -> {

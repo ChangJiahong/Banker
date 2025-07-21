@@ -1,0 +1,15 @@
+CREATE TABLE TemplateField (
+    id INTEGER PRIMARY KEY NOT NULL ,
+    templateId INTEGER NOT NULL,
+    formFieldName TEXT UNIQUE NOT NULL,
+    sourceFieldName TEXT NOT NULL,
+    sourceFieldType TEXT NOT NULL,
+    created INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+
+
+selectTemplateFieldsById:
+SELECT *
+FROM TemplateField
+WHERE templateId = ?;

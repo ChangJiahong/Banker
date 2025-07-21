@@ -1,0 +1,14 @@
+CREATE TABLE DocTemplate (
+    id INTEGER PRIMARY KEY NOT NULL ,
+    templateName TEXT NOT NULL,
+    filePath TEXT NOT NULL,
+    fileType TEXT NOT NULL,
+    created INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+
+selectTemplatesByBusinessId:
+SELECT DT.*
+FROM DocTemplate DT
+LEFT JOIN BusinessTemplates BT ON DT.id = BT.templateId
+WHERE businessId = ?;

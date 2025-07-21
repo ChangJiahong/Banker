@@ -8,3 +8,7 @@ import kotlinx.coroutines.flow.map
 fun <T : Any> Flow<Query<T>>.list(): Flow<List<T>> = map {
     it.executeAsList()
 }
+
+fun <T : Any> Flow<Query<T>>.one(): Flow<T> = map {
+    it.executeAsOne()
+}

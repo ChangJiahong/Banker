@@ -34,7 +34,7 @@ object OptionsDirScreen : DirScreen {
         ) {
             itemsIndexed(businessList) { index, item ->
                 FoldersButton(item.businessName, painterResource(Res.drawable.dir)) {
-                    DirUiEvent.ClickBusiness(index).sendTo(dirScreenModel)
+                    DirUiEvent.ClickBusiness(item).sendTo(dirScreenModel)
                 }
             }
         }

@@ -24,4 +24,4 @@ fun QueryResult<Long>.ck() {
 }
 
 
-class ExecuteError : RuntimeException()
+class ExecuteError(msg: String="") : RuntimeException(msg)

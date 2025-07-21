@@ -2,13 +2,16 @@ package cn.changjiahong.banker.app.business_handle
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
-import cn.changjiahong.banker.app.xinef.EPayUIEvent
+import cn.changjiahong.banker.DocTemplate
+import cn.changjiahong.banker.app.RR
 import cn.changjiahong.banker.model.BusinessRelated
 import cn.changjiahong.banker.model.UserDO
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.service.BusinessService
+import cn.changjiahong.banker.service.TemplateService
 import cn.changjiahong.banker.service.UserService
+import cn.changjiahong.banker.uieffect.GoDIREffect
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -20,9 +23,13 @@ import org.koin.core.annotation.Factory
 class BusinessHandlerScreenModel(
     val business: Business,
     val userService: UserService, val businessService: BusinessService,
+    val templateService: TemplateService
 ) : MviScreenModel() {
     private val _clientelesData = MutableStateFlow<List<UserDO>>(listOf())
     val clientelesData = _clientelesData.asStateFlow()
+
+    private val _templatesData = MutableStateFlow<List<DocTemplate>>(listOf())
+    val templatesData = _templatesData.asStateFlow()
 
     private val _currentlySelected = MutableStateFlow<UserDO?>(null)
     val currentlySelected = _currentlySelected.asStateFlow()
@@ -57,13 +64,30 @@ class BusinessHandlerScreenModel(
             is BhUIEvent.SaveBhDetail -> {
                 saveBhDetail()
             }
+
+            is BhUIEvent.SelectedClientele -> {
+                _currentlySelected.value = event.userDO
+            }
+
+            is BhUIEvent.GoPreTemplate -> {
+                GoDIREffect(RR.TEMPLATE(event.businessId, event.template, event.userId)).trigger()
+            }
         }
     }
 
 
     init {
         loadClientele()
+        loadDocTemplates()
         loadBusinessTypeFields()
+    }
+
+    private fun loadDocTemplates() {
+        screenModelScope.launch {
+            templateService.getDocTempsByBusinessId(business.id).collect {
+                _templatesData.value = it
+            }
+        }
     }
 
 

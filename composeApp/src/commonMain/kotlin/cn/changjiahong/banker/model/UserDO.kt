@@ -7,7 +7,6 @@ public data class UserDO(
     public val name: String,
     public val idNumber: String,
     public val phone: String?,
-    public val address: String?,
     public val businessRelated: BusinessRelated,
     public val created: Instant
 )

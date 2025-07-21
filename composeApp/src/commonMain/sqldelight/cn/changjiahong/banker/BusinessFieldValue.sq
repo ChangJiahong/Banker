@@ -4,7 +4,7 @@ CREATE TABLE BusinessFieldValue (
  businessId  INTEGER  NOT NULL REFERENCES Business(id),
  fieldId     INTEGER  NOT NULL REFERENCES BusinessField(id),
  fieldValue  TEXT     NOT NULL ,
- created      INTEGER,
+ created INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
  PRIMARY KEY (uid,businessId,fieldId)
 );
 

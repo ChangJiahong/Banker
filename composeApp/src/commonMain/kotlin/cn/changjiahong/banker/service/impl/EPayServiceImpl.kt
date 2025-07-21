@@ -26,14 +26,13 @@ class EPayServiceImpl(
         bankerNum: String
     ): Flow<NoData> = flow {
         db.transaction {
-            userRepository.insertUser(
+            val uid = userRepository.insertUser(
                 name = username,
                 idNumber = idNum,
                 phone = phone,
-                address = "",
                 businessRelated = BusinessRelated.EPay
             )
-            val uid = userRepository.getLastUserId()
+//            val uid = userRepository.getLastUserId()
             ePayRepository.insertEPay(uid, bAddress, bScope, bankerNum)
         }
         emit(NoData)
