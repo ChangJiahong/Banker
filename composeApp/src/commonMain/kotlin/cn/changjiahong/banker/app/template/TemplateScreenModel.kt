@@ -8,6 +8,7 @@ import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.service.TemplateService
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.Factory
@@ -22,7 +23,7 @@ class TemplateScreenModel(
 
 
     private val _templateFillerData = MutableStateFlow<List<TemplateFillerItem>>(emptyList())
-    val templateFillerData = emptyList<TemplateField>()
+    val templateFillerData = _templateFillerData.asStateFlow()
 
 
     override fun handleEvent(event: UiEvent) {
@@ -39,7 +40,7 @@ class TemplateScreenModel(
                 it.printStackTrace()
                 println(it.message)
             }.collect {
-                println("----->>>>"+it)
+                _templateFillerData.value = it
             }
         }
     }

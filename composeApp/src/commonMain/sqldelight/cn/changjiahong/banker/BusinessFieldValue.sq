@@ -11,3 +11,8 @@ CREATE TABLE BusinessFieldValue (
 insertBusinessFieldValues:
 INSERT INTO BusinessFieldValue(id,uid,businessId,fieldId,fieldValue)
 VALUES (?,?,?,?,?);
+
+selectBusinessFieldValuesById:
+SELECT *
+FROM BusinessFieldValue
+WHERE uid = ? AND businessId = ?;

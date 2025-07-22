@@ -9,22 +9,24 @@ import com.itextpdf.kernel.pdf.PdfWriter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.File
+import java.net.URI
 
 actual object PdfTemplateProcessor {
 //    override val type = TemplateType.PDF
 
-    actual suspend fun fillTemplate(fieldMap: Map<String, String>): Flow<String> = flow {
+    actual suspend fun fillTemplate(fieldMap: Map<String, String>,fileUri: String): Flow<String> = flow {
         val pdfReader =
-            PdfReader(File("/Volumes/Ti600/Users/changjiahong/Documents/《个人征信业务授权书》_模版.pdf"))
+            PdfReader(File(URI(fileUri)))
         val writer = PdfWriter(File("/Volumes/Ti600/Users/changjiahong/Documents/111.pdf"))
         val pdfDoc = PdfDocument(pdfReader, writer)
         val form = PdfAcroForm.getAcroForm(pdfDoc, false)
         val result = mutableListOf<String>()
 
+        fieldMap.forEach {
+            form.getField(it.key).setValue(it.value)
+        }
 
-        form.getField("checkbox1").setValue("yes")
-        form.getField("id_type").setValue("身份证")
-        form.getField("id_num").setValue("341126199711066356")
+        form.getField("checkbox7").setValue("yes")
 
         form.flattenFields()
         pdfDoc.close()

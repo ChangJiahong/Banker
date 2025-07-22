@@ -24,4 +24,8 @@ class DocTemplateRepositoryImpl(db: BankerDb) : DocTemplateRepository {
 
         return templateFieldQueries.selectTemplateFieldsById(templateId).asFlow().list()
     }
+
+    override suspend fun findTemplateFieldsById2(templateId: Long): List<TemplateField> {
+        return templateFieldQueries.selectTemplateFieldsById(templateId).executeAsList()
+    }
 }

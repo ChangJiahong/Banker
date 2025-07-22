@@ -1,5 +1,6 @@
 package cn.changjiahong.banker.app.template
 
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -7,8 +8,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import banker.composeapp.generated.resources.Res
+import cn.changjiahong.banker.DocTemplate
 import cn.changjiahong.banker.model.TemplateFillerItem
+import cn.changjiahong.banker.pdfutils.PDFViewer
 import cn.changjiahong.banker.pdfutils.PdfTemplateProcessor
 
 @Composable
@@ -17,26 +22,40 @@ fun DOCTemplateView(templateFillerData: List<TemplateFillerItem>) {
 }
 
 @Composable
-fun PDFTemplateView(templateFillerData: List<TemplateFillerItem>) {
+fun PDFTemplateView(template: DocTemplate, templateFillerData: List<TemplateFillerItem>) {
     var tempPath by remember { mutableStateOf("") }
 
+    val fieldMap = mutableMapOf<String, String>()
 
-    LaunchedEffect(Unit){
-        PdfTemplateProcessor.fillTemplate(emptyMap()).collect {
+    templateFillerData.forEach {
+        fieldMap.put(it.fieldName, it.fieldValue)
+    }
+
+    LaunchedEffect(Unit) {
+
+        val filePath = if (template.filePath.startsWith("res:/")) {
+            Res.getUri(template.filePath.substringAfter("res:/"))
+        } else {
+            "file:${template.filePath}"
+        }
+
+
+
+        PdfTemplateProcessor.fillTemplate(fieldMap, filePath).collect {
             tempPath = it
         }
-        val tp =  Res.getUri("files/《个人征信业务授权书》_模版.pdf")
-        println(tp)
-        tempPath=tp
+//        val tp =  Res.getUri("files/001.pdf")
+//        println(tp)
+//        tempPath=tp
 
     }
 //
-    Text(tempPath)
+//    Text(tempPath)
 
-//        if (tempPath.isNotEmpty()) {
-//            PDFViewer(
-//                tempPath,
-//                modifier = Modifier.width(300.dp)
-//            )
-//        }
+    if (tempPath.isNotEmpty()) {
+        PDFViewer(
+            tempPath,
+            modifier = Modifier.width(300.dp)
+        )
+    }
 }

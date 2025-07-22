@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.LineHeightStyle
@@ -32,21 +34,14 @@ class TemplateScreen(val businessId: Long, val template: DocTemplate, val userId
 
         val templateScreenModel = koinScreenModel<TemplateScreenModel>(parameters = { parametersOf(businessId,template,userId) })
 
-        val fieldsMap = emptyMap<String, String>()
 
-        val businessFieldsMap = emptyMap<BusinessField, BusinessFieldValue>()
-        val userFieldsMap = emptyMap<UserExtendField, UserExtendFieldValue>()
-
-        val templateFields = emptyList<TemplateField>()
-
-
-        val templateFillerData: List<TemplateFillerItem> = listOf()
+        val templateFillerData by templateScreenModel.templateFillerData.collectAsState()
 
 
 
 
         when (template.fileType) {
-            PDF -> PDFTemplateView(templateFillerData)
+            PDF -> PDFTemplateView(template,templateFillerData)
             DOC -> DOCTemplateView(templateFillerData)
             else -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("未知的文件类型，尚不受支持。请联系管理员！！！")

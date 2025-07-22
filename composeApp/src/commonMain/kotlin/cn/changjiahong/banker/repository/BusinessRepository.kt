@@ -4,6 +4,7 @@ import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.BusinessField
 import cn.changjiahong.banker.BusinessFieldValue
 import cn.changjiahong.banker.model.BusinessFields
+import cn.changjiahong.banker.model.FieldValuePair
 import kotlinx.coroutines.flow.Flow
 
 interface BusinessRepository {
@@ -15,4 +16,10 @@ interface BusinessRepository {
         businessId: Long,
         userId: Long
     ): Flow<Map<BusinessField, BusinessFieldValue>>
+
+    suspend fun findFieldMapById(
+        businessId: Long,
+        userId: Long
+    ): Map<String,FieldValuePair>
+
 }

@@ -4,6 +4,7 @@ import cn.changjiahong.banker.User
 import cn.changjiahong.banker.UserExtendField
 import cn.changjiahong.banker.UserExtendFieldValue
 import cn.changjiahong.banker.model.BusinessRelated
+import cn.changjiahong.banker.model.FieldValuePair
 import cn.changjiahong.banker.model.UserDO
 import kotlinx.coroutines.flow.Flow
 
@@ -25,4 +26,6 @@ interface UserRepository {
 
 
    suspend fun findUserFieldsMapById(userId: Long): Flow<Map<UserExtendField, UserExtendFieldValue>>
+
+   suspend fun findFieldMapById(userId: Long): Map<String,FieldValuePair>
 }

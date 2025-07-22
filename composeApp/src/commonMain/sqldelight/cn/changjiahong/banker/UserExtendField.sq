@@ -1,9 +1,14 @@
 CREATE TABLE UserExtendField (
     id INTEGER PRIMARY KEY NOT NULL ,
-    uid INTEGER REFERENCES User(id),
+    uid INTEGER NOT NULL REFERENCES User(id),
     fieldName  TEXT UNIQUE NOT NULL,
     fieldType  TEXT NOT NULL ,
     description     TEXT    NOT NULL ,
     validationRule  TEXT    ,
     created INTEGER NOT NULL DEFAULT (strftime('%s','now')) -- 时间戳格式
 );
+
+selectUserFieldsByUid:
+SELECT *
+FROM UserExtendField
+WHERE uid = ?;
