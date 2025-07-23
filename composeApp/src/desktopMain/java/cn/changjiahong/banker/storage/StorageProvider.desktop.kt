@@ -13,4 +13,12 @@ actual object StorageProvider {
             else -> "/"
         }
 
+    actual fun getTempFilePath(fileName: String): String {
+        val tempDir = File(Storage.tempDir)
+        if (!tempDir.exists()) {
+            tempDir.mkdirs()
+        }
+        return "${Storage.tempDir}/$fileName"
+    }
+
 }
