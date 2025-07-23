@@ -28,7 +28,7 @@ object MainScreen : Screen {
     override fun Content() = MainView()
 }
 
-private val navigationTabs = arrayOf(HomeScreen)
+private val navigationTabs = arrayOf(RR.HOME,RR.ABOUT)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

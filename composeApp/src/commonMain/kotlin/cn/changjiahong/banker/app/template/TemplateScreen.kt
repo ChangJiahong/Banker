@@ -38,11 +38,9 @@ class TemplateScreen(val businessId: Long, val template: DocTemplate, val userId
         val templateFillerData by templateScreenModel.templateFillerData.collectAsState()
 
 
-
-
         when (template.fileType) {
             PDF -> PDFTemplateView(template,templateFillerData)
-            DOC -> DOCTemplateView(templateFillerData)
+            DOC -> DOCTemplateView(template,templateFillerData)
             else -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("未知的文件类型，尚不受支持。请联系管理员！！！")
             }

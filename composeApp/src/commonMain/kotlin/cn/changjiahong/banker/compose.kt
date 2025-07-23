@@ -109,7 +109,7 @@ fun PopupDialog(
 
 @Preview
 @Composable
-fun FoldersButton(text: String, icon: Painter, onClick: () -> Unit = {}) {
+fun FoldersButton(text: String="", icon: Painter, onClick: () -> Unit = {}) {
     Box(
         modifier = Modifier.wrapContentHeight().width(150.dp)
             .clip(RoundedCornerShape(10.dp))
@@ -129,7 +129,9 @@ fun FoldersButton(text: String, icon: Painter, onClick: () -> Unit = {}) {
                 contentDescription = null,
                 modifier = Modifier.size(80.dp)
             )
-            Text(text, fontSize = 14.sp, modifier = Modifier.padding { paddingTop(5.dp) })
+            if (text.isNotEmpty()) {
+                Text(text, fontSize = 14.sp, modifier = Modifier.padding { paddingTop(5.dp) })
+            }
         }
     }
 }

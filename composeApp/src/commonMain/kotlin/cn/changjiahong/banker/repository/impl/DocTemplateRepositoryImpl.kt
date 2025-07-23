@@ -16,6 +16,10 @@ class DocTemplateRepositoryImpl(db: BankerDb) : DocTemplateRepository {
     val docTemplateQueries = db.docTemplateQueries
     val templateFieldQueries = db.templateFieldQueries
 
+    override suspend fun findAllDocTemps(): Flow<List<DocTemplate>> {
+        return docTemplateQueries.selectAllDocTemps().asFlow().list()
+    }
+
     override suspend fun findTemplatesByBusinessId(businessId: Long): Flow<List<DocTemplate>> {
         return docTemplateQueries.selectTemplatesByBusinessId(businessId).asFlow().list()
     }

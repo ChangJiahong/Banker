@@ -17,12 +17,18 @@ import cn.changjiahong.banker.pdfutils.PDFViewer
 import cn.changjiahong.banker.pdfutils.PdfTemplateProcessor
 
 @Composable
-fun DOCTemplateView(templateFillerData: List<TemplateFillerItem>) {
+fun DOCTemplateView(
+    template: DocTemplate,
+    templateFillerData: List<TemplateFillerItem> = emptyList()
+) {
 
 }
 
 @Composable
-fun PDFTemplateView(template: DocTemplate, templateFillerData: List<TemplateFillerItem>) {
+fun PDFTemplateView(
+    template: DocTemplate,
+    templateFillerData: List<TemplateFillerItem> = emptyList()
+) {
     var tempPath by remember { mutableStateOf("") }
 
     val fieldMap = mutableMapOf<String, String>()
@@ -40,9 +46,12 @@ fun PDFTemplateView(template: DocTemplate, templateFillerData: List<TemplateFill
         }
 
 
-
-        PdfTemplateProcessor.fillTemplate(fieldMap, filePath).collect {
-            tempPath = it
+        if (fieldMap.isEmpty()){
+            tempPath = filePath.substringAfter("file:")
+        }else {
+            PdfTemplateProcessor.fillTemplate(fieldMap, filePath).collect {
+                tempPath = it
+            }
         }
 //        val tp =  Res.getUri("files/001.pdf")
 //        println(tp)

@@ -25,6 +25,10 @@ class TemplateServiceImpl(
     val userRepository: UserRepository
 ) : TemplateService {
 
+    override suspend fun getAllDocTemps(): Flow<List<DocTemplate>> {
+        return docTemplateRepository.findAllDocTemps()
+    }
+
     override suspend fun getDocTempsByBusinessId(businessId: Long): Flow<List<DocTemplate>> {
         return docTemplateRepository.findTemplatesByBusinessId(businessId)
     }

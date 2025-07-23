@@ -9,5 +9,6 @@ interface DocTemplateRepository {
     suspend fun findTemplateFieldsById(templateId: Long): Flow<List<TemplateField>>
 
     suspend fun findTemplateFieldsById2(templateId: Long): List<TemplateField>
+    suspend fun findAllDocTemps(): Flow<List<DocTemplate>>
 
 }

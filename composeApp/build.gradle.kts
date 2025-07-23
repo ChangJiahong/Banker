@@ -65,6 +65,9 @@ kotlin {
 
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0") // 最新版
 
+            implementation("com.github.alorma.compose-settings:ui-tiles:2.10.0")
+            implementation("com.github.alorma.compose-settings:ui-tiles-extended:2.10.0")
+
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
             implementation(libs.koin.compose)

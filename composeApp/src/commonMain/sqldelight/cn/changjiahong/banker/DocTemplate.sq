@@ -6,6 +6,10 @@ CREATE TABLE DocTemplate (
     created INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
+selectAllDocTemps:
+SELECT *
+FROM DocTemplate;
+
 
 selectTemplatesByBusinessId:
 SELECT DT.*
