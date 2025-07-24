@@ -22,6 +22,12 @@ fun DOCTemplateView(
     templateFillerData: List<TemplateFillerItem> = emptyList()
 ) {
 
+    LaunchedEffect(Unit){
+        PdfTemplateProcessor.fillWordTemplate(mapOf(),"filePath").collect{
+//            tempPath = it
+            println("word")
+        }
+    }
 }
 
 @Composable

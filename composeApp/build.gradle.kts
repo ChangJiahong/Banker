@@ -88,6 +88,10 @@ kotlin {
             implementation("com.itextpdf:bouncy-castle-adapter:9.2.0")
             implementation("org.apache.pdfbox:pdfbox:3.0.5")
 
+            implementation("org.apache.poi:poi-ooxml:5.2.5")
+            implementation("com.deepoove:poi-tl:1.12.0")
+
+
             implementation("app.cash.sqldelight:sqlite-driver:2.1.0")
         }
     }
