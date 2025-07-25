@@ -2,6 +2,7 @@ CREATE TABLE BusinessField (
  id              INTEGER  PRIMARY KEY NOT NULL ,
  businessId      INTEGER  NOT NULL REFERENCES Business(id)      ,
  fieldName       TEXT     NOT NULL ,
+ toFormFieldName TEXT      ,
  fieldType       TEXT     NOT NULL ,
  description     TEXT     NOT NULL ,
  validationRule  TEXT          ,

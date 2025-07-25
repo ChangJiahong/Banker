@@ -39,6 +39,7 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
                         it.fieldId,
                         it.businessId,
                         it.fieldName,
+                        "",
                         it.fieldType,
                         it.description,
                         it.validationRule,
@@ -114,48 +115,5 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         }
 
         return businessFieldValueMap
-    }
-
-    override suspend fun findBusinessFieldsMapById(
-        businessId: Long,
-        userId: Long
-    ): Flow<Map<BusinessField, BusinessFieldValue>> {
-
-        return businessFieldQueries.selectBusinessFieldsMapById(
-            uid = userId,
-            businessId = businessId
-        ) { id, businessId, fieldName, fieldType, description, validationRule, groupId, isFixed, fixedValue, created,
-            BFVId, uid, businessId_, fieldId, fieldValue, created_ ->
-
-            val bf = BusinessField(
-                id,
-                businessId,
-                fieldName,
-                fieldType,
-                description,
-                validationRule,
-                groupId,
-                isFixed,
-                fixedValue,
-                created
-            )
-            val bfv: BusinessFieldValue
-            if (BFVId == null || uid == null || businessId_ == null || fieldId == null || fieldValue == null || created_ == null) {
-                if (bf.isFixed > 0 && bf.fixedValue != null) {
-                    bfv = BusinessFieldValue(0, userId, businessId, 0, fixedValue!!, 0)
-                } else {
-                    throw ExecuteError("业务信息不完整，请完善信息")
-                }
-            } else {
-                bfv = BusinessFieldValue(BFVId, uid, businessId_, fieldId, fieldValue, created_)
-            }
-            Pair(bf, bfv)
-        }.asFlow().list().map {
-            val map = mutableStateMapOf<BusinessField, BusinessFieldValue>()
-            it.forEach { (key, value) ->
-                map.put(key, value)
-            }
-            map
-        }
     }
 }

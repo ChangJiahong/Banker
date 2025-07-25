@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,11 +22,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -43,11 +47,43 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import banker.composeapp.generated.resources.Res
+import banker.composeapp.generated.resources.arrow_back
 import banker.composeapp.generated.resources.cancel
 import banker.composeapp.generated.resources.home
+import cn.changjiahong.banker.app.about.settings.business.BusinessGridView
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScaffoldWithTopBar(
+    title: String,
+    content: @Composable (PaddingValues) -> Unit
+){
+    val globalNavigator =
+        GlobalNavigator.current
+    Scaffold(
+        topBar = {
+            TopAppBar({
+                Text(title)
+            }, navigationIcon = {
+                IconButton(onClick = {
+                    globalNavigator.pop()
+                }, modifier = Modifier) {
+                    Icon(
+                        painter = painterResource(Res.drawable.arrow_back),
+                        contentDescription = "arrow back"
+                    )
+                }
+            })
+        }
+    ) { paddingValues ->
+        content(paddingValues)
+    }
+}
+
 
 @Composable
 fun TipDialog(tipText: String, onDismissRequest: () -> Unit) {

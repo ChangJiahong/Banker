@@ -1,4 +1,4 @@
-package cn.changjiahong.banker.app.template
+package cn.changjiahong.banker.app.about.settings.template
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.DocTemplate

@@ -17,7 +17,7 @@ fun main() = application {
     val screenHeight = screenSize.height
 
     // 设置窗口大小为屏幕一半（转换为 dp）
-    val windowWidthDp = (screenWidth /2).dp
+    val windowWidthDp = (screenWidth /1.5).dp
     val windowHeightDp = (screenHeight*0.8).dp
 
     val windowState = rememberWindowState(

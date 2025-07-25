@@ -12,10 +12,6 @@ interface BusinessRepository {
     suspend fun findBusinessTypes(): Flow<List<Business>>
     suspend fun findFieldsByBusinessId(): Flow<BusinessFields>
     fun insertBusinessFieldValues(uid: Long, businessId: Long, fieldValues: Map<Long, String>)
-    suspend fun findBusinessFieldsMapById(
-        businessId: Long,
-        userId: Long
-    ): Flow<Map<BusinessField, BusinessFieldValue>>
 
     suspend fun findFieldMapById(
         businessId: Long,

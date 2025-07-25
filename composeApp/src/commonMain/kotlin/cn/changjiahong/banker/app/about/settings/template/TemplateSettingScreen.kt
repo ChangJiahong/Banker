@@ -1,11 +1,10 @@
-package cn.changjiahong.banker.app.template
+package cn.changjiahong.banker.app.about.settings.template
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -26,25 +25,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.add_box
 import banker.composeapp.generated.resources.arrow_back
-import banker.composeapp.generated.resources.dir
 import banker.composeapp.generated.resources.pdf
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.FoldersButton
 import cn.changjiahong.banker.GlobalNavigator
-import cn.changjiahong.banker.app.home.DirUiEvent
-import cn.changjiahong.banker.utils.padding
+import cn.changjiahong.banker.ScaffoldWithTopBar
 import org.jetbrains.compose.resources.painterResource
 
 object TemplateSettingScreen : Screen {
@@ -56,24 +49,7 @@ object TemplateSettingScreen : Screen {
 @Composable
 fun TemplateSettingScreen.TemplateSettingView(tempSettingScreenModel: TemplateSettingScreenModel = koinScreenModel()) {
 
-    val globalNavigator =
-        GlobalNavigator.current
-    Scaffold(
-        topBar = {
-            TopAppBar({
-                Text("模版文件维护")
-            }, navigationIcon = {
-                IconButton(onClick = {
-                    globalNavigator.pop()
-                }, modifier = Modifier) {
-                    Icon(
-                        painter = painterResource(Res.drawable.arrow_back),
-                        contentDescription = "arrow back"
-                    )
-                }
-            })
-        }
-    ) { paddingValues ->
+    ScaffoldWithTopBar("模版文件维护"){ paddingValues ->
         TempFileGridView(modifier = Modifier.padding(paddingValues), tempSettingScreenModel)
     }
 }

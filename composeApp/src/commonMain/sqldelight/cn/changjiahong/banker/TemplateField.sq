@@ -2,6 +2,7 @@ CREATE TABLE TemplateField (
     id INTEGER PRIMARY KEY NOT NULL ,
     templateId INTEGER NOT NULL,
     formFieldName TEXT UNIQUE NOT NULL,
+    formFieldType TEXT ,
     sourceFieldName TEXT NOT NULL,
     sourceFieldType TEXT NOT NULL,
     created INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))

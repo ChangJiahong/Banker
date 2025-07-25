@@ -17,6 +17,8 @@ class AboutScreenModel: MviScreenModel() {
     override fun handleEvent(event: UiEvent) {
         when(event){
             is AboutUiEvent.GoTemplateSetting -> GoEffect(RR.TEMPLATE_SETTING).trigger()
+
+            is AboutUiEvent.GoBusinessSetting -> GoEffect(RR.BUSINESS_SETTING).trigger()
         }
     }
 }

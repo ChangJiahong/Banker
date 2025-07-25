@@ -76,7 +76,7 @@ class TemplateServiceImpl(
 
         templateFields.forEach { tempField ->
 
-            if (fieldsMap.contains(tempField.sourceFieldName)) {
+            if (fieldsMap.contains(tempField.formFieldName)) {
                 tempFillerList.add(
                     TemplateFillerItem(
                         tempField.formFieldName,

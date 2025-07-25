@@ -77,7 +77,9 @@ fun AboutScreen.AboutView(aboutScreenModel: AboutScreenModel = koinScreenModel()
                     )
                 },
                 colors = SettingsTileDefaults.colors(containerColor = Color(0xfff8f3fb)),
-                onClick = { },
+                onClick = {
+                    AboutUiEvent.GoBusinessSetting.sendTo(aboutScreenModel)
+                },
             )
         }
 
