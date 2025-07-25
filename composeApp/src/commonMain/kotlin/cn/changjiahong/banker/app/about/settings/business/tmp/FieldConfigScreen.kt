@@ -3,7 +3,6 @@ package cn.changjiahong.banker.app.about.settings.business.tmp
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
@@ -25,9 +24,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cn.changjiahong.banker.Business
-import cn.changjiahong.banker.BusinessField
 import cn.changjiahong.banker.DocTemplate
 import cn.changjiahong.banker.ScaffoldWithTopBar
+import cn.changjiahong.banker.composable.BooleanFieldDropdown
 import cn.changjiahong.banker.composable.TextFieldDropdown
 import cn.changjiahong.banker.composable.TextFieldDropdownBox
 
@@ -63,20 +62,16 @@ fun FieldConfigView(modifier: Modifier) {
 
 
         Row {
-            val options = mapOf(
-                Pair("1", "1"),
-                Pair("2", "2"),
-                Pair("3", "3"),
-                Pair("4", "4"),
-                Pair("5", "5"),
+            val options = listOf("1","2","3"
             )
             val sl = remember { MutableList(4) { "" } }
 
-            var v1 by remember { mutableStateOf("") }
+            var v1 by remember { mutableStateOf("123") }
             var v2 by remember { mutableStateOf("") }
             var v3 by remember { mutableStateOf("") }
             var v4 by remember { mutableStateOf("") }
             var v5 by remember { mutableStateOf("") }
+            var v6 by remember { mutableStateOf(false) }
 
             var fieldName by remember { mutableStateOf("") }
             val toFormFieldName: String? = null
@@ -90,7 +85,8 @@ fun FieldConfigView(modifier: Modifier) {
 
 
             TextFieldDropdownBox(options) {
-//                TextFieldDropdown()
+                TextFieldDropdown(v1, onValueChange = {v1=it},"aa")
+                BooleanFieldDropdown(v6, onValueChange = {v6=it},"bb")
             }
 
 //            TextFieldDropdown(options, sl, inputText = fieldName, label = "字段名", modifier = Modifier.width(150.dp)){

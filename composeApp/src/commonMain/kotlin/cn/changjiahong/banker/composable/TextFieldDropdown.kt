@@ -22,23 +22,23 @@ import androidx.compose.ui.unit.dp
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-class TextFieldDropdownScope<T>(val options: Map<String, T>) {
-    val selected = mapOf<String, T>()
+class TextFieldDropdownScope(val options: List<String>) {
+    val selected = mutableMapOf<String, String>()
 
 }
 
 
-@Composable
-fun Tt() {
-    TextFieldDropdownBox(mapOf(Pair("", ""))) {
-//        TextFieldDropdown()
-    }
-}
+//@Composable
+//fun Tt() {
+////    TextFieldDropdownBox(mapOf(Pair("", ""))) {
+////        TextFieldDropdown()
+//    }
+//}
 
 @Composable
-fun <T> TextFieldDropdownBox(
-    options: Map<String, T>,
-    content: @Composable TextFieldDropdownScope<T>.() -> Unit
+fun TextFieldDropdownBox(
+    options: List<String>,
+    content: @Composable TextFieldDropdownScope.() -> Unit
 ) {
 
     val textFieldDropdownScope = TextFieldDropdownScope(options)
@@ -48,9 +48,9 @@ fun <T> TextFieldDropdownBox(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalUuidApi::class)
 @Composable
-inline fun <reified T> TextFieldDropdownScope<T>.TextFieldDropdown(
-    value: T,
-    crossinline onValueChange: (T) -> Unit,
+inline fun TextFieldDropdownScope.TextFieldDropdown(
+    value: String,
+    crossinline onValueChange: (String) -> Unit,
     label: String,
     enableEdit: Boolean = true,
     modifier: Modifier = Modifier
@@ -58,15 +58,9 @@ inline fun <reified T> TextFieldDropdownScope<T>.TextFieldDropdown(
     var expanded by remember { mutableStateOf(false) }
     val id by remember { mutableStateOf(Uuid.random().toHexString()) }
 
-    val vToStr: (T) -> String =
-        { v -> options.filterValues { it == v }.firstNotNullOfOrNull { it.key } ?: "" }
-    val strToV: (String) -> T? = { k -> options[k] }
-
-    var inputText by rememberSaveable { mutableStateOf(vToStr(value)) }
-
-    var allowEdit = enableEdit
-    if (T::class != String::class) {
-        allowEdit = false
+    val onValueChange: (String) -> Unit = {
+        selected[id] = it
+        onValueChange(it)
     }
 
     ExposedDropdownMenuBox(
@@ -74,22 +68,12 @@ inline fun <reified T> TextFieldDropdownScope<T>.TextFieldDropdown(
         onExpandedChange = { expanded = it },
         modifier = modifier
     ) {
-//        var inputText by remember {
-//            mutableStateOf(valueTransform(value))
-//        }
-
         OutlinedTextField(
-            value = inputText,
+            value = value,
             onValueChange = {
-                inputText = it
-                val vv = strToV(it)
-                if (vv != null) {
-                    onValueChange(vv)
-                } else if (T::class != String::class) {
-                    onValueChange(it as T)
-                }
+                onValueChange(it)
             },
-            readOnly = allowEdit,
+            readOnly = !enableEdit,
             label = { Text(label, style = MaterialTheme.typography.labelMedium) },
             shape = RoundedCornerShape(15.dp),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
@@ -101,13 +85,59 @@ inline fun <reified T> TextFieldDropdownScope<T>.TextFieldDropdown(
             onDismissRequest = { expanded = false }
         ) {
             options
-//                .filterNot { it in selected }
-//                .filter { it.contains(inputText, ignoreCase = true) }
+                .filterNot { selected.containsValue(it) }
+                .filter { it.contains(value, ignoreCase = true) }
                 .forEach { option ->
                     DropdownMenuItem(
-                        text = { Text(option.key) },
+                        text = { Text(option) },
                         onClick = {
-//                            onValueChange(option)
+                            onValueChange(option)
+                            expanded = false
+                        }
+                    )
+                }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalUuidApi::class)
+@Composable
+inline fun BooleanFieldDropdown(
+    value: Boolean,
+    crossinline onValueChange: (Boolean) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = modifier
+    ) {
+        OutlinedTextField(
+            value = if (value) "是" else "否",
+            onValueChange = {
+                onValueChange(it == "是")
+            },
+            readOnly = true,
+            label = { Text(label, style = MaterialTheme.typography.labelMedium) },
+            shape = RoundedCornerShape(15.dp),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true)
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            listOf("是", "否")
+                .forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            onValueChange(option == "是")
                             expanded = false
                         }
                     )
