@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -60,14 +61,28 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun ScaffoldWithTopBar(
     title: String,
+    iconPainter: Painter? = null,
+    iconDescription: String = "",
+    iconOnClick: () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
-){
+) {
     val globalNavigator =
         GlobalNavigator.current
     Scaffold(
         topBar = {
             TopAppBar({
-                Text(title)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(title)
+                    iconPainter?.run {
+                        IconButton(onClick = iconOnClick, modifier = Modifier) {
+                            Icon(
+                                painter = iconPainter,
+                                contentDescription = iconDescription
+                            )
+                        }
+                    }
+
+                }
             }, navigationIcon = {
                 IconButton(onClick = {
                     globalNavigator.pop()
@@ -145,7 +160,7 @@ fun PopupDialog(
 
 @Preview
 @Composable
-fun FoldersButton(text: String="", icon: Painter, onClick: () -> Unit = {}) {
+fun FoldersButton(text: String = "", icon: Painter, onClick: () -> Unit = {}) {
     Box(
         modifier = Modifier.wrapContentHeight().width(150.dp)
             .clip(RoundedCornerShape(10.dp))
@@ -236,6 +251,7 @@ fun InputView(
     value: String = "",
     label: String = "",
     errorText: String = "",
+    readOnly: Boolean = false,
     leadingIcon: Painter? = null,
     onValueChange: (String) -> Unit = {},
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
@@ -246,9 +262,11 @@ fun InputView(
         OutlinedTextField(
             value,
             onValueChange = onValueChange,
+            readOnly = readOnly,
             label = { Text(label, style = MaterialTheme.typography.labelMedium) },
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
+            textStyle = TextStyle.Default.copy(fontSize = 20.sp),
             visualTransformation = if (keyboardOptions.keyboardType == KeyboardType.Password)
                 PasswordVisualTransformation('*') else VisualTransformation.None,
             singleLine = true,

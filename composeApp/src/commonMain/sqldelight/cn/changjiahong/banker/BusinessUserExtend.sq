@@ -1,0 +1,3 @@
+CREATE TABLE BusinessUserExtend (
+    id INTEGER NOT NULL
+);

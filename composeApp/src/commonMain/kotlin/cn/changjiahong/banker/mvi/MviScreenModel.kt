@@ -8,7 +8,9 @@ import cn.changjiahong.banker.uieffect.GoDIREvent
 import cn.changjiahong.banker.uieffect.UiEffectDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 
@@ -64,5 +66,16 @@ abstract class MviScreenModel : ScreenModel, KoinComponent {
     open fun handleEffect(handle: UiEffectHandler) {
         val oldHandler = _handleEffect
         _handleEffect = { if (!handle(it)) oldHandler(it) }
+    }
+}
+
+inline fun <T> MutableStateFlow<List<T>>.replace(
+    index:Int,
+    transform: (T) -> T
+) {
+    this.update { list ->
+        list.toMutableList().apply {
+            this[index] = transform(this[index])
+        }
     }
 }

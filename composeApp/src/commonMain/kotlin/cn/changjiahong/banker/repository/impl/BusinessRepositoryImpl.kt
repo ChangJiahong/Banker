@@ -6,7 +6,9 @@ import cn.changjiahong.banker.BankerDb
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.BusinessField
 import cn.changjiahong.banker.BusinessFieldValue
+import cn.changjiahong.banker.BusinessFiledTemplateFiledMap
 import cn.changjiahong.banker.ExecuteError
+import cn.changjiahong.banker.model.BField
 import cn.changjiahong.banker.model.BusinessFieldGroup
 import cn.changjiahong.banker.model.BusinessFields
 import cn.changjiahong.banker.model.FieldValuePair
@@ -22,6 +24,7 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
     private val businessQueries = db.businessQueries
     private val businessFieldQueries = db.businessFieldQueries
     private val businessFieldValueQueries = db.businessFieldValueQueries
+    private val businessFiledTemplateFiledMapQueries = db.businessFiledTemplateFiledMapQueries
 
     override suspend fun findBusinessTypes(): Flow<List<Business>> {
         return businessQueries.selectAll().asFlow().list()
@@ -53,6 +56,10 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
 
             BusinessFields(fieldGroups)
         }
+    }
+
+    override fun findFieldsById(businessId: Long): Flow<List<BusinessField>> {
+        return businessFieldQueries.selectBusinessFieldsByBusinessId(businessId).asFlow().list()
     }
 
     override fun insertBusinessFieldValues(
@@ -115,5 +122,82 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         }
 
         return businessFieldValueMap
+    }
+
+
+    override fun insertBusinessFields(insertData: List<BField>) {
+
+    }
+
+    override fun updateBusinessFields(updateData: List<BField>) {
+        TODO("Not yet implemented")
+    }
+
+    override fun saveOrUpdateBusinessFields(fields: List<BusinessField>) {
+        fields.forEach { (id, businessId, fieldName, toFormFieldName, fieldType, description, validationRule, groupId, isFixed, fixedValue, created) ->
+            if (id < 0) {
+                businessFieldQueries.insert(
+                    getSnowId(),
+                    businessId,
+                    fieldName,
+                    fieldType,
+                    description,
+                    validationRule,
+                    groupId,
+                    isFixed
+                )
+            } else {
+                businessFieldQueries.update(
+                    businessId,
+                    fieldName,
+                    fieldType,
+                    description,
+                    validationRule,
+                    groupId,
+                    isFixed,
+                    id
+                )
+            }
+        }
+    }
+
+
+    override fun insertBusinessTemplateFieldMap(
+        businessFieldId: Long?,
+        tempFieldId: Long,
+        fixed: Boolean,
+        fixedValue: String?
+    ): Long {
+        val id = getSnowId()
+        businessFiledTemplateFiledMapQueries.insert(
+            id,
+            businessFieldId,
+            tempFieldId,
+            if (fixed) 1 else 0,
+            fixedValue
+        )
+
+        return id
+    }
+
+    override fun updateBusinessTemplateFieldMap(
+        id: Long,
+        businessFieldId: Long?,
+        tempFieldId: Long,
+        fixed: Boolean,
+        fixedValue: String?
+    ) {
+        businessFiledTemplateFiledMapQueries.update(
+            businessFieldId,
+            tempFieldId, if (fixed) 1 else 0,
+            fixedValue, id
+        )
+    }
+
+    override fun findFieldConfigMapByBidAndTid(
+        bId: Long,
+        tId: Long
+    ): Flow<List<BusinessFiledTemplateFiledMap>> {
+        return businessFiledTemplateFiledMapQueries.selectByBidAndTid(bId, tId).asFlow().list()
     }
 }

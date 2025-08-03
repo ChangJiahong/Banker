@@ -92,4 +92,7 @@ class TemplateServiceImpl(
         emit(tempFillerList)
     }
 
+    override suspend fun getFieldsByTemplateId(id: Long): Flow<List<TemplateField>> {
+        return docTemplateRepository.findTemplateFieldsById(id)
+    }
 }

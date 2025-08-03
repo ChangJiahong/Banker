@@ -15,30 +15,39 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.add_box
-import banker.composeapp.generated.resources.dir
+import banker.composeapp.generated.resources.home
 import banker.composeapp.generated.resources.pdf
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.FoldersButton
 import cn.changjiahong.banker.ScaffoldWithTopBar
-import cn.changjiahong.banker.app.about.settings.business.BusinessSettingsUiEvent
 import cn.changjiahong.banker.app.about.settings.template.RightClickMenu
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parameterArrayOf
 
-class BusinessTmpDetailScreen(val business: Business): Screen {
+class BusinessTmpDetailScreen(val business: Business) : Screen {
     @Composable
     override fun Content() {
-        ScaffoldWithTopBar("模版配置") { paddingValues ->
-            BusinessTmpDetailView(Modifier.padding(paddingValues))
+        val businessTmpDetailScreenModel =
+            koinScreenModel<BusinessTmpDetailScreenModel> { parameterArrayOf(business) }
+
+        ScaffoldWithTopBar("模版配置",
+            iconPainter = painterResource(Res.drawable.home),
+            iconOnClick = {
+            BusinessTmpDetailUiEvent.GoBusinessFieldConfigScreen(business)
+                .sendTo(businessTmpDetailScreenModel)
+        }) { paddingValues ->
+            BusinessTmpDetailView(Modifier.padding(paddingValues), businessTmpDetailScreenModel)
         }
     }
 }
 
 @Composable
-fun BusinessTmpDetailScreen.BusinessTmpDetailView(modifier: Modifier) {
-    val businessTmpDetailScreenModel = koinScreenModel<BusinessTmpDetailScreenModel> {  parameterArrayOf(business) }
+fun BusinessTmpDetailScreen.BusinessTmpDetailView(
+    modifier: Modifier,
+    businessTmpDetailScreenModel: BusinessTmpDetailScreenModel
+) {
 
     val tmpDetails by businessTmpDetailScreenModel.tmpDetails.collectAsState()
     LazyVerticalGrid(
@@ -61,7 +70,8 @@ fun BusinessTmpDetailScreen.BusinessTmpDetailView(modifier: Modifier) {
                 })
             }) {
                 FoldersButton(item.templateName, painterResource(Res.drawable.pdf)) {
-                    BusinessTmpDetailUiEvent.GoFieldConfigScreen(business,item).sendTo(businessTmpDetailScreenModel)
+                    BusinessTmpDetailUiEvent.GoTempFieldConfigScreen(business, item)
+                        .sendTo(businessTmpDetailScreenModel)
 //                    BusinessSettingsUiEvent.GoBusinessTmpDetails(item).sendTo(businessTmpDetailScreenModel)
                 }
             }

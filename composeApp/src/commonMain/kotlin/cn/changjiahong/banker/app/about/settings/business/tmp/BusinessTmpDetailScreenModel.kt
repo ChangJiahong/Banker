@@ -14,7 +14,8 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Factory
 
 sealed interface BusinessTmpDetailUiEvent : UiEvent {
-    class GoFieldConfigScreen(val business: Business,val template: DocTemplate):UiEvent
+    class GoTempFieldConfigScreen(val business: Business, val template: DocTemplate):UiEvent
+    class GoBusinessFieldConfigScreen(val business: Business):UiEvent
 }
 
 @Factory
@@ -28,7 +29,8 @@ class BusinessTmpDetailScreenModel(val business: Business, val templateService: 
 
     override fun handleEvent(event: UiEvent) {
         when(event){
-            is BusinessTmpDetailUiEvent.GoFieldConfigScreen -> GoEffect(RR.FIELD_CONFIG(event.business,event.template)).trigger()
+            is BusinessTmpDetailUiEvent.GoTempFieldConfigScreen -> GoEffect(RR.FIELD_CONFIG(event.business,event.template)).trigger()
+            is BusinessTmpDetailUiEvent.GoBusinessFieldConfigScreen -> GoEffect(RR.BUSINESS_FIELD_CONFIG(event.business)).trigger()
         }
     }
 

@@ -12,6 +12,15 @@ CREATE TABLE BusinessField (
  created         INTEGER  NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
+insert:
+INSERT INTO BusinessField(id,businessId,fieldName,fieldType,description,validationRule,groupId,isFixed)
+VALUES (?,?,?,?,?,?,?,?) ;
+
+update:
+UPDATE BusinessField
+SET businessId=?, fieldName=?, fieldType=?, description=?, validationRule=?, groupId=?, isFixed=?, fixedValue='', toFormFieldName=''
+WHERE id=?;
+
 selectFieldsByBusinessId:
 SELECT groupId,
        g.groupName,
