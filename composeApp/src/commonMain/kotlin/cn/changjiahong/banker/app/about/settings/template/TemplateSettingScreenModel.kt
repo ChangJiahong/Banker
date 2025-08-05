@@ -14,6 +14,7 @@ import org.koin.core.annotation.Factory
 
 sealed interface TempSettingUiEvent : UiEvent {
     class GoPreTemplateScreen(val docTemplate: DocTemplate) : TempSettingUiEvent
+    class GoTempFiledSettingScreen(val docTemplate: DocTemplate) : TempSettingUiEvent
 }
 
 @Factory
@@ -26,6 +27,7 @@ class TemplateSettingScreenModel(val templateService: TemplateService) : MviScre
     override fun handleEvent(event: UiEvent) {
         when (event) {
             is TempSettingUiEvent.GoPreTemplateScreen -> GoEffect(RR.PRE_TEMPLATE(event.docTemplate)).trigger()
+            is TempSettingUiEvent.GoTempFiledSettingScreen -> GoEffect(RR.TEMP_FIELD_SETTING(event.docTemplate)).trigger()
         }
     }
 

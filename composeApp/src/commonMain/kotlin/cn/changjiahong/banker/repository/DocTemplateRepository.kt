@@ -10,5 +10,7 @@ interface DocTemplateRepository {
 
     suspend fun findTemplateFieldsById2(templateId: Long): List<TemplateField>
     suspend fun findAllDocTemps(): Flow<List<DocTemplate>>
+    fun insertNewTemplateField(templateId: Long,fieldName: String, fieldType: String): Long
+    fun updateTemplateFieldById(fieldName: String, fieldType: String, id: Long): Boolean
 
 }

@@ -14,3 +14,12 @@ selectTemplateFieldsById:
 SELECT *
 FROM TemplateField
 WHERE templateId = ?;
+
+insert:
+INSERT INTO TemplateField(id,templateId,formFieldName,formFieldType,sourceFieldName,sourceFieldType)
+VALUES (?,?,?,?,"","");
+
+update:
+UPDATE TemplateField SET formFieldName=?,formFieldType=?
+WHERE id=?;
+

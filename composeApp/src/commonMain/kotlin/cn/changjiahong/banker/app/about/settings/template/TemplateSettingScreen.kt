@@ -77,7 +77,7 @@ fun TempFileGridView(
                 DropdownMenuItem(text = {
                     Text("查看表单")
                 }, onClick = {
-                    println("菜单项2点击")
+                    TempSettingUiEvent.GoTempFiledSettingScreen(item).sendTo(tempSettingScreenModel)
                     it()
                 })
             }) {

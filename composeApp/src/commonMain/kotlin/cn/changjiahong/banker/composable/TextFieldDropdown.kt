@@ -156,119 +156,30 @@ inline fun <reified T> TextFieldDropdown(
 }
 
 
-//@Composable
-//fun TextFieldDropdownBox(
-//    options: List<String>,
-//    content: @Composable TextFieldDropdownScope.() -> Unit
-//) {
-//
-//    val textFieldDropdownScope = TextFieldDropdownScope(options)
-//
-//    textFieldDropdownScope.content()
-//}
-//
-//@OptIn(ExperimentalMaterial3Api::class, ExperimentalUuidApi::class)
-//@Composable
-//inline fun TextFieldDropdownScope.TextFieldDropdownItem(
-//    value: String,
-//    crossinline onValueChange: (String) -> Unit,
-//    label: String,
-//    enableEdit: Boolean = true,
-//    modifier: Modifier = Modifier
-//) {
-//    var expanded by remember { mutableStateOf(false) }
-//    val id by remember { mutableStateOf(Uuid.random().toHexString()) }
-//
-//    val onValueChange: (String) -> Unit = {
-//        selected[id] = it
-//        onValueChange(it)
-//    }
-//
-//    ExposedDropdownMenuBox(
-//        expanded = expanded,
-//        onExpandedChange = { expanded = it },
-//        modifier = modifier
-//    ) {
-//        OutlinedTextField(
-//            value = value,
-//            onValueChange = {
-//                onValueChange(it)
-//            },
-//            readOnly = !enableEdit,
-//            textStyle = TextStyle.Default.copy(fontSize = 20.sp),
-//            label = { Text(label, style = MaterialTheme.typography.labelMedium) },
-//            shape = RoundedCornerShape(15.dp),
-//            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-//            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-//            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true)
-//        )
-//        ExposedDropdownMenu(
-//            expanded = expanded,
-//            onDismissRequest = { expanded = false }
-//        ) {
-//            options
-//                .filterNot { selected.containsValue(it) && it != selected[id] }
-//                .filter { it.contains(value, ignoreCase = true) || !enableEdit  }
-//                .forEach { option ->
-//                    DropdownMenuItem(
-//                        text = { Text(option) },
-//                        onClick = {
-//                            onValueChange(option)
-//                            expanded = false
-//                        }
-//                    )
-//                }
-//        }
-//    }
-//}
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-inline fun TextFieldDropdown(
+fun TextFieldDropdown(
     options: List<String>,
-    value: String,
-    crossinline onValueChange: (String) -> Unit,
+    value: String?,
+    onValueChange: (String) -> Unit,
     label: String,
     enableEdit: Boolean = true,
+    errorText: String = "",
     modifier: Modifier = Modifier
 ) {
-    var expanded by remember { mutableStateOf(false) }
 
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
+    val scope = rememberDropdownScope(options.map { Option(it, it) })
+
+    TextFieldDropdown(
+        optionsScope = scope,
+        onValueSelected = { onValueChange(it ?: "") },
+        selectedValue = value,
+        label = label,
+        enableEdit = enableEdit,
+        errorText = errorText,
         modifier = modifier
-    ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = {
-                onValueChange(it)
-            },
-            readOnly = !enableEdit,
-            label = { Text(label, style = MaterialTheme.typography.labelMedium) },
-            shape = RoundedCornerShape(15.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true)
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            options
-                .filter { it.contains(value, ignoreCase = true) || !enableEdit }
-                .forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option) },
-                        onClick = {
-                            onValueChange(option)
-                            expanded = false
-                        }
-                    )
-                }
-        }
-    }
+    )
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalUuidApi::class)
 @Composable
