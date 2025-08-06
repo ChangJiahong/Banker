@@ -53,4 +53,8 @@ class DocTemplateRepositoryImpl(db: BankerDb) : DocTemplateRepository {
         val res = templateFieldQueries.update(fieldName, fieldType, id)
         return res.value > 0
     }
+
+    override suspend fun findTemplatesByFuzzyName(tempName: String): Flow<List<DocTemplate>> {
+        return docTemplateQueries.selectTemplatesByFuzzyName(tempName).asFlow().list()
+    }
 }

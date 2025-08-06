@@ -16,3 +16,8 @@ SELECT DT.*
 FROM DocTemplate DT
 LEFT JOIN BusinessTemplates BT ON DT.id = BT.templateId
 WHERE businessId = ?;
+
+selectTemplatesByFuzzyName:
+SELECT *
+FROM DocTemplate
+WHERE templateName LIKE '%' || ? || '%';

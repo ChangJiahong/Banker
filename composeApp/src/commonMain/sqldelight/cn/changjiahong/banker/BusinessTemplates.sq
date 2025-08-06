@@ -5,3 +5,12 @@ CREATE TABLE BusinessTemplates (
     created INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     PRIMARY KEY (businessId,templateId)
 );
+
+selectByBusinessAndTemplate:
+SELECT *
+FROM BusinessTemplates
+WHERE businessId=? AND templateId=?;
+
+insert:
+INSERT INTO BusinessTemplates(id,businessId,templateId)
+VALUES (?,?,?);

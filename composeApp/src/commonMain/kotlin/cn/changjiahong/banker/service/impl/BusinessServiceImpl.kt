@@ -76,7 +76,7 @@ class BusinessServiceImpl(
         emit(NoData)
     }
 
-    override fun saveBusinessTemplateFieldConfig(data: List<TBField>): Flow<NoData> =flow {
+    override fun saveBusinessTemplateFieldConfig(data: List<TBField>): Flow<NoData> = flow {
         db.transaction {
             data.forEach { tBField ->
                 if (tBField.id < 0) {
@@ -105,6 +105,19 @@ class BusinessServiceImpl(
         bId: Long,
         tId: Long
     ): Flow<List<BusinessFiledTemplateFiledMap>> {
-        return businessRepository.findFieldConfigMapByBidAndTid(bId,tId)
+        return businessRepository.findFieldConfigMapByBidAndTid(bId, tId)
+    }
+
+    override fun addTemplate(
+        businessId: Long,
+        templateId: Long
+    ): Flow<NoData> = flow {
+        businessRepository.insertTemplateIntoBusiness(businessId, templateId)
+        emit(NoData)
+    }
+
+    override fun addBusiness(name: String): Flow<NoData> = flow {
+        businessRepository.insertBusiness(name)
+        emit(NoData)
     }
 }

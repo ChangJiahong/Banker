@@ -124,4 +124,8 @@ class TemplateServiceImpl(
 
         emit(NoData)
     }
+
+    override suspend fun fuzzySearchByTempName(tempName: String): Flow<List<DocTemplate>> {
+        return docTemplateRepository.findTemplatesByFuzzyName(tempName)
+    }
 }

@@ -28,16 +28,25 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -55,6 +64,54 @@ import cn.changjiahong.banker.app.about.settings.business.BusinessGridView
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SimpleSearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSearch: (String) -> Unit,
+    // Customization options
+    placeholder: @Composable () -> Unit = { Text("Search") },
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    modifier: Modifier = Modifier
+) {
+    // Track expanded state of search bar
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
+    Box(
+        modifier
+            .semantics { isTraversalGroup = true }
+    ) {
+        SearchBar(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .semantics { traversalIndex = 0f },
+            inputField = {
+                // Customizable input field implementation
+                SearchBarDefaults.InputField(
+                    query = query,
+                    onQueryChange = onQueryChange,
+                    onSearch = {
+                        onSearch(query)
+                        expanded = false
+                    },
+                    expanded = expanded,
+                    onExpandedChange = {  },
+                    placeholder = placeholder,
+                    leadingIcon = leadingIcon,
+                    trailingIcon = trailingIcon
+                )
+            },
+            expanded = expanded,
+            onExpandedChange = {  },
+        ) {
+        }
+    }
+}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,6 +165,8 @@ fun TipDialog(tipText: String, onDismissRequest: () -> Unit) {
         title = { Text("提示") },
         text = { Text(tipText) })
 }
+
+
 
 @Composable
 fun PopupDialog(

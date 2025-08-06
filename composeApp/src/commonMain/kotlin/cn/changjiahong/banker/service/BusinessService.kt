@@ -36,5 +36,7 @@ interface BusinessService {
     fun saveBusinessTemplateFieldConfig(data: List<TBField>): Flow<NoData>
 
     fun getFieldConfigMapByBidAndTid(bId: Long, tId: Long): Flow<List<BusinessFiledTemplateFiledMap>>
+    fun addTemplate(businessId: Long, templateId: Long): Flow<NoData>
+    fun addBusiness(name: String): Flow<NoData>
 
 }

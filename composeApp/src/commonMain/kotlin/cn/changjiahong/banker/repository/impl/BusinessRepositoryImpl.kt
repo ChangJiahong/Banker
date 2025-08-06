@@ -8,6 +8,7 @@ import cn.changjiahong.banker.BusinessField
 import cn.changjiahong.banker.BusinessFieldValue
 import cn.changjiahong.banker.BusinessFiledTemplateFiledMap
 import cn.changjiahong.banker.ExecuteError
+import cn.changjiahong.banker.ck
 import cn.changjiahong.banker.model.BField
 import cn.changjiahong.banker.model.BusinessFieldGroup
 import cn.changjiahong.banker.model.BusinessFields
@@ -22,6 +23,7 @@ import org.koin.core.annotation.Factory
 @Factory
 class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
     private val businessQueries = db.businessQueries
+    private val businessTemplatesQueries = db.businessTemplatesQueries
     private val businessFieldQueries = db.businessFieldQueries
     private val businessFieldValueQueries = db.businessFieldValueQueries
     private val businessFiledTemplateFiledMapQueries = db.businessFiledTemplateFiledMapQueries
@@ -199,5 +201,27 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         tId: Long
     ): Flow<List<BusinessFiledTemplateFiledMap>> {
         return businessFiledTemplateFiledMapQueries.selectByBidAndTid(bId, tId).asFlow().list()
+    }
+
+    override suspend fun insertTemplateIntoBusiness(businessId: Long, templateId: Long): Long {
+
+        val re = businessTemplatesQueries.selectByBusinessAndTemplate(businessId, templateId)
+            .executeAsOneOrNull()
+        if (re != null) {
+            throw ExecuteError("已添加该模版，请勿重复添加")
+        }
+        val id = getSnowId()
+        businessTemplatesQueries.insert(id, businessId, templateId).ck()
+        return id
+    }
+
+    override suspend fun insertBusiness(name: String): Long {
+        val re = businessQueries.selectByName(name).executeAsOneOrNull()
+        if (re != null) {
+            throw ExecuteError("已有该业务名称，请勿重复添加")
+        }
+        val id = getSnowId()
+        businessQueries.insert(id, name).ck()
+        return id
     }
 }

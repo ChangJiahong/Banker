@@ -44,5 +44,7 @@ interface BusinessRepository {
     )
 
     fun findFieldConfigMapByBidAndTid(bId: Long, tId: Long): Flow<List<BusinessFiledTemplateFiledMap>>
+    suspend fun insertTemplateIntoBusiness(businessId: Long, templateId: Long):Long
+    suspend fun insertBusiness(name: String): Long
 
 }

@@ -7,4 +7,13 @@ CREATE TABLE Business (
 selectAll:
 SELECT * FROM Business;
 
+selectByName:
+SELECT * FROM Business
+WHERE businessName = ?;
+
+insert:
+INSERT INTO Business(id,businessName)
+VALUES (?,?);
+
+
 

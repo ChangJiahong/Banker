@@ -5,11 +5,17 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.uieffect.DIREffect
 import cn.changjiahong.banker.uieffect.GoDIREffect
 import cn.changjiahong.banker.uieffect.GoDIREvent
+import cn.changjiahong.banker.uieffect.GoEffect
+import cn.changjiahong.banker.uieffect.GoEvent
+import cn.changjiahong.banker.uieffect.ShowSnackbar
 import cn.changjiahong.banker.uieffect.UiEffectDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -32,6 +38,11 @@ abstract class MviScreenModel : ScreenModel, KoinComponent {
                     is GoDIREvent -> {
                         GoDIREffect(value.screen, value.isReplace).trigger()
                     }
+
+                    is GoEvent -> {
+                        GoEffect(value.screen, value.isReplace).trigger()
+                    }
+
                     else ->
                         handleEvent(value)
                 }
@@ -67,10 +78,20 @@ abstract class MviScreenModel : ScreenModel, KoinComponent {
         val oldHandler = _handleEffect
         _handleEffect = { if (!handle(it)) oldHandler(it) }
     }
+
+    suspend fun <T> Flow<T>.catchAndCollect(collector: FlowCollector<T>) {
+        catch {
+            snack(it.message ?: "")
+        }.collect(collector)
+    }
+
+    fun snack(text: String) {
+        ShowSnackbar(text).trigger()
+    }
 }
 
 inline fun <T> MutableStateFlow<List<T>>.replace(
-    index:Int,
+    index: Int,
     transform: (T) -> T
 ) {
     this.update { list ->
