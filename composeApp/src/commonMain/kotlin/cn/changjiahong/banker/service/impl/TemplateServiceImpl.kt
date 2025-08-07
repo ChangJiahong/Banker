@@ -110,12 +110,14 @@ class TemplateServiceImpl(
                     docTemplateRepository.insertNewTemplateField(
                         templateId,
                         tempField.fieldName!!,
+                        tempField.alias!!,
                         tempField.fieldType!!
                     )
                 } else {
                     docTemplateRepository.updateTemplateFieldById(
                         tempField.fieldName!!,
                         tempField.fieldType!!,
+                        tempField.alias!!,
                         tempField.id
                     )
                 }
@@ -133,8 +135,8 @@ class TemplateServiceImpl(
         path: String,
         templateName: String,
         fileType: String
-    ): Flow<NoData> =flow {
-        docTemplateRepository.insertNewTemplate(templateName,path,fileType)
+    ): Flow<NoData> = flow {
+        docTemplateRepository.insertNewTemplate(templateName, path, fileType)
         emit(NoData)
     }
 }

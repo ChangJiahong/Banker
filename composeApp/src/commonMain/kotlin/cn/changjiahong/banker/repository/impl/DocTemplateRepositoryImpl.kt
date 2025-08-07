@@ -38,19 +38,21 @@ class DocTemplateRepositoryImpl(db: BankerDb) : DocTemplateRepository {
     override fun insertNewTemplateField(
         templateId: Long,
         fieldName: String,
+        alias: String,
         fieldType: String
     ): Long {
         val id = getSnowId()
-        templateFieldQueries.insert(id, templateId, fieldName, fieldType).ck()
+        templateFieldQueries.insert(id, templateId, fieldName, fieldType,alias).ck()
         return id
     }
 
     override fun updateTemplateFieldById(
         fieldName: String,
         fieldType: String,
+        alias: String,
         id: Long
     ): Boolean {
-        val res = templateFieldQueries.update(fieldName, fieldType, id)
+        val res = templateFieldQueries.update(fieldName, fieldType, alias,id)
         return res.value > 0
     }
 

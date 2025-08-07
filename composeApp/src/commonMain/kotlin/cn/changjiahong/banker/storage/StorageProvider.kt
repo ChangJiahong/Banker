@@ -49,3 +49,5 @@ fun PlatformFile.containsFile(fileName: String): Boolean {
     if (!this.exists() || !this.isDirectory()) return false
     return PlatformFile(this, fileName).exists()
 }
+
+val String.platformFile get() = PlatformFile(this)

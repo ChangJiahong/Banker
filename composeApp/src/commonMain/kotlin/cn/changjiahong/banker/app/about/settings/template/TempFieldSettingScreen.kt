@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -41,7 +42,11 @@ import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.app.about.settings.business.tmp.BFieldConfigScreenUiEvent
 import cn.changjiahong.banker.app.about.settings.business.tmp.FieldConfigScreenUiEvent
 import cn.changjiahong.banker.composable.BooleanFieldDropdown
+import cn.changjiahong.banker.composable.Option
 import cn.changjiahong.banker.composable.TextFieldDropdown
+import cn.changjiahong.banker.composable.TextFieldDropdownScope
+import cn.changjiahong.banker.composable.rememberDropdownScope
+import cn.changjiahong.banker.model.FormField
 import cn.changjiahong.banker.model.TempField
 import cn.changjiahong.banker.model.TempFieldError
 import cn.changjiahong.banker.utils.padding
@@ -103,9 +108,15 @@ fun TempFieldSettingScreen.TempFieldView(
                         .verticalScroll(verticalScrollState)
                 ) {
                     Column(Modifier.fillMaxWidth().horizontalScroll(scrollState)) {
+
+                        val tempFormFields by tempFieldSettingScreenModel.tempFormFields.collectAsState()
+
+                        val scope =
+                            rememberDropdownScope(tempFormFields.map { Option(it.name, it) })
+
                         tempFieldConfigs.forEachIndexed { index, field ->
 
-                            FieldConfigItem(field, tempFieldConfigsError[index]) {
+                            FieldConfigItem(scope, field, tempFieldConfigsError[index]) {
                                 TFSUiEvent.UpdateTempFieldConfig(index, it)
                                     .sendTo(tempFieldSettingScreenModel)
                             }
@@ -128,6 +139,7 @@ fun TempFieldSettingScreen.TempFieldView(
 
 @Composable
 private fun FieldConfigItem(
+    scope: TextFieldDropdownScope<FormField>,
     tempField: TempField,
     tempFieldError: TempFieldError,
     updateTempField: (TempField) -> Unit
@@ -135,25 +147,37 @@ private fun FieldConfigItem(
     var item by remember(tempField) { mutableStateOf(tempField) }
     var error by remember(tempFieldError) { mutableStateOf(tempFieldError) }
 
+    var field by remember() { mutableStateOf<FormField?>(scope.options.find { it.label == item.fieldName }?.value) }
+
     Row {
-        InputView(
-            value = item.fieldName ?: "",
-            onValueChange = {
-                item = item.copy(fieldName = it)
+
+        TextFieldDropdown(
+            scope,
+            field,
+            {
+                field = it
+                item = item.copy(fieldName = it?.name)
+                if (item.fieldType == null) {
+                    item = item.copy(fieldType = it?.type)
+                }
+                if (item.alias == null) {
+                    item = item.copy(alias = it?.name)
+                }
                 updateTempField(item)
-            },
-            label = "字段名",
-            errorText = error.fieldName,
-            modifier = Modifier.width(150.dp)
+            }, "字段名",
+            enableEdit = false,
+            modifier = Modifier.width(200.dp)
                 .padding { paddingHorizontal(2.dp) }
         )
+
+
         TextFieldDropdown(
             value = item.fieldType ?: "",
             onValueChange = {
                 item = item.copy(fieldType = it)
                 updateTempField(item)
             },
-            options = listOf("TEXT", "IMAGE"),
+            options = listOf("TEXT","CHECK", "IMAGE"),
             enableEdit = false,
             label = "字段类型",
             errorText = error.fieldType,
@@ -161,6 +185,17 @@ private fun FieldConfigItem(
                 .padding { paddingHorizontal(2.dp) }
         )
 
+        InputView(
+            value = item.alias ?: "",
+            onValueChange = {
+                item = item.copy(alias = it)
+                updateTempField(item)
+            },
+            label = "别名",
+            errorText = error.alias,
+            modifier = Modifier.width(200.dp)
+                .padding { paddingHorizontal(2.dp) }
+        )
 
     }
 }

@@ -68,7 +68,7 @@ inline fun <reified T> TextFieldDropdown(
 
     val options = optionsScope.options
 
-    var inputText by remember {
+    var inputText by remember(selectedValue) {
         mutableStateOf(
             selectedValue?.let { sv ->
                 options.find { it.value == sv }?.label ?: ""

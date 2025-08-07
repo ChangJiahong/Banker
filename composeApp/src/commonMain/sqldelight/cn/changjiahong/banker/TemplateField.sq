@@ -1,7 +1,8 @@
 CREATE TABLE TemplateField (
     id INTEGER PRIMARY KEY NOT NULL ,
     templateId INTEGER NOT NULL,
-    formFieldName TEXT UNIQUE NOT NULL,
+    formFieldName TEXT NOT NULL,
+    alias TEXT NOT NULL ,
     formFieldType TEXT ,
     sourceFieldName TEXT NOT NULL,
     sourceFieldType TEXT NOT NULL,
@@ -16,10 +17,10 @@ FROM TemplateField
 WHERE templateId = ?;
 
 insert:
-INSERT INTO TemplateField(id,templateId,formFieldName,formFieldType,sourceFieldName,sourceFieldType)
-VALUES (?,?,?,?,"","");
+INSERT INTO TemplateField(id,templateId,formFieldName,formFieldType,alias,sourceFieldName,sourceFieldType)
+VALUES (?,?,?,?,?,"","");
 
 update:
-UPDATE TemplateField SET formFieldName=?,formFieldType=?
+UPDATE TemplateField SET formFieldName=?,formFieldType=?,alias=?
 WHERE id=?;
 
