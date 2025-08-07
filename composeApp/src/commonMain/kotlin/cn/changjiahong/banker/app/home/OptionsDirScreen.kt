@@ -33,7 +33,7 @@ object OptionsDirScreen : DirScreen {
             horizontalArrangement = Arrangement.Center, verticalArrangement = Arrangement.Center
         ) {
             itemsIndexed(businessList) { index, item ->
-                FoldersButton(item.businessName, painterResource(Res.drawable.dir)) {
+                FoldersButton(item.businessName) {
                     DirUiEvent.ClickBusiness(item).sendTo(dirScreenModel)
                 }
             }

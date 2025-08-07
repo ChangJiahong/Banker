@@ -4,7 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,6 +47,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.pointer.isSecondaryPressed
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
@@ -52,6 +57,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -59,12 +65,62 @@ import androidx.compose.ui.window.DialogProperties
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.arrow_back
 import banker.composeapp.generated.resources.cancel
+import banker.composeapp.generated.resources.dir
+import banker.composeapp.generated.resources.excel
 import banker.composeapp.generated.resources.home
+import banker.composeapp.generated.resources.pdf
+import banker.composeapp.generated.resources.unknown_file
+import banker.composeapp.generated.resources.word
 import cn.changjiahong.banker.app.about.settings.business.BusinessGridView
+import cn.changjiahong.banker.storage.FileType
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+
+@Composable
+fun RightClickMenu(
+    menu: @Composable ColumnScope.(close: () -> Unit) -> Unit,
+    content: @Composable BoxScope.() -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var offset by remember { mutableStateOf(DpOffset(0.dp, 0.dp)) }
+    Box(
+        modifier = Modifier
+            .wrapContentSize()
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        val mouseEvent = event.buttons
+
+                        if (mouseEvent.isSecondaryPressed) {
+                            val position = event.changes.first().position
+                            offset = DpOffset(position.x.toDp(), position.y.toDp())
+                            expanded = true
+                        }
+                    }
+                }
+            }) {
+
+
+        Box {
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                offset = offset
+            ) {
+                menu {
+                    expanded = false
+                }
+            }
+
+        }
+
+        content()
+    }
+
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,19 +155,18 @@ fun SimpleSearchBar(
                         expanded = false
                     },
                     expanded = expanded,
-                    onExpandedChange = {  },
+                    onExpandedChange = { },
                     placeholder = placeholder,
                     leadingIcon = leadingIcon,
                     trailingIcon = trailingIcon
                 )
             },
             expanded = expanded,
-            onExpandedChange = {  },
+            onExpandedChange = { },
         ) {
         }
     }
 }
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -167,7 +222,6 @@ fun TipDialog(tipText: String, onDismissRequest: () -> Unit) {
 }
 
 
-
 @Composable
 fun PopupDialog(
     title: String = "",
@@ -219,7 +273,12 @@ fun PopupDialog(
 
 @Preview
 @Composable
-fun FoldersButton(text: String = "", icon: Painter, onClick: () -> Unit = {}) {
+fun FoldersButton(
+    text: String = "",
+    fileType: String = FileType.DIR,
+    icon: Painter? = null,
+    onClick: () -> Unit = {}
+) {
     Box(
         modifier = Modifier.wrapContentHeight().width(150.dp)
             .clip(RoundedCornerShape(10.dp))
@@ -235,7 +294,15 @@ fun FoldersButton(text: String = "", icon: Painter, onClick: () -> Unit = {}) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = icon,
+                painter = icon ?: painterResource(
+                    when (FileType.getFileType(fileType)) {
+                        FileType.PDF -> Res.drawable.pdf
+                        FileType.DIR -> Res.drawable.dir
+                        FileType.DOC, FileType.DOCX -> Res.drawable.word
+                        FileType.XLS, FileType.XLSX -> Res.drawable.excel
+                        else -> Res.drawable.unknown_file
+                    }
+                ),
                 contentDescription = null,
                 modifier = Modifier.size(80.dp)
             )

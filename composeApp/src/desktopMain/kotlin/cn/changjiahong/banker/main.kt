@@ -7,6 +7,7 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import io.github.vinceglb.filekit.FileKit
 import org.koin.core.context.startKoin
 import java.awt.Toolkit
 
@@ -31,6 +32,9 @@ fun main() = application {
     startKoin {
         modules(appModules)
     }
+
+    FileKit.init(appId = "Banker")
+
     Window(
         onCloseRequest = ::exitApplication,
         title = "Banker",

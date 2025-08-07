@@ -28,6 +28,8 @@ class GoEvent(val screen: Screen, val isReplace: Boolean = false) : DefaultEvent
 
 class ShowSnackbar(val text: String) : DefaultEffect
 
+class ShowSnack(val text: String) : DefaultEvent
+
 
 @Composable
 fun NavigatorEffectRegister(globalNavigator: Navigator) {

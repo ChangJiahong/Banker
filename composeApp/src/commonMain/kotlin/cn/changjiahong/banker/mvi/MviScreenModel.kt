@@ -7,6 +7,7 @@ import cn.changjiahong.banker.uieffect.GoDIREffect
 import cn.changjiahong.banker.uieffect.GoDIREvent
 import cn.changjiahong.banker.uieffect.GoEffect
 import cn.changjiahong.banker.uieffect.GoEvent
+import cn.changjiahong.banker.uieffect.ShowSnack
 import cn.changjiahong.banker.uieffect.ShowSnackbar
 import cn.changjiahong.banker.uieffect.UiEffectDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +42,10 @@ abstract class MviScreenModel : ScreenModel, KoinComponent {
 
                     is GoEvent -> {
                         GoEffect(value.screen, value.isReplace).trigger()
+                    }
+
+                    is ShowSnack -> {
+                        snack(value.text)
                     }
 
                     else ->

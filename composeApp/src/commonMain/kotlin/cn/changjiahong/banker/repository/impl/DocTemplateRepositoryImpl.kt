@@ -57,4 +57,14 @@ class DocTemplateRepositoryImpl(db: BankerDb) : DocTemplateRepository {
     override suspend fun findTemplatesByFuzzyName(tempName: String): Flow<List<DocTemplate>> {
         return docTemplateQueries.selectTemplatesByFuzzyName(tempName).asFlow().list()
     }
+
+    override suspend fun insertNewTemplate(
+        templateName: String,
+        path: String,
+        fileType: String
+    ): Long {
+        val id = getSnowId()
+        docTemplateQueries.insert(id, templateName, path, fileType).ck()
+        return id
+    }
 }

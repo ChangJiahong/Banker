@@ -28,5 +28,6 @@ interface TemplateService {
     suspend fun getFieldsByTemplateId(id: Long): Flow<List<TemplateField>>
     fun saveOrUpdateFieldsConfig(templateId: Long,fieldConfigs: List<TempField>): Flow<NoData>
     suspend fun fuzzySearchByTempName(tempName: String): Flow<List<DocTemplate>>
+    suspend fun addNewTemplate(path: String, templateName: String, fileType: String): Flow<NoData>
 
 }

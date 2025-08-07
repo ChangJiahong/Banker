@@ -117,7 +117,7 @@ fun BusinessHandlerScreen.BusinessHandlerView(
                 verticalArrangement = Arrangement.Center,
             ) {
                 itemsIndexed(templates) { index, it ->
-                    FoldersButton(it.templateName, painterResource(Res.drawable.pdf)) {
+                    FoldersButton(it.templateName, fileType = it.fileType) {
                         if (currentlySelected == null) {
                             openErrorDialog = true
                             return@FoldersButton

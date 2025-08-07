@@ -21,3 +21,8 @@ selectTemplatesByFuzzyName:
 SELECT *
 FROM DocTemplate
 WHERE templateName LIKE '%' || ? || '%';
+
+
+insert:
+INSERT INTO DocTemplate(id,templateName,filePath,fileType)
+VALUES (?,?,?,?);

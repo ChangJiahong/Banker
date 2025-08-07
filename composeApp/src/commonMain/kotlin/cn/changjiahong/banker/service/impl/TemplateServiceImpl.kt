@@ -128,4 +128,13 @@ class TemplateServiceImpl(
     override suspend fun fuzzySearchByTempName(tempName: String): Flow<List<DocTemplate>> {
         return docTemplateRepository.findTemplatesByFuzzyName(tempName)
     }
+
+    override suspend fun addNewTemplate(
+        path: String,
+        templateName: String,
+        fileType: String
+    ): Flow<NoData> =flow {
+        docTemplateRepository.insertNewTemplate(templateName,path,fileType)
+        emit(NoData)
+    }
 }

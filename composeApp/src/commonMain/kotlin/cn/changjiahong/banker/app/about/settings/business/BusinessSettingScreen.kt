@@ -44,12 +44,12 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.FoldersButton
 import cn.changjiahong.banker.GlobalNavigator
+import cn.changjiahong.banker.RightClickMenu
 import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.SimpleSearchBar
 import cn.changjiahong.banker.app.about.settings.business.tmp.BusinessTmpDetailScreenModel
 import cn.changjiahong.banker.app.about.settings.business.tmp.BusinessTmpDetailUiEffect
 import cn.changjiahong.banker.app.about.settings.business.tmp.BusinessTmpDetailUiEvent
-import cn.changjiahong.banker.app.about.settings.template.RightClickMenu
 import cn.changjiahong.banker.app.about.settings.template.TempFileGridView
 import cn.changjiahong.banker.app.about.settings.template.TempSettingUiEvent
 import cn.changjiahong.banker.app.about.settings.template.TemplateSettingScreenModel
@@ -57,6 +57,7 @@ import cn.changjiahong.banker.composable.PopupDialog
 import cn.changjiahong.banker.composable.PopupDialogState
 import cn.changjiahong.banker.composable.RoundedInputField
 import cn.changjiahong.banker.composable.rememberPopupDialogState
+import cn.changjiahong.banker.storage.FileType
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
 
@@ -102,7 +103,7 @@ fun BusinessGridView(
                     it()
                 })
             }) {
-                FoldersButton(item.businessName, painterResource(Res.drawable.dir)) {
+                FoldersButton(item.businessName) {
                     BusinessSettingsUiEvent.GoBusinessTmpDetails(item)
                         .sendTo(businessSettingScreenModel)
                 }

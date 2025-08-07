@@ -3,13 +3,16 @@ package cn.changjiahong.banker.app.about.settings.template
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
@@ -32,12 +36,26 @@ import androidx.compose.ui.unit.dp
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.add_box
 import banker.composeapp.generated.resources.arrow_back
+import banker.composeapp.generated.resources.home
 import banker.composeapp.generated.resources.pdf
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.FoldersButton
-import cn.changjiahong.banker.GlobalNavigator
+import cn.changjiahong.banker.RightClickMenu
 import cn.changjiahong.banker.ScaffoldWithTopBar
+import cn.changjiahong.banker.composable.PopupDialog
+import cn.changjiahong.banker.composable.PopupDialogState
+import cn.changjiahong.banker.composable.RoundedInputField
+import cn.changjiahong.banker.composable.rememberPopupDialogState
+import cn.changjiahong.banker.storage.FileType
+import cn.changjiahong.banker.uieffect.ShowSnack
+import cn.changjiahong.banker.uieffect.ShowSnackbar
+import cn.changjiahong.banker.utils.padding
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.path
 import org.jetbrains.compose.resources.painterResource
 
 object TemplateSettingScreen : Screen {
@@ -49,7 +67,7 @@ object TemplateSettingScreen : Screen {
 @Composable
 fun TemplateSettingScreen.TemplateSettingView(tempSettingScreenModel: TemplateSettingScreenModel = koinScreenModel()) {
 
-    ScaffoldWithTopBar("模版文件维护"){ paddingValues ->
+    ScaffoldWithTopBar("模版文件维护") { paddingValues ->
         TempFileGridView(modifier = Modifier.padding(paddingValues), tempSettingScreenModel)
     }
 }
@@ -59,6 +77,8 @@ fun TempFileGridView(
     modifier: Modifier = Modifier,
     tempSettingScreenModel: TemplateSettingScreenModel
 ) {
+
+    val popupDialogState = rememberPopupDialogState()
 
     val tempFiles by tempSettingScreenModel.tempFiles.collectAsState()
     LazyVerticalGrid(
@@ -81,7 +101,7 @@ fun TempFileGridView(
                     it()
                 })
             }) {
-                FoldersButton(item.templateName, painterResource(Res.drawable.pdf)) {
+                FoldersButton(item.templateName, fileType = item.fileType) {
                     TempSettingUiEvent.GoPreTemplateScreen(item).sendTo(tempSettingScreenModel)
                 }
             }
@@ -89,53 +109,65 @@ fun TempFileGridView(
 
         item {
             FoldersButton(icon = painterResource(Res.drawable.add_box)) {
-
+                popupDialogState.show()
             }
         }
     }
+    AddDocTemplate(popupDialogState, tempSettingScreenModel)
 }
 
-
 @Composable
-fun RightClickMenu(
-    menu: @Composable ColumnScope.(close: () -> Unit) -> Unit,
-    content: @Composable BoxScope.() -> Unit
+fun AddDocTemplate(
+    popupDialogState: PopupDialogState,
+    tempSettingScreenModel: TemplateSettingScreenModel
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    var offset by remember { mutableStateOf(DpOffset(0.dp, 0.dp)) }
-    Box(
-        modifier = Modifier
-            .wrapContentSize()
-            .pointerInput(Unit) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        val mouseEvent = event.buttons
+    tempSettingScreenModel.handleEffect {
+        when(it){
+            is TempSettingUiEffect.AddTempSuccess ->{
+                popupDialogState.dismiss()
+                true
+            }
+            else -> false
+        }
+    }
+    PopupDialog(popupDialogState, title = "添加模版文件", modifier = Modifier.fillMaxWidth(0.6f)) {
+        var filePath by remember { mutableStateOf("") }
+        var selectFile by remember { mutableStateOf<PlatformFile?>(null) }
 
-                        if (mouseEvent.isSecondaryPressed) {
-                            val position = event.changes.first().position
-                            offset = DpOffset(position.x.toDp(), position.y.toDp())
-                            expanded = true
-                        }
+        val launcher = rememberFilePickerLauncher(type = FileKitType.File(FileType.SupportedType)) { file ->
+            // Handle the file
+            println(file?.path)
+            selectFile = file
+            filePath = file?.path ?: ""
+        }
+
+        Column(
+            Modifier.fillMaxWidth().padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            RoundedInputField(
+                filePath,
+                { filePath = it },
+                readOnly = true,
+                modifier = Modifier.padding { paddingBottom(10.dp) },
+                trailingIcon = {
+                    IconButton({
+                        launcher.launch()
+                    }) {
+                        Icon(painterResource(Res.drawable.home), contentDescription = "")
                     }
+                })
+
+            Button({
+                if (selectFile == null) {
+                    ShowSnack("请选择一个文件").sendTo(tempSettingScreenModel)
+                    return@Button
                 }
+                TempSettingUiEvent.AddDocTemplate(selectFile!!).sendTo(tempSettingScreenModel)
             }) {
-
-
-        Box {
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                offset = offset
-            ) {
-                menu {
-                    expanded = false
-                }
+                Text("添加")
             }
 
         }
-
-        content()
     }
-
 }

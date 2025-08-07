@@ -100,7 +100,7 @@ fun EPayScreen.XinEFuView(ePayScreenModel: EPayScreenModel = koinScreenModel()) 
 
         Box(modifier = Modifier.weight(1f).fillMaxHeight().background(Color(0xfffefbff))) {
 
-            FoldersButton("个人征信申请材料", painterResource(Res.drawable.pdf)) {
+            FoldersButton("个人征信申请材料") {
                 EPayUIEvent.GoPreTemplate("").sendTo(ePayScreenModel)
             }
 

@@ -13,5 +13,6 @@ interface DocTemplateRepository {
     fun insertNewTemplateField(templateId: Long, fieldName: String, fieldType: String): Long
     fun updateTemplateFieldById(fieldName: String, fieldType: String, id: Long): Boolean
     suspend fun findTemplatesByFuzzyName(tempName: String): Flow<List<DocTemplate>>
+    suspend fun insertNewTemplate(templateName: String, path: String, fileType: String): Long
 
 }

@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 fun RoundedInputField(
     value: String,
     onValueChange: (String) -> Unit,
+    readOnly: Boolean = false,
     imeAction: ImeAction = ImeAction.Search,
     onGo: (String) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -46,6 +47,7 @@ fun RoundedInputField(
         value = value,
         onValueChange = onValueChange,
         placeholder = { Text(hint) },
+        readOnly = readOnly,
         modifier = modifier.focusRequester(focusRequester),
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Color.Transparent,

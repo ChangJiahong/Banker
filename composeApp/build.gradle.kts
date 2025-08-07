@@ -68,6 +68,11 @@ kotlin {
             implementation("com.github.alorma.compose-settings:ui-tiles:2.10.0")
             implementation("com.github.alorma.compose-settings:ui-tiles-extended:2.10.0")
 
+            implementation("io.github.vinceglb:filekit-core:0.10.0")
+//            implementation("io.github.vinceglb:filekit-dialogs:0.10.0")
+            implementation("io.github.vinceglb:filekit-dialogs-compose:0.10.0")
+//            implementation("io.github.vinceglb:filekit-coil:0.10.0")
+
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
             implementation(libs.koin.compose)

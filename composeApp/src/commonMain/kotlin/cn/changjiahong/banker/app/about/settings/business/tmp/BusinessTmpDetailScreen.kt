@@ -48,9 +48,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.FoldersButton
+import cn.changjiahong.banker.RightClickMenu
 import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.SimpleSearchBar
-import cn.changjiahong.banker.app.about.settings.template.RightClickMenu
 import cn.changjiahong.banker.composable.PopupDialog
 import cn.changjiahong.banker.composable.PopupDialogState
 import cn.changjiahong.banker.composable.RoundedInputField
@@ -103,7 +103,7 @@ fun BusinessTmpDetailScreen.BusinessTmpDetailView(
                     it()
                 })
             }) {
-                FoldersButton(item.templateName, painterResource(Res.drawable.pdf)) {
+                FoldersButton(item.templateName, fileType = item.fileType) {
                     BusinessTmpDetailUiEvent.GoTempFieldConfigScreen(business, item)
                         .sendTo(businessTmpDetailScreenModel)
 //                    BusinessSettingsUiEvent.GoBusinessTmpDetails(item).sendTo(businessTmpDetailScreenModel)
