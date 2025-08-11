@@ -1,5 +1,6 @@
 package cn.changjiahong.banker.model
 
+@Deprecated("")
 class BusinessRelated(val flag: Long) {
 
     companion object {

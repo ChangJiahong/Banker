@@ -25,7 +25,23 @@ interface UserRepository {
     suspend fun findUserById(userId: Long): Flow<User>
 
 
-   suspend fun findUserFieldsMapById(userId: Long): Flow<Map<UserExtendField, UserExtendFieldValue>>
+    suspend fun findUserFieldsMapById(userId: Long): Flow<Map<UserExtendField, UserExtendFieldValue>>
 
-   suspend fun findFieldMapById(userId: Long): Map<String,FieldValuePair>
+    suspend fun findFieldMapById(userId: Long): Map<String, FieldValuePair>
+    fun insertUserExtendField(
+        fieldName: String,
+        description: String,
+        validationRule: String
+    ): Long
+
+    fun updateUserExtendFieldById(
+        fieldName: String,
+        description: String,
+        validationRule: String,
+        id: Long
+    )
+
+   suspend fun findUserExtendFields(): Flow<List<UserExtendField>>
+    fun findUserExtFields(): List<UserExtendField>
+
 }

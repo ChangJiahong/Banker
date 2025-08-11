@@ -1,14 +1,26 @@
 CREATE TABLE UserExtendField (
     id INTEGER PRIMARY KEY NOT NULL ,
-    uid INTEGER NOT NULL REFERENCES User(id),
+    uid INTEGER REFERENCES User(id),
     fieldName  TEXT UNIQUE NOT NULL,
-    fieldType  TEXT NOT NULL ,
+    fieldType  TEXT ,
     description     TEXT    NOT NULL ,
     validationRule  TEXT    ,
     created INTEGER NOT NULL DEFAULT (strftime('%s','now')) -- 时间戳格式
 );
 
+selectUserFields:
+SELECT *
+FROM UserExtendField;
+
 selectUserFieldsByUid:
 SELECT *
-FROM UserExtendField
-WHERE uid = ?;
+FROM UserExtendField;
+
+insert:
+INSERT INTO UserExtendField(id,fieldName,description,validationRule)
+VALUES (?,?,?,?);
+
+update:
+UPDATE UserExtendField
+SET fieldName=?,description=?,validationRule=?
+WHERE id=?;

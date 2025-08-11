@@ -51,13 +51,16 @@ class UserRepositoryImpl(db: BankerDb) : UserRepository {
 
     override suspend fun findFieldMapById(userId: Long): Map<String, FieldValuePair> {
         val userDetail = selectById(userId)
-        val userFields = userExtendFieldQueries.selectUserFieldsByUid(userId).executeAsList()
+        val userFields = userExtendFieldQueries.selectUserFieldsByUid().executeAsList()
         val userFieldValues =
             userExtendFieldValueQueries.selectUserFieldValuesByUid(userId).executeAsList()
         val fieldMap = mutableMapOf<String, FieldValuePair>()
         fieldMap.apply {
             put("user:phone", FieldValuePair(0, "phone", "TEXT", "手机号码", userDetail.phone))
-            put("user:idNumber", FieldValuePair(0, "idNumber", "TEXT", "身份证号码", userDetail.idNumber))
+            put(
+                "user:idNumber",
+                FieldValuePair(0, "idNumber", "TEXT", "身份证号码", userDetail.idNumber)
+            )
             put("user:name", FieldValuePair(0, "name", "TEXT", "姓名", userDetail.name))
 
             userFields.forEach { field ->
@@ -68,7 +71,7 @@ class UserRepositoryImpl(db: BankerDb) : UserRepository {
                         FieldValuePair(
                             field.id,
                             field.fieldName,
-                            field.fieldType,
+                            "field.fieldType",
                             field.description,
                             fv.fieldValue
                         )
@@ -100,6 +103,33 @@ class UserRepositoryImpl(db: BankerDb) : UserRepository {
             }
             map
         }
+    }
+
+    override fun insertUserExtendField(
+        fieldName: String,
+        description: String,
+        validationRule: String
+    ): Long {
+        val id = getSnowId()
+        userExtendFieldQueries.insert(id, fieldName, description, validationRule).ck()
+        return id
+    }
+
+    override fun updateUserExtendFieldById(
+        fieldName: String,
+        description: String,
+        validationRule: String,
+        id: Long
+    ) {
+        userExtendFieldQueries.update(fieldName, description, validationRule, id).ck()
+    }
+
+    override suspend fun findUserExtendFields(): Flow<List<UserExtendField>> {
+        return userExtendFieldQueries.selectUserFields().asFlow().list()
+    }
+
+    override fun findUserExtFields(): List<UserExtendField> {
+        return userExtendFieldQueries.selectUserFields().executeAsList()
     }
 
     private val map: (User) -> UserDO =

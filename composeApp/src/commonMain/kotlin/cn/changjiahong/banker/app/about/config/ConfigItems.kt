@@ -38,7 +38,7 @@ object UserFiledConfigItem : MenusConfig {
     override val menuIcon: DrawableResource
         get() = Res.drawable.home
     override val screen: Screen?
-        get() = null
+        get() = RR.USER_EXTEND_FIELD_SETTING()
 }
 
 object PwdConfigItem: MenusConfig{

@@ -6,12 +6,15 @@ import cn.changjiahong.banker.DocTemplate
 import cn.changjiahong.banker.composable.Option
 import cn.changjiahong.banker.model.TBField
 import cn.changjiahong.banker.model.TBFieldError
+import cn.changjiahong.banker.model.TUExtendField
+import cn.changjiahong.banker.model.TUExtendFieldError
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEffect
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.mvi.replace
 import cn.changjiahong.banker.service.BusinessService
 import cn.changjiahong.banker.service.TemplateService
+import cn.changjiahong.banker.service.UserService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -19,8 +22,10 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Factory
 
 sealed interface FieldConfigScreenUiEvent : UiEvent {
-    object AddFieldConfig : FieldConfigScreenUiEvent
+    object AddBFieldConfig : FieldConfigScreenUiEvent
+    object AddUFieldConfig : FieldConfigScreenUiEvent
     class UpdateBusinessFiled(val index: Int, val field: TBField) : FieldConfigScreenUiEvent
+    class UpdateUFiled(val index: Int, val field: TUExtendField) : FieldConfigScreenUiEvent
 
     object SaveConfig : UiEvent
 }
@@ -33,7 +38,8 @@ sealed interface FieldConfigScreenUiEffect : UiEffect {
 class FieldConfigScreenModel(
     val business: Business, val template: DocTemplate,
     val templateService: TemplateService,
-    val businessService: BusinessService
+    val businessService: BusinessService,
+    val userService: UserService,
 ) : MviScreenModel() {
 
     private val _templateOptions = MutableStateFlow<List<Option<Long>>>(emptyList())
@@ -44,29 +50,46 @@ class FieldConfigScreenModel(
 
     val businessOptions = _businessOptions.asStateFlow()
 
+    private val _userOptions = MutableStateFlow<List<Option<Long>>>(emptyList())
+
+    val userOptions = _userOptions.asStateFlow()
+
+    private val _tuFieldConfigs = MutableStateFlow<List<TUExtendField>>(emptyList())
+    private val _tuFieldConfigsError = MutableStateFlow<List<TUExtendFieldError>>(emptyList())
+
     private val _btFieldConfigs = MutableStateFlow<List<TBField>>(emptyList())
     private val _btFieldConfigsError = MutableStateFlow<List<TBFieldError>>(emptyList())
 
     val btFieldConfigs = _btFieldConfigs.asStateFlow()
     val btFieldConfigsError = _btFieldConfigsError.asStateFlow()
 
+    val tuFieldConfigs = _tuFieldConfigs.asStateFlow()
+    val tuFieldConfigsError = _tuFieldConfigsError.asStateFlow()
+
     override fun handleEvent(event: UiEvent) {
 
         when (event) {
-            is FieldConfigScreenUiEvent.AddFieldConfig -> {
+            is FieldConfigScreenUiEvent.AddBFieldConfig -> {
                 _btFieldConfigs.update { it + TBField() }
                 _btFieldConfigsError.update { it + TBFieldError() }
             }
 
+            is FieldConfigScreenUiEvent.AddUFieldConfig -> {
+                _tuFieldConfigs.update { it + TUExtendField() }
+                _tuFieldConfigsError.update { it + TUExtendFieldError() }
+            }
+
             is FieldConfigScreenUiEvent.UpdateBusinessFiled ->
                 _btFieldConfigs.replace(event.index) { event.field }
+
+            is FieldConfigScreenUiEvent.UpdateUFiled ->
+                _tuFieldConfigs.replace(event.index) { event.field }
 
             is FieldConfigScreenUiEvent.SaveConfig -> saveConfig()
         }
     }
 
     private fun saveConfig() {
-        println(btFieldConfigs.value)
         val btValue = btFieldConfigs.value
         val error = mutableListOf<TBFieldError>()
         var hasError = false
@@ -97,13 +120,24 @@ class FieldConfigScreenModel(
             businessService.saveBusinessTemplateFieldConfig(_btFieldConfigs.value).collect {
                 FieldConfigScreenUiEffect.SaveSuccess.trigger()
             }
+
+            userService.saveUserTempFieldConfig(_tuFieldConfigs.value)
         }
     }
 
     init {
         loadTemplateFields()
+        loadUserFields()
         loadBusinessFields()
         loadFieldMap()
+    }
+
+    private fun loadUserFields() {
+        screenModelScope.launch {
+            userService.getUserFields().collect { data ->
+                _businessOptions.value = data.map { Option(it.description, it.id) }
+            }
+        }
     }
 
     private fun loadFieldMap() {
@@ -115,7 +149,7 @@ class FieldConfigScreenModel(
                         it.fixedValue
                     )
                 }
-                _btFieldConfigsError.value = MutableList(data.size){ TBFieldError() }
+                _btFieldConfigsError.value = MutableList(data.size) { TBFieldError() }
 
             }
         }

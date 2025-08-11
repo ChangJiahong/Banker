@@ -1,7 +1,6 @@
 package cn.changjiahong.banker.app.about.settings.business.tmp
 
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,10 +46,8 @@ import cn.changjiahong.banker.GlobalNavigator
 import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.composable.BooleanFieldDropdown
-import cn.changjiahong.banker.composable.Option
 import cn.changjiahong.banker.composable.TextFieldDropdown
 import cn.changjiahong.banker.composable.rememberDropdownScope
-import cn.changjiahong.banker.model.BField
 import cn.changjiahong.banker.platform.HorizontalScrollbar
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
@@ -86,9 +83,13 @@ fun FieldConfigScreen.FieldConfigView(modifier: Modifier) {
 
         val templateOptions by fieldConfigScreenModel.templateOptions.collectAsState()
         val businessOptions by fieldConfigScreenModel.businessOptions.collectAsState()
+        val userOptions by fieldConfigScreenModel.userOptions.collectAsState()
 
         val btFieldConfigs by fieldConfigScreenModel.btFieldConfigs.collectAsState()
         val btFieldConfigsError by fieldConfigScreenModel.btFieldConfigsError.collectAsState()
+
+        val tuFieldConfigs by fieldConfigScreenModel.tuFieldConfigs.collectAsState()
+        val tuFieldConfigsError by fieldConfigScreenModel.tuFieldConfigsError.collectAsState()
 
         val tempFieldOptions =
             rememberDropdownScope(templateOptions)
@@ -99,14 +100,74 @@ fun FieldConfigScreen.FieldConfigView(modifier: Modifier) {
         val groups = remember { mutableStateListOf("") }
 
 
-        Text("基本信息", fontSize = 24.sp)
+        Row(Modifier.padding {
+            paddingVertical(5.dp)
+        }, verticalAlignment = Alignment.CenterVertically) {
+            Text("基本信息", fontSize = 24.sp)
+            IconButton({
+                FieldConfigScreenUiEvent.AddUFieldConfig.sendTo(fieldConfigScreenModel)
+            }) {
+                Icon(painter = painterResource(Res.drawable.home), contentDescription = "")
+            }
+        }
         HorizontalDivider()
+        Card(modifier = Modifier.padding {
+            paddingVertical(5.dp)
+        }) {
+            Column(
+                modifier = Modifier.padding(5.dp).heightIn(max = 300.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Column(Modifier.fillMaxWidth()) {
+                    tuFieldConfigs.forEachIndexed { index, field ->
+                        Row {
 
-        Row {
-            Text("fieldName")
-            Text("fieldType")
-            Text("description")
-            Text("validationRule")
+                            var item by remember(field) { mutableStateOf(field) }
+                            var itemError by remember(tuFieldConfigsError[index]) {
+                                mutableStateOf(
+                                    tuFieldConfigsError[index]
+                                )
+                            }
+
+                            val englishRegex = Regex("^$|^(?=.*[a-zA-Z])[a-zA-Z0-9]*$")
+
+                            TextFieldDropdown(
+                                tempFieldOptions,
+                                item.tempFieldId,
+                                onValueSelected = {
+                                    item = item.copy(tempFieldId = it)
+                                    FieldConfigScreenUiEvent.UpdateUFiled(
+                                        index,
+                                        item
+                                    ).sendTo(fieldConfigScreenModel)
+                                },
+                                "表单名",
+                                enableEdit = false,
+                                errorText = itemError.tempFieldId,
+                                modifier = Modifier.width(150.dp)
+                                    .padding { paddingHorizontal(2.dp) }
+                            )
+
+                            TextFieldDropdown(
+                                businessFieldOptions,
+                                item.userFieldId,
+                                onValueSelected = {
+                                    item = item.copy(userFieldId = it)
+                                    FieldConfigScreenUiEvent.UpdateUFiled(
+                                        index,
+                                        item
+                                    ).sendTo(fieldConfigScreenModel)
+                                },
+                                label = "字段名",
+                                errorText = itemError.userFieldId,
+                                modifier = Modifier.width(150.dp)
+                                    .padding { paddingHorizontal(2.dp) }
+                            )
+                        }
+
+                    }
+                }
+            }
         }
 
         Row(Modifier.padding {
@@ -114,7 +175,7 @@ fun FieldConfigScreen.FieldConfigView(modifier: Modifier) {
         }, verticalAlignment = Alignment.CenterVertically) {
             Text("业务信息", fontSize = 24.sp)
             IconButton({
-                FieldConfigScreenUiEvent.AddFieldConfig.sendTo(fieldConfigScreenModel)
+                FieldConfigScreenUiEvent.AddBFieldConfig.sendTo(fieldConfigScreenModel)
             }) {
                 Icon(painter = painterResource(Res.drawable.home), contentDescription = "")
             }
