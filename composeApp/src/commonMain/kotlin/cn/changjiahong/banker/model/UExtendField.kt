@@ -5,6 +5,7 @@ data class UExtendField(
     val fieldName: String = "",
     val description: String = "",
     val validationRule: String = "",
+    val forced: Boolean = false
 )
 data class UExtendFieldError(
     val fieldName: String = "",

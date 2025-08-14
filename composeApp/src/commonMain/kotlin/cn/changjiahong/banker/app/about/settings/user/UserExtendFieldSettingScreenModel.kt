@@ -99,7 +99,7 @@ class UserExtendFieldSettingScreenModel(val userService: UserService) : MviScree
                 _uFiledConfigs.value = it.map { field ->
                     field.run {
                         UExtendField(
-                            id, fieldName, description, validationRule ?: ""
+                            id, fieldName, description, validationRule ?: "",forced==1L
                         )
                     }
                 }

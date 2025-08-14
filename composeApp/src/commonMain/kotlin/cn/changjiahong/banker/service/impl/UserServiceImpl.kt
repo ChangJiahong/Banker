@@ -35,12 +35,14 @@ class UserServiceImpl(val db: BankerDb, val userRepository: UserRepository) : Us
                     userRepository.insertUserExtendField(
                         field.fieldName,
                         field.description,
+                        field.forced,
                         field.validationRule
                     )
                 } else {
                     userRepository.updateUserExtendFieldById(
                         field.fieldName,
                         field.description,
+                        field.forced,
                         field.validationRule,
                         field.id
                     )
@@ -61,11 +63,6 @@ class UserServiceImpl(val db: BankerDb, val userRepository: UserRepository) : Us
             userExtFields.forEach {
                 add(UserField(it.id, it.fieldName, it.description, it.validationRule ?: ""))
             }
-
-            add(UserField(1, "user:name", "客户姓名"))
-            add(UserField(2, "user:idNumber", "身份证号码"))
-            add(UserField(3, "user:phone", "手机号码"))
-
         }
 
 

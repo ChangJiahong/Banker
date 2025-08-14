@@ -95,6 +95,8 @@ fun FieldConfigScreen.FieldConfigView(modifier: Modifier) {
             rememberDropdownScope(templateOptions)
         val businessFieldOptions =
             rememberDropdownScope(businessOptions)
+        val userFieldOptions =
+            rememberDropdownScope(userOptions)
 
 
         val groups = remember { mutableStateListOf("") }
@@ -149,7 +151,7 @@ fun FieldConfigScreen.FieldConfigView(modifier: Modifier) {
                             )
 
                             TextFieldDropdown(
-                                businessFieldOptions,
+                                userFieldOptions,
                                 item.userFieldId,
                                 onValueSelected = {
                                     item = item.copy(userFieldId = it)

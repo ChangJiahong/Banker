@@ -89,9 +89,9 @@ class UserRepositoryImpl(db: BankerDb) : UserRepository {
     override suspend fun findUserFieldsMapById(userId: Long): Flow<Map<UserExtendField, UserExtendFieldValue>> {
 
         return userQueries.selectUserFieldsMapById(userId)
-        { id, uid, fieldName, fieldType, description, validationRule, created, UEFV_id, UEFV_uid, fieldId, fieldValue, created_ ->
+        { id, uid, fieldName, fieldType, forced,description, validationRule, created, UEFV_id, UEFV_uid, fieldId, fieldValue, created_ ->
             val uef =
-                UserExtendField(id, uid, fieldName, fieldType, description, validationRule, created)
+                UserExtendField(id, uid, fieldName, fieldType, forced,description, validationRule, created)
 
             val uefv = UserExtendFieldValue(UEFV_id, UEFV_uid, fieldId, fieldValue, created_)
 
@@ -108,20 +108,22 @@ class UserRepositoryImpl(db: BankerDb) : UserRepository {
     override fun insertUserExtendField(
         fieldName: String,
         description: String,
+        forced: Boolean,
         validationRule: String
     ): Long {
         val id = getSnowId()
-        userExtendFieldQueries.insert(id, fieldName, description, validationRule).ck()
+        userExtendFieldQueries.insert(id, fieldName, if (forced) 1 else 0,description, validationRule).ck()
         return id
     }
 
     override fun updateUserExtendFieldById(
         fieldName: String,
         description: String,
+        forced: Boolean,
         validationRule: String,
         id: Long
     ) {
-        userExtendFieldQueries.update(fieldName, description, validationRule, id).ck()
+        userExtendFieldQueries.update(fieldName, if (forced) 1 else 0,description, validationRule, id).ck()
     }
 
     override suspend fun findUserExtendFields(): Flow<List<UserExtendField>> {

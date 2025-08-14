@@ -31,6 +31,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.ScaffoldWithTopBar
+import cn.changjiahong.banker.composable.BooleanFieldDropdown
 import cn.changjiahong.banker.platform.HorizontalScrollbar
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
@@ -119,6 +120,18 @@ private fun UserExtendFieldSettingScreen.ExtendFieldSettingView(modifier: Modifi
                                 },
                                 label = "校验规则",
                                 errorText = error.validationRule,
+                                modifier = Modifier.width(160.dp)
+                                    .padding { paddingHorizontal(2.dp) }
+                            )
+
+                            BooleanFieldDropdown(
+                                value = item.forced,
+                                onValueChange = {
+                                    item = item.copy(forced = it)
+                                    UserExtendFieldSettingScreenUiEvent.UpdateBusinessFiled(index, item)
+                                        .sendTo(fieldConfigScreenModel)
+                                },
+                                label = "是否必输项",
                                 modifier = Modifier.width(160.dp)
                                     .padding { paddingHorizontal(2.dp) }
                             )

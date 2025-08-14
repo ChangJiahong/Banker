@@ -31,12 +31,14 @@ interface UserRepository {
     fun insertUserExtendField(
         fieldName: String,
         description: String,
+        forced: Boolean,
         validationRule: String
     ): Long
 
     fun updateUserExtendFieldById(
         fieldName: String,
         description: String,
+        forced: Boolean,
         validationRule: String,
         id: Long
     )

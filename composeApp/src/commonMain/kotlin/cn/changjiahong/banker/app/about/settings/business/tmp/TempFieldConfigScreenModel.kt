@@ -117,11 +117,12 @@ class FieldConfigScreenModel(
         }
 
         screenModelScope.launch {
-            businessService.saveBusinessTemplateFieldConfig(_btFieldConfigs.value).collect {
-                FieldConfigScreenUiEffect.SaveSuccess.trigger()
-            }
 
-            userService.saveUserTempFieldConfig(_tuFieldConfigs.value)
+            userService.saveUserTempFieldConfig(_tuFieldConfigs.value).catchAndCollect {
+                businessService.saveBusinessTemplateFieldConfig(_btFieldConfigs.value).catchAndCollect {
+                    FieldConfigScreenUiEffect.SaveSuccess.trigger()
+                }
+            }
         }
     }
 
@@ -135,7 +136,7 @@ class FieldConfigScreenModel(
     private fun loadUserFields() {
         screenModelScope.launch {
             userService.getUserFields().collect { data ->
-                _businessOptions.value = data.map { Option(it.description, it.id) }
+                _userOptions.value = data.map { Option(it.description, it.id) }
             }
         }
     }
