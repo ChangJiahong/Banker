@@ -2,7 +2,7 @@ package cn.changjiahong.banker.app.about.settings.business.tmp
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
-import cn.changjiahong.banker.DocTemplate
+import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.composable.Option
 import cn.changjiahong.banker.model.TBField
 import cn.changjiahong.banker.model.TBFieldError
@@ -36,7 +36,7 @@ sealed interface FieldConfigScreenUiEffect : UiEffect {
 
 @Factory
 class FieldConfigScreenModel(
-    val business: Business, val template: DocTemplate,
+    val business: Business, val template: Template,
     val templateService: TemplateService,
     val businessService: BusinessService,
     val userService: UserService,
@@ -118,7 +118,7 @@ class FieldConfigScreenModel(
 
         screenModelScope.launch {
 
-            userService.saveUserTempFieldConfig(_tuFieldConfigs.value).catchAndCollect {
+            userService.saveUserTempFieldConfig(business.id,_tuFieldConfigs.value).catchAndCollect {
                 businessService.saveBusinessTemplateFieldConfig(_btFieldConfigs.value).catchAndCollect {
                     FieldConfigScreenUiEffect.SaveSuccess.trigger()
                 }
@@ -152,6 +152,15 @@ class FieldConfigScreenModel(
                 }
                 _btFieldConfigsError.value = MutableList(data.size) { TBFieldError() }
 
+            }
+
+        }
+        screenModelScope.launch {
+            userService.getFieldConfigMapByTIdAndBId(template.id,business.id).collect { data->
+                _tuFieldConfigs.value = data.map {
+                    TUExtendField(it.id,it.tFieldId,it.uFieldId)
+                }
+                _tuFieldConfigsError.value = MutableList(data.size){ TUExtendFieldError() }
             }
         }
     }

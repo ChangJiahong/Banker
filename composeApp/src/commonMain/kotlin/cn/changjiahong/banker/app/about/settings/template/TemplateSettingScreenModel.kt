@@ -1,7 +1,7 @@
 package cn.changjiahong.banker.app.about.settings.template
 
 import cafe.adriel.voyager.core.model.screenModelScope
-import cn.changjiahong.banker.DocTemplate
+import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.app.RR
 import cn.changjiahong.banker.storage.FileType
 import cn.changjiahong.banker.mvi.MviScreenModel
@@ -11,27 +11,22 @@ import cn.changjiahong.banker.service.TemplateService
 import cn.changjiahong.banker.storage.Storage
 import cn.changjiahong.banker.storage.containsFile
 import cn.changjiahong.banker.uieffect.GoEffect
-import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
-import io.github.vinceglb.filekit.cacheDir
 import io.github.vinceglb.filekit.copyTo
-import io.github.vinceglb.filekit.databasesDir
 import io.github.vinceglb.filekit.exists
 import io.github.vinceglb.filekit.extension
-import io.github.vinceglb.filekit.filesDir
 import io.github.vinceglb.filekit.isDirectory
 import io.github.vinceglb.filekit.name
 import io.github.vinceglb.filekit.nameWithoutExtension
 import io.github.vinceglb.filekit.path
-import io.github.vinceglb.filekit.projectDir
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.Factory
 
 sealed interface TempSettingUiEvent : UiEvent {
-    class GoPreTemplateScreen(val docTemplate: DocTemplate) : TempSettingUiEvent
-    class GoTempFiledSettingScreen(val docTemplate: DocTemplate) : TempSettingUiEvent
+    class GoPreTemplateScreen(val template: Template) : TempSettingUiEvent
+    class GoTempFiledSettingScreen(val template: Template) : TempSettingUiEvent
 
     class AddDocTemplate(val file: PlatformFile) : TempSettingUiEvent
 
@@ -45,14 +40,14 @@ sealed interface TempSettingUiEffect : UiEffect {
 @Factory
 class TemplateSettingScreenModel(val templateService: TemplateService) : MviScreenModel() {
 
-    private val _tempFiles = MutableStateFlow<List<DocTemplate>>(emptyList())
+    private val _tempFiles = MutableStateFlow<List<Template>>(emptyList())
 
     val tempFiles = _tempFiles.asStateFlow()
 
     override fun handleEvent(event: UiEvent) {
         when (event) {
-            is TempSettingUiEvent.GoPreTemplateScreen -> GoEffect(RR.PRE_TEMPLATE(event.docTemplate)).trigger()
-            is TempSettingUiEvent.GoTempFiledSettingScreen -> GoEffect(RR.TEMP_FIELD_SETTING(event.docTemplate)).trigger()
+            is TempSettingUiEvent.GoPreTemplateScreen -> GoEffect(RR.PRE_TEMPLATE(event.template)).trigger()
+            is TempSettingUiEvent.GoTempFiledSettingScreen -> GoEffect(RR.TEMP_FIELD_SETTING(event.template)).trigger()
 
             is TempSettingUiEvent.AddDocTemplate -> addDocTemplate(event.file)
         }

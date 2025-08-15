@@ -1,8 +1,8 @@
 package cn.changjiahong.banker.app.business_handle
 
 import androidx.compose.runtime.Stable
-import cn.changjiahong.banker.DocTemplate
-import cn.changjiahong.banker.model.BusinessFields
+import cn.changjiahong.banker.BizField
+import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.model.UserDO
 import cn.changjiahong.banker.mvi.UiEffect
 import cn.changjiahong.banker.mvi.UiEvent
@@ -10,7 +10,7 @@ import cn.changjiahong.banker.mvi.UiState
 
 @Stable
 data class BhUiState(
-    val businessFields: BusinessFields = BusinessFields(),
+    val bizFields: List<BizField> = emptyList(),
 
     val fieldValues: Map<Long, String> = emptyMap(),
     val fieldErrorMsg: Map<String, String> = emptyMap(),
@@ -23,7 +23,7 @@ data class BhUiState(
     val idNumberError: String = "",
     val phoneError: String = "",
 
-) : UiState
+    ) : UiState
 
 sealed interface BhUIEvent : UiEvent {
     object AddClientele : BhUIEvent
@@ -40,7 +40,7 @@ sealed interface BhUIEvent : UiEvent {
 
     data class SelectedClientele(val userDO: UserDO) : BhUIEvent
 
-    data class GoPreTemplate(val businessId: Long,val template: DocTemplate,val userId: Long) : BhUIEvent
+    data class GoPreTemplate(val businessId: Long, val template: Template, val userId: Long) : BhUIEvent
 
 }
 

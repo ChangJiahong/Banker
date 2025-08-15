@@ -1,8 +1,9 @@
 package cn.changjiahong.banker.repository
 
 import cn.changjiahong.banker.User
-import cn.changjiahong.banker.UserExtendField
-import cn.changjiahong.banker.UserExtendFieldValue
+import cn.changjiahong.banker.BasicField
+import cn.changjiahong.banker.BasicFieldValue
+import cn.changjiahong.banker.RelBasicFieldTplField
 import cn.changjiahong.banker.model.BusinessRelated
 import cn.changjiahong.banker.model.FieldValuePair
 import cn.changjiahong.banker.model.UserDO
@@ -25,7 +26,7 @@ interface UserRepository {
     suspend fun findUserById(userId: Long): Flow<User>
 
 
-    suspend fun findUserFieldsMapById(userId: Long): Flow<Map<UserExtendField, UserExtendFieldValue>>
+    suspend fun findUserFieldsMapById(userId: Long): Flow<Map<BasicField, BasicFieldValue>>
 
     suspend fun findFieldMapById(userId: Long): Map<String, FieldValuePair>
     fun insertUserExtendField(
@@ -43,7 +44,11 @@ interface UserRepository {
         id: Long
     )
 
-   suspend fun findUserExtendFields(): Flow<List<UserExtendField>>
-    fun findUserExtFields(): List<UserExtendField>
+    suspend fun findUserExtendFields(): Flow<List<BasicField>>
+    fun findUserExtFields(): List<BasicField>
+    fun insertUserTempFieldMap(businessId: Long,tempFieldId: Long, userFieldId: Long): Long
+    fun updateUserTempFieldMap(id: Long, userFieldId: Long, tempFieldId: Long)
+    suspend fun findFieldConfigMapByTid(templateId: Long,businessId: Long): List<RelBasicFieldTplField>
+    suspend fun findUserFieldsByBusinessId(businessId: Long): Flow<List<BasicField>>
 
 }

@@ -1,66 +1,41 @@
 package cn.changjiahong.banker.repository.impl
 
-import androidx.compose.runtime.mutableStateMapOf
 import app.cash.sqldelight.coroutines.asFlow
 import cn.changjiahong.banker.BankerDb
 import cn.changjiahong.banker.Business
-import cn.changjiahong.banker.BusinessField
-import cn.changjiahong.banker.BusinessFieldValue
-import cn.changjiahong.banker.BusinessFiledTemplateFiledMap
+import cn.changjiahong.banker.BizField
+import cn.changjiahong.banker.RelBizFieldTplField
 import cn.changjiahong.banker.ExecuteError
 import cn.changjiahong.banker.ck
 import cn.changjiahong.banker.model.BField
-import cn.changjiahong.banker.model.BusinessFieldGroup
-import cn.changjiahong.banker.model.BusinessFields
 import cn.changjiahong.banker.model.FieldValuePair
 import cn.changjiahong.banker.repository.BusinessRepository
 import cn.changjiahong.banker.utils.getSnowId
 import cn.changjiahong.banker.utils.list
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Factory
 
 @Factory
 class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
     private val businessQueries = db.businessQueries
-    private val businessTemplatesQueries = db.businessTemplatesQueries
-    private val businessFieldQueries = db.businessFieldQueries
-    private val businessFieldValueQueries = db.businessFieldValueQueries
-    private val businessFiledTemplateFiledMapQueries = db.businessFiledTemplateFiledMapQueries
+    private val businessTemplatesQueries = db.relBizTplQueries
+    private val businessFieldQueries = db.bizFieldQueries
+    private val businessFieldValueQueries = db.bizFieldValueQueries
+    private val businessFiledTemplateFiledMapQueries = db.relBizFieldTplFieldQueries
 
     override suspend fun findBusinessTypes(): Flow<List<Business>> {
         return businessQueries.selectAll().asFlow().list()
     }
 
-    override suspend fun findFieldsByBusinessId(): Flow<BusinessFields> {
+    /**
+     * 获取业务属性，by BusinessId
+     */
+    override suspend fun findFieldsByBusinessId(businessId: Long): Flow<List<BizField>> {
 
-        return businessFieldQueries.selectFieldsByBusinessId(1L).asFlow().list().map { fields ->
-
-            val groupedFields = fields.groupBy { Pair(it.groupId, it.groupName ?: "") }
-
-            val fieldGroups = groupedFields.map { (key, value) ->
-                BusinessFieldGroup(key.first, key.second, value.map {
-                    BusinessField(
-                        it.fieldId,
-                        it.businessId,
-                        it.fieldName,
-                        "",
-                        it.fieldType,
-                        it.description,
-                        it.validationRule,
-                        it.groupId,
-                        it.isFixed,
-                        it.fixedValue,
-                        it.created
-                    )
-                })
-            }
-
-            BusinessFields(fieldGroups)
-        }
+        return businessFieldQueries.selectFieldsByBusinessId(businessId).asFlow().list()
     }
 
-    override fun findFieldsById(businessId: Long): Flow<List<BusinessField>> {
+    override fun findFieldsById(businessId: Long): Flow<List<BizField>> {
         return businessFieldQueries.selectBusinessFieldsByBusinessId(businessId).asFlow().list()
     }
 
@@ -135,7 +110,7 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         TODO("Not yet implemented")
     }
 
-    override fun saveOrUpdateBusinessFields(fields: List<BusinessField>) {
+    override fun saveOrUpdateBusinessFields(fields: List<BizField>) {
         fields.forEach { (id, businessId, fieldName, toFormFieldName, fieldType, description, validationRule, groupId, isFixed, fixedValue, created) ->
             if (id < 0) {
                 businessFieldQueries.insert(
@@ -199,7 +174,7 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
     override fun findFieldConfigMapByBidAndTid(
         bId: Long,
         tId: Long
-    ): Flow<List<BusinessFiledTemplateFiledMap>> {
+    ): Flow<List<RelBizFieldTplField>> {
         return businessFiledTemplateFiledMapQueries.selectByBidAndTid(bId, tId).asFlow().list()
     }
 

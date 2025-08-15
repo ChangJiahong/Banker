@@ -20,7 +20,9 @@ val GlobalNavigator: ProvidableCompositionLocal<Navigator> =
     staticCompositionLocalOf { error("GlobalNavigator not initialized") }
 
 val appModules: List<Module>
-    get() = listOf(AppKoin.module)
+    get() = listOf(
+        AppKoin.module
+    )
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable

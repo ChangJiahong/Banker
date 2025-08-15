@@ -41,7 +41,7 @@ import banker.composeapp.generated.resources.home
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.Business
-import cn.changjiahong.banker.DocTemplate
+import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.GlobalNavigator
 import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.ScaffoldWithTopBar
@@ -53,7 +53,7 @@ import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parametersOf
 
-class FieldConfigScreen(val business: Business, val template: DocTemplate) : Screen {
+class FieldConfigScreen(val business: Business, val template: Template) : Screen {
     @Composable
     override fun Content() {
         ScaffoldWithTopBar("字段配置") { pd ->

@@ -1,7 +1,0 @@
-CREATE TABLE UserFieldTempFieldMap (
- id              INTEGER  NOT NULL ,
- uFieldId        INTEGER  REFERENCES UserExtendField(id),
- tFieldId        INTEGER  NOT NULL REFERENCES TemplateField(id),
- created INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
- PRIMARY KEY (uFieldId,tFieldId)
-);

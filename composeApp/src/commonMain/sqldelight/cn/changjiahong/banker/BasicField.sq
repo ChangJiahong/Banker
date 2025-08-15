@@ -1,4 +1,4 @@
-CREATE TABLE UserExtendField (
+CREATE TABLE BasicField (
     id INTEGER PRIMARY KEY NOT NULL ,
     uid INTEGER REFERENCES User(id),
     fieldName  TEXT UNIQUE NOT NULL,
@@ -11,17 +11,24 @@ CREATE TABLE UserExtendField (
 
 selectUserFields:
 SELECT *
-FROM UserExtendField;
+FROM BasicField;
+
+
+findUserFieldsByBId:
+SELECT uf.*
+FROM BasicField uf
+LEFT JOIN RelBasicFieldTplField uft ON uft.uFieldId = uf.id
+WHERE uft.bId = ? OR forced = 1;
 
 selectUserFieldsByUid:
 SELECT *
-FROM UserExtendField;
+FROM BasicField;
 
 insert:
-INSERT INTO UserExtendField(id,fieldName,forced,description,validationRule)
+INSERT INTO BasicField(id,fieldName,forced,description,validationRule)
 VALUES (?,?,?,?,?);
 
 update:
-UPDATE UserExtendField
+UPDATE BasicField
 SET fieldName=?,forced=?,description=?,validationRule=?
 WHERE id=?;

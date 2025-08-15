@@ -15,11 +15,11 @@ import androidx.compose.ui.Modifier
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.arrow_back
 import cafe.adriel.voyager.core.screen.Screen
-import cn.changjiahong.banker.DocTemplate
+import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.GlobalNavigator
 import org.jetbrains.compose.resources.painterResource
 
-class PreTemplateScreen(val template: DocTemplate): Screen {
+class PreTemplateScreen(val template: Template): Screen {
     private val PDF = "PDF"
     private val DOC = "DOC"
     @OptIn(ExperimentalMaterial3Api::class)

@@ -1,7 +1,6 @@
 package cn.changjiahong.banker.app.template
 
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -11,14 +10,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import banker.composeapp.generated.resources.Res
-import cn.changjiahong.banker.DocTemplate
+import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.model.TemplateFillerItem
 import cn.changjiahong.banker.pdfutils.PDFViewer
 import cn.changjiahong.banker.pdfutils.PdfTemplateProcessor
 
 @Composable
 fun DOCTemplateView(
-    template: DocTemplate,
+    template: Template,
     templateFillerData: List<TemplateFillerItem> = emptyList()
 ) {
 
@@ -32,7 +31,7 @@ fun DOCTemplateView(
 
 @Composable
 fun PDFTemplateView(
-    template: DocTemplate,
+    template: Template,
     templateFillerData: List<TemplateFillerItem> = emptyList()
 ) {
     var tempPath by remember { mutableStateOf("") }

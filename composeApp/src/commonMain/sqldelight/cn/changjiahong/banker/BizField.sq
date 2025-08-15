@@ -1,4 +1,5 @@
-CREATE TABLE BusinessField (
+-- 业务属性
+CREATE TABLE BizField (
  id              INTEGER  PRIMARY KEY NOT NULL ,
  businessId      INTEGER  NOT NULL REFERENCES Business(id)      ,
  fieldName       TEXT     NOT NULL ,
@@ -13,39 +14,27 @@ CREATE TABLE BusinessField (
 );
 
 insert:
-INSERT INTO BusinessField(id,businessId,fieldName,fieldType,description,validationRule,groupId,isFixed)
+INSERT INTO BizField(id,businessId,fieldName,fieldType,description,validationRule,groupId,isFixed)
 VALUES (?,?,?,?,?,?,?,?) ;
 
 update:
-UPDATE BusinessField
+UPDATE BizField
 SET businessId=?, fieldName=?, fieldType=?, description=?, validationRule=?, groupId=?, isFixed=?, fixedValue='', toFormFieldName=''
 WHERE id=?;
 
 selectFieldsByBusinessId:
-SELECT groupId,
-       g.groupName,
-       bf.businessId,
-       bf.id fieldId,
-       fieldName,
-       fieldType,
-       description,
-       validationRule,
-       isFixed,
-       fixedValue,
-       bf.created
-FROM BusinessField bf
-         LEFT JOIN FieldGroup g ON g.id = groupId
+SELECT *
+FROM BizField bf
 WHERE bf.businessId = ?;
--- GROUP BY groupId;
 
 selectBusinessFieldsMapById:
 SELECT BF.*, BFV.*
-FROM BusinessField BF
-         LEFT JOIN BusinessFieldValue BFV ON BF.businessId = BFV.businessId AND BF.id = BFV.fieldId
+FROM BizField BF
+         LEFT JOIN BizFieldValue BFV ON BF.businessId = BFV.businessId AND BF.id = BFV.fieldId
 WHERE BFV.uid = ? AND BF.businessId = ?;
 
 
 selectBusinessFieldsByBusinessId:
 SELECT BF.*
-FROM BusinessField BF
+FROM BizField BF
 WHERE  BF.businessId = ?;

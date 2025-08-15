@@ -1,7 +1,7 @@
 package cn.changjiahong.banker.app
 
 import cn.changjiahong.banker.Business
-import cn.changjiahong.banker.DocTemplate
+import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.app.about.AboutScreen
 import cn.changjiahong.banker.app.about.settings.business.BusinessSettingScreen
 import cn.changjiahong.banker.app.about.settings.business.tmp.BusinessFieldConfigScreen
@@ -33,14 +33,14 @@ object RR {
 
     val TEMPLATE_SETTING = TemplateSettingScreen
 
-    val TEMP_FIELD_SETTING ={ t: DocTemplate -> TempFieldSettingScreen(t)}
+    val TEMP_FIELD_SETTING ={ t: Template -> TempFieldSettingScreen(t)}
 
     val BUSINESS_SETTING = BusinessSettingScreen
     val BUSINESS_TMP_DETAIL = { b: Business -> BusinessTmpDetailScreen(b) }
     val USER_EXTEND_FIELD_SETTING = { UserExtendFieldSettingScreen() }
 
-    val TEMPLATE = { bId: Long, t: DocTemplate, uId: Long -> TemplateScreen(bId, t, uId) }
-    val PRE_TEMPLATE = { t: DocTemplate -> PreTemplateScreen(t) }
-    val FIELD_CONFIG = { b:Business,t: DocTemplate -> FieldConfigScreen(b,t) }
+    val TEMPLATE = { bId: Long, t: Template, uId: Long -> TemplateScreen(bId, t, uId) }
+    val PRE_TEMPLATE = { t: Template -> PreTemplateScreen(t) }
+    val FIELD_CONFIG = { b:Business,t: Template -> FieldConfigScreen(b,t) }
     val BUSINESS_FIELD_CONFIG = { b:Business -> BusinessFieldConfigScreen(b) }
 }

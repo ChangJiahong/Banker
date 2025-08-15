@@ -1,8 +1,7 @@
 package cn.changjiahong.banker.app.template
 
 import cafe.adriel.voyager.core.model.screenModelScope
-import cn.changjiahong.banker.DocTemplate
-import cn.changjiahong.banker.TemplateField
+import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.model.TemplateFillerItem
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEvent
@@ -16,7 +15,7 @@ import org.koin.core.annotation.Factory
 @Factory
 class TemplateScreenModel(
     val businessId: Long,
-    val template: DocTemplate,
+    val template: Template,
     val userId: Long,
     val templateService: TemplateService
 ) : MviScreenModel() {

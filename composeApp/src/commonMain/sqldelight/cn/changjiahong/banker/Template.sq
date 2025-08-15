@@ -1,4 +1,4 @@
-CREATE TABLE DocTemplate (
+CREATE TABLE Template (
     id INTEGER PRIMARY KEY NOT NULL ,
     templateName TEXT NOT NULL,
     filePath TEXT NOT NULL,
@@ -8,21 +8,21 @@ CREATE TABLE DocTemplate (
 
 selectAllDocTemps:
 SELECT *
-FROM DocTemplate;
+FROM Template;
 
 
 selectTemplatesByBusinessId:
 SELECT DT.*
-FROM DocTemplate DT
-LEFT JOIN BusinessTemplates BT ON DT.id = BT.templateId
+FROM Template DT
+LEFT JOIN RelBizTpl BT ON DT.id = BT.templateId
 WHERE businessId = ?;
 
 selectTemplatesByFuzzyName:
 SELECT *
-FROM DocTemplate
+FROM Template
 WHERE templateName LIKE '%' || ? || '%';
 
 
 insert:
-INSERT INTO DocTemplate(id,templateName,filePath,fileType)
+INSERT INTO Template(id,templateName,filePath,fileType)
 VALUES (?,?,?,?);

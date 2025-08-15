@@ -1,4 +1,4 @@
-CREATE TABLE TemplateField (
+CREATE TABLE TplField (
     id INTEGER PRIMARY KEY NOT NULL ,
     templateId INTEGER NOT NULL,
     formFieldName TEXT NOT NULL,
@@ -13,14 +13,14 @@ CREATE TABLE TemplateField (
 
 selectTemplateFieldsById:
 SELECT *
-FROM TemplateField
+FROM TplField
 WHERE templateId = ?;
 
 insert:
-INSERT INTO TemplateField(id,templateId,formFieldName,formFieldType,alias,sourceFieldName,sourceFieldType)
+INSERT INTO TplField(id,templateId,formFieldName,formFieldType,alias,sourceFieldName,sourceFieldType)
 VALUES (?,?,?,?,?,"","");
 
 update:
-UPDATE TemplateField SET formFieldName=?,formFieldType=?,alias=?
+UPDATE TplField SET formFieldName=?,formFieldType=?,alias=?
 WHERE id=?;
 

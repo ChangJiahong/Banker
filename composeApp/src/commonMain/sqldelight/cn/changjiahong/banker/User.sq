@@ -16,8 +16,8 @@ SELECT * FROM User WHERE id = ?;
 
 selectUserFieldsMapById:
 SELECT UEF.*, UEFV.*
-FROM UserExtendField UEF
-         INNER JOIN UserExtendFieldValue UEFV ON UEF.uid = UEFV.uid AND UEF.id = UEFV.fieldId
+FROM BasicField UEF
+         INNER JOIN BasicFieldValue UEFV ON UEF.uid = UEFV.uid AND UEF.id = UEFV.fieldId
 WHERE UEF.uid = ?;
 
 

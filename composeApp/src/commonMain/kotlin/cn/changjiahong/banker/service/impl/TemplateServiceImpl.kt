@@ -1,40 +1,34 @@
 package cn.changjiahong.banker.service.impl
 
 import cn.changjiahong.banker.BankerDb
-import cn.changjiahong.banker.BusinessField
-import cn.changjiahong.banker.BusinessFieldValue
-import cn.changjiahong.banker.DocTemplate
+import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.ExecuteError
-import cn.changjiahong.banker.TemplateField
-import cn.changjiahong.banker.UserExtendField
-import cn.changjiahong.banker.UserExtendFieldValue
+import cn.changjiahong.banker.TplField
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.model.TempField
 import cn.changjiahong.banker.model.TemplateFillerItem
 import cn.changjiahong.banker.repository.BusinessRepository
-import cn.changjiahong.banker.repository.DocTemplateRepository
+import cn.changjiahong.banker.repository.TemplateRepository
 import cn.changjiahong.banker.repository.UserRepository
 import cn.changjiahong.banker.service.TemplateService
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.take
 import org.koin.core.annotation.Factory
 
 @Factory
 class TemplateServiceImpl(
     val db: BankerDb,
-    val docTemplateRepository: DocTemplateRepository,
+    val templateRepository: TemplateRepository,
     val businessRepository: BusinessRepository,
     val userRepository: UserRepository
 ) : TemplateService {
 
-    override suspend fun getAllDocTemps(): Flow<List<DocTemplate>> {
-        return docTemplateRepository.findAllDocTemps()
+    override suspend fun getAllDocTemps(): Flow<List<Template>> {
+        return templateRepository.findAllDocTemps()
     }
 
-    override suspend fun getDocTempsByBusinessId(businessId: Long): Flow<List<DocTemplate>> {
-        return docTemplateRepository.findTemplatesByBusinessId(businessId)
+    override suspend fun getDocTempsByBusinessId(businessId: Long): Flow<List<Template>> {
+        return templateRepository.findTemplatesByBusinessId(businessId)
     }
 
     override suspend fun checkTemplateFillerDataIsComplete(
@@ -50,7 +44,7 @@ class TemplateServiceImpl(
         val fieldsMap = businessFieldsMap + userFieldsMap
 
         val templateFields =
-            docTemplateRepository.findTemplateFieldsById2(templateId)
+            templateRepository.findTemplateFieldsById2(templateId)
 
         templateFields.forEach { tempField ->
             if (!fieldsMap.contains(tempField.sourceFieldName)) {
@@ -74,7 +68,7 @@ class TemplateServiceImpl(
         val fieldsMap = businessFieldsMap + userFieldsMap
 
         val templateFields =
-            docTemplateRepository.findTemplateFieldsById2(templateId)
+            templateRepository.findTemplateFieldsById2(templateId)
 
         val tempFillerList = mutableListOf<TemplateFillerItem>()
 
@@ -96,8 +90,8 @@ class TemplateServiceImpl(
         emit(tempFillerList)
     }
 
-    override suspend fun getFieldsByTemplateId(id: Long): Flow<List<TemplateField>> {
-        return docTemplateRepository.findTemplateFieldsById(id)
+    override suspend fun getFieldsByTemplateId(id: Long): Flow<List<TplField>> {
+        return templateRepository.findTemplateFieldsById(id)
     }
 
     override fun saveOrUpdateFieldsConfig(
@@ -107,14 +101,14 @@ class TemplateServiceImpl(
         db.transaction {
             fieldConfigs.forEach { tempField ->
                 if (tempField.id < 0) {
-                    docTemplateRepository.insertNewTemplateField(
+                    templateRepository.insertNewTemplateField(
                         templateId,
                         tempField.fieldName!!,
                         tempField.alias!!,
                         tempField.fieldType!!
                     )
                 } else {
-                    docTemplateRepository.updateTemplateFieldById(
+                    templateRepository.updateTemplateFieldById(
                         tempField.fieldName!!,
                         tempField.fieldType!!,
                         tempField.alias!!,
@@ -127,8 +121,8 @@ class TemplateServiceImpl(
         emit(NoData)
     }
 
-    override suspend fun fuzzySearchByTempName(tempName: String): Flow<List<DocTemplate>> {
-        return docTemplateRepository.findTemplatesByFuzzyName(tempName)
+    override suspend fun fuzzySearchByTempName(tempName: String): Flow<List<Template>> {
+        return templateRepository.findTemplatesByFuzzyName(tempName)
     }
 
     override suspend fun addNewTemplate(
@@ -136,7 +130,7 @@ class TemplateServiceImpl(
         templateName: String,
         fileType: String
     ): Flow<NoData> = flow {
-        docTemplateRepository.insertNewTemplate(templateName, path, fileType)
+        templateRepository.insertNewTemplate(templateName, path, fileType)
         emit(NoData)
     }
 }

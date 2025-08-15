@@ -173,91 +173,71 @@ fun AddClienteleDialog(
             ) {
                 val uiState by businessHandlerScreenModel.uiState.collectAsState()
 
+                val basicFields by businessHandlerScreenModel.basicFields.collectAsState()
+
                 var usernameFieldValue by remember { mutableStateOf(TextFieldValue(uiState.username)) }
+                basicFields.forEachIndexed { index, field ->
 
-                InputView(
-                    label = "姓名",
-                    value = usernameFieldValue.copy(uiState.username),
-                    modifier = Modifier.width(200.dp).padding(10.dp, 0.dp),
-                    onValueChange = { newValue ->
-                        usernameFieldValue = newValue
-                        BhUIEvent.EnterUsername(newValue.text).sendTo(businessHandlerScreenModel)
 
-                    },
-                    errorText = uiState.usernameError,
-                    leadingIcon = painterResource(Res.drawable.home)
-                )
+                    InputView(
+                        label = field.fieldName,
+                        value = usernameFieldValue.copy(uiState.username),
+                        modifier = Modifier.width(200.dp).padding(10.dp, 0.dp),
+                        onValueChange = { newValue ->
+                            usernameFieldValue = newValue
+                            BhUIEvent.EnterUsername(newValue.text)
+                                .sendTo(businessHandlerScreenModel)
 
-                var idNumFieldValue by remember { mutableStateOf(TextFieldValue(uiState.idNumber)) }
+                        },
+                        errorText = uiState.usernameError,
+                        leadingIcon = painterResource(Res.drawable.home)
+                    )
 
-                InputView(
-                    label = "身份证号码",
-                    value = idNumFieldValue.copy(uiState.idNumber),
-                    modifier = Modifier.width(300.dp).padding(10.dp, 0.dp),
-                    onValueChange = {
-                        idNumFieldValue = it
-                        BhUIEvent.EnterIdNum(it.text).sendTo(businessHandlerScreenModel)
-                    },
-                    errorText = uiState.idNumberError,
-                    leadingIcon = painterResource(Res.drawable.home)
-                )
-                var phoneFieldValue by remember { mutableStateOf(TextFieldValue(uiState.phone)) }
+                }
 
-                InputView(
-                    label = "电话号码",
-                    modifier = Modifier.width(250.dp).padding(10.dp, 0.dp),
-                    value = phoneFieldValue.copy(uiState.phone),
-                    onValueChange = {
-                        phoneFieldValue = it
-                        BhUIEvent.EnterPhone(it.text).sendTo(businessHandlerScreenModel)
-                    },
-                    errorText = uiState.phoneError,
-                    leadingIcon = painterResource(Res.drawable.home)
-                )
 
             }
 
-            val businessFields = uiState.businessFields
+            val businessFields by businessHandlerScreenModel.businessFields.collectAsState()
 
-            businessFields.fieldGroups.forEach { businessFieldGroup ->
-                Text(
-                    businessFieldGroup.groupName,
-                    modifier = Modifier.padding(10.dp, 0.dp),
-                    fontSize = 24.sp
-                )
-                HorizontalDivider(modifier = Modifier.padding(10.dp, 0.dp))
-                FlowRow(
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth().padding(10.dp)
-                ) {
+            Text(
+                "业务信息",
+                modifier = Modifier.padding(10.dp, 0.dp),
+                fontSize = 24.sp
+            )
+            HorizontalDivider(modifier = Modifier.padding(10.dp, 0.dp))
+            FlowRow(
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth().padding(10.dp)
+            ) {
 
-                    businessFieldGroup.fields.forEach { field ->
-                        var fieldValue by remember {
-                            mutableStateOf(
-                                TextFieldValue(
-                                    uiState.fieldValues[field.id] ?: ""
-                                )
+                businessFields.forEach { field ->
+                    var fieldValue by remember {
+                        mutableStateOf(
+                            TextFieldValue(
+                                uiState.fieldValues[field.id] ?: ""
                             )
-                        }
-
-                        InputView(
-                            label = field.description,
-                            modifier = Modifier.width(250.dp).padding(10.dp, 0.dp),
-                            value = fieldValue.copy(uiState.fieldValues[field.id] ?: ""),
-                            onValueChange = {
-                                fieldValue = it
-                                BhUIEvent.EnterField(
-                                    field.id,
-                                    it.text
-                                ).sendTo(businessHandlerScreenModel)
-
-                            },
-                            errorText = uiState.fieldErrorMsg[field.fieldName] ?: "",
-                            leadingIcon = painterResource(Res.drawable.home)
                         )
                     }
+
+                    InputView(
+                        label = field.description,
+                        modifier = Modifier.width(250.dp).padding(10.dp, 0.dp),
+                        value = fieldValue.copy(uiState.fieldValues[field.id] ?: ""),
+                        onValueChange = {
+                            fieldValue = it
+                            BhUIEvent.EnterField(
+                                field.id,
+                                it.text
+                            ).sendTo(businessHandlerScreenModel)
+
+                        },
+                        errorText = uiState.fieldErrorMsg[field.fieldName] ?: "",
+                        leadingIcon = painterResource(Res.drawable.home)
+                    )
                 }
             }
+
 //
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

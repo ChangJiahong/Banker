@@ -2,10 +2,9 @@ package cn.changjiahong.banker.service.impl
 
 import cn.changjiahong.banker.BankerDb
 import cn.changjiahong.banker.Business
-import cn.changjiahong.banker.BusinessField
-import cn.changjiahong.banker.BusinessFiledTemplateFiledMap
+import cn.changjiahong.banker.BizField
+import cn.changjiahong.banker.RelBizFieldTplField
 import cn.changjiahong.banker.model.BField
-import cn.changjiahong.banker.model.BusinessFields
 import cn.changjiahong.banker.model.BusinessRelated
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.model.TBField
@@ -18,7 +17,8 @@ import org.koin.core.annotation.Factory
 
 @Factory
 class BusinessServiceImpl(
-    val db: BankerDb, val userRepository: UserRepository,
+    val db: BankerDb,
+    val userRepository: UserRepository,
     val businessRepository: BusinessRepository
 ) : BusinessService {
 
@@ -26,18 +26,21 @@ class BusinessServiceImpl(
         return businessRepository.findBusinessTypes()
     }
 
-    override suspend fun getFieldsByBusinessId(businessId: Long): Flow<BusinessFields> {
-        return businessRepository.findFieldsByBusinessId()
+    /**
+     * 获取该业务的所有属性信息
+     */
+    override suspend fun getFieldsByBusinessId(businessId: Long): Flow<List<BizField>> {
+        return businessRepository.findFieldsByBusinessId(businessId)
     }
 
     override suspend fun getFieldsById(
         businessId: Long,
         templateId: Long
-    ): Flow<List<BusinessField>> {
+    ): Flow<List<BizField>> {
         return businessRepository.findFieldsById(businessId)
     }
 
-    override suspend fun getFieldsById(businessId: Long): Flow<List<BusinessField>> {
+    override suspend fun getFieldsById(businessId: Long): Flow<List<BizField>> {
         return businessRepository.findFieldsById(businessId)
     }
 
@@ -64,7 +67,7 @@ class BusinessServiceImpl(
 
     override suspend fun saveBFieldConfigs(value: List<BField>): Flow<NoData> = flow {
         val data = value.map {
-            BusinessField(
+            BizField(
                 it.id, it.businessId, it.fieldName,
                 "", it.fieldType, it.description, it.validationRule, 0, 0, "",
                 0
@@ -104,7 +107,7 @@ class BusinessServiceImpl(
     override fun getFieldConfigMapByBidAndTid(
         bId: Long,
         tId: Long
-    ): Flow<List<BusinessFiledTemplateFiledMap>> {
+    ): Flow<List<RelBizFieldTplField>> {
         return businessRepository.findFieldConfigMapByBidAndTid(bId, tId)
     }
 

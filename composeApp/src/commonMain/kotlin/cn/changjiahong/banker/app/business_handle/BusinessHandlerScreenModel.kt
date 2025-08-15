@@ -2,7 +2,9 @@ package cn.changjiahong.banker.app.business_handle
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
-import cn.changjiahong.banker.DocTemplate
+import cn.changjiahong.banker.BizField
+import cn.changjiahong.banker.Template
+import cn.changjiahong.banker.BasicField
 import cn.changjiahong.banker.app.RR
 import cn.changjiahong.banker.model.BusinessRelated
 import cn.changjiahong.banker.model.UserDO
@@ -28,8 +30,23 @@ class BusinessHandlerScreenModel(
     private val _clientelesData = MutableStateFlow<List<UserDO>>(listOf())
     val clientelesData = _clientelesData.asStateFlow()
 
-    private val _templatesData = MutableStateFlow<List<DocTemplate>>(listOf())
+
+    /**
+     * 基本信息
+     */
+    private val _basicFields = MutableStateFlow<List<BasicField>>(listOf())
+    val basicFields = _basicFields.asStateFlow()
+
+    private val _templatesData = MutableStateFlow<List<Template>>(listOf())
     val templatesData = _templatesData.asStateFlow()
+
+    private val _basicFieldValues = MutableStateFlow<List<String>>(emptyList())
+
+    /**
+     * 业务信息
+     */
+    private val _bizFields = MutableStateFlow<List<BizField>>(emptyList())
+    val businessFields = _bizFields.asStateFlow()
 
     private val _currentlySelected = MutableStateFlow<UserDO?>(null)
     val currentlySelected = _currentlySelected.asStateFlow()
@@ -79,6 +96,7 @@ class BusinessHandlerScreenModel(
     init {
         loadClientele()
         loadDocTemplates()
+        loadBasicFields()
         loadBusinessTypeFields()
     }
 
@@ -91,6 +109,9 @@ class BusinessHandlerScreenModel(
     }
 
 
+    /**
+     * 用户基本信息
+     */
     fun loadClientele() {
         screenModelScope.launch {
             userService.getUsersByBR(BusinessRelated.EPay).collect {
@@ -99,27 +120,45 @@ class BusinessHandlerScreenModel(
         }
     }
 
+
+    fun loadBasicFields() {
+        screenModelScope.launch {
+            userService.getUserFieldsByBusinessId(business.id).collect {
+                _basicFields.value = it
+            }
+        }
+    }
+
+    /**
+     * 初始化业务属性信息
+     */
     fun loadBusinessTypeFields(call: () -> Unit = {}) {
         screenModelScope.launch {
             businessService.getFieldsByBusinessId(business.id).collect { businessFields ->
-                val fieldValues = mutableMapOf<Long, String>()
-                val fieldErrorMsg = mutableMapOf<String, String>()
-                businessFields.fieldGroups.forEach { (groupId, groupName, fields) ->
-                    fieldValues += fields.associate {
-                        it.id to ""
-                    }
-                    fieldErrorMsg += fields.associate {
-                        it.fieldName to ""
-                    }
-                }
 
-                _uiState.update {
-                    it.copy(
-                        businessFields = businessFields,
-                        fieldValues = fieldValues,
-                        fieldErrorMsg = fieldErrorMsg
-                    )
-                }
+                println(business.id)
+                println(businessFields)
+                _bizFields.value = businessFields
+
+
+//                val fieldValues = mutableMapOf<Long, String>()
+//                val fieldErrorMsg = mutableMapOf<String, String>()
+//                businessFields.forEach { field ->
+//                    fieldValues += field.associate {
+//                        it.id to ""
+//                    }
+//                    fieldErrorMsg += fields.associate {
+//                        it.fieldName to ""
+//                    }
+//                }
+//
+//                _uiState.update {
+//                    it.copy(
+//                        businessFields = businessFields,
+//                        fieldValues = fieldValues,
+//                        fieldErrorMsg = fieldErrorMsg
+//                    )
+//                }
                 call()
             }
         }

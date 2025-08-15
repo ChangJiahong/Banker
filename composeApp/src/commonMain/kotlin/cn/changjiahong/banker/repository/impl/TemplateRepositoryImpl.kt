@@ -2,36 +2,35 @@ package cn.changjiahong.banker.repository.impl
 
 import app.cash.sqldelight.coroutines.asFlow
 import cn.changjiahong.banker.BankerDb
-import cn.changjiahong.banker.DocTemplate
-import cn.changjiahong.banker.TemplateField
+import cn.changjiahong.banker.Template
+import cn.changjiahong.banker.TplField
 import cn.changjiahong.banker.ck
-import cn.changjiahong.banker.repository.DocTemplateRepository
+import cn.changjiahong.banker.repository.TemplateRepository
 import cn.changjiahong.banker.utils.getSnowId
 import cn.changjiahong.banker.utils.list
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import org.koin.core.annotation.Factory
 
 @Factory
-class DocTemplateRepositoryImpl(db: BankerDb) : DocTemplateRepository {
+class TemplateRepositoryImpl(db: BankerDb) : TemplateRepository {
 
-    val docTemplateQueries = db.docTemplateQueries
-    val templateFieldQueries = db.templateFieldQueries
+    val docTemplateQueries = db.templateQueries
+    val templateFieldQueries = db.tplFieldQueries
 
-    override suspend fun findAllDocTemps(): Flow<List<DocTemplate>> {
+    override suspend fun findAllDocTemps(): Flow<List<Template>> {
         return docTemplateQueries.selectAllDocTemps().asFlow().list()
     }
 
-    override suspend fun findTemplatesByBusinessId(businessId: Long): Flow<List<DocTemplate>> {
+    override suspend fun findTemplatesByBusinessId(businessId: Long): Flow<List<Template>> {
         return docTemplateQueries.selectTemplatesByBusinessId(businessId).asFlow().list()
     }
 
-    override suspend fun findTemplateFieldsById(templateId: Long): Flow<List<TemplateField>> {
+    override suspend fun findTemplateFieldsById(templateId: Long): Flow<List<TplField>>  {
 
         return templateFieldQueries.selectTemplateFieldsById(templateId).asFlow().list()
     }
 
-    override suspend fun findTemplateFieldsById2(templateId: Long): List<TemplateField> {
+    override suspend fun findTemplateFieldsById2(templateId: Long): List<TplField> {
         return templateFieldQueries.selectTemplateFieldsById(templateId).executeAsList()
     }
 
@@ -56,7 +55,7 @@ class DocTemplateRepositoryImpl(db: BankerDb) : DocTemplateRepository {
         return res.value > 0
     }
 
-    override suspend fun findTemplatesByFuzzyName(tempName: String): Flow<List<DocTemplate>> {
+    override suspend fun findTemplatesByFuzzyName(tempName: String): Flow<List<Template>> {
         return docTemplateQueries.selectTemplatesByFuzzyName(tempName).asFlow().list()
     }
 

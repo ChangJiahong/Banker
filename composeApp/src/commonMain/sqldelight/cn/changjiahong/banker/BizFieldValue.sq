@@ -1,18 +1,19 @@
-CREATE TABLE BusinessFieldValue (
+-- 业务属性值
+CREATE TABLE BizFieldValue (
  id           INTEGER  NOT NULL ,
  uid          INTEGER  NOT NULL REFERENCES  User(id),
  businessId  INTEGER  NOT NULL REFERENCES Business(id),
- fieldId     INTEGER  NOT NULL REFERENCES BusinessField(id),
+ fieldId     INTEGER  NOT NULL REFERENCES BizField(id),
  fieldValue  TEXT     NOT NULL ,
  created INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
  PRIMARY KEY (uid,businessId,fieldId)
 );
 
 insertBusinessFieldValues:
-INSERT INTO BusinessFieldValue(id,uid,businessId,fieldId,fieldValue)
+INSERT INTO BizFieldValue(id,uid,businessId,fieldId,fieldValue)
 VALUES (?,?,?,?,?);
 
 selectBusinessFieldValuesById:
 SELECT *
-FROM BusinessFieldValue
+FROM BizFieldValue
 WHERE uid = ? AND businessId = ?;

@@ -2,8 +2,7 @@ package cn.changjiahong.banker.app.about.settings.business.tmp
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
-import cn.changjiahong.banker.DocTemplate
-import cn.changjiahong.banker.PopupDialog
+import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.app.RR
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEffect
@@ -19,12 +18,12 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Factory
 
 sealed interface BusinessTmpDetailUiEvent : UiEvent {
-    class GoTempFieldConfigScreen(val business: Business, val template: DocTemplate) :
+    class GoTempFieldConfigScreen(val business: Business, val template: Template) :
         BusinessTmpDetailUiEvent
 
     class GoBusinessFieldConfigScreen(val business: Business) : BusinessTmpDetailUiEvent
 
-    class AddTemplate(val docTemplate: DocTemplate) : BusinessTmpDetailUiEvent
+    class AddTemplate(val template: Template) : BusinessTmpDetailUiEvent
 
     class FuzzySearch(val name: String) : BusinessTmpDetailUiEvent
 }
@@ -41,11 +40,11 @@ class BusinessTmpDetailScreenModel(
     MviScreenModel() {
 
 
-    private val _tmpDetails = MutableStateFlow<List<DocTemplate>>(emptyList())
+    private val _tmpDetails = MutableStateFlow<List<Template>>(emptyList())
 
     val tmpDetails = _tmpDetails.asStateFlow()
 
-    private val _searchRes = MutableStateFlow<List<DocTemplate>>(emptyList())
+    private val _searchRes = MutableStateFlow<List<Template>>(emptyList())
 
     val searchRes = _searchRes.asStateFlow()
 
@@ -64,15 +63,15 @@ class BusinessTmpDetailScreenModel(
                 )
             ).trigger()
 
-            is BusinessTmpDetailUiEvent.AddTemplate -> addTemplate(event.docTemplate)
+            is BusinessTmpDetailUiEvent.AddTemplate -> addTemplate(event.template)
 
             is BusinessTmpDetailUiEvent.FuzzySearch -> fuzzySearchByTempName(event.name)
         }
     }
 
-    private fun addTemplate(docTemplate: DocTemplate) {
+    private fun addTemplate(template: Template) {
         screenModelScope.launch {
-            businessService.addTemplate(business.id, docTemplate.id)
+            businessService.addTemplate(business.id, template.id)
                 .catch {
                     ShowSnackbar(it.message?:"").trigger()
                 }.collect {

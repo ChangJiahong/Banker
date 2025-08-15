@@ -1,6 +1,7 @@
+-- 业务信息
 CREATE TABLE Business (
     id INTEGER PRIMARY KEY NOT NULL ,
-    businessName TEXT NOT NULL,
+    businessName TEXT UNIQUE NOT NULL,
     created INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 

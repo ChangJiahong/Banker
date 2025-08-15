@@ -1,6 +1,6 @@
 package cn.changjiahong.banker.model
 
-import cn.changjiahong.banker.BusinessField
+import cn.changjiahong.banker.BizField
 
 //data class BusinessFields(
 //    val businessId: Long,
@@ -15,7 +15,7 @@ data class BusinessFields(
 data class BusinessFieldGroup(
     val groupId: Long,
     val groupName: String,
-    val fields: List<BusinessField>
+    val fields: List<BizField>
 )
 
 data class BField(
