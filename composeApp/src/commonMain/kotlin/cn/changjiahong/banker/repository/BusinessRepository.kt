@@ -20,12 +20,6 @@ interface BusinessRepository {
 
     fun findFieldsById(businessId: Long): Flow<List<BizField>>
 
-    fun insertBusinessFields(insertData: List<BField>)
-
-    fun updateBusinessFields(updateData: List<BField>)
-
-    fun saveOrUpdateBusinessFields(fields: List<BizField>)
-
     fun insertRelTplFieldBizField(
         businessFieldId: Long?,
         tempFieldId: Long,

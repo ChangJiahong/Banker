@@ -102,42 +102,6 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
     }
 
 
-    override fun insertBusinessFields(insertData: List<BField>) {
-
-    }
-
-    override fun updateBusinessFields(updateData: List<BField>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun saveOrUpdateBusinessFields(fields: List<BizField>) {
-//        fields.forEach { (id, businessId, fieldName, fieldType, description, validationRule, groupId, isFixed, fixedValue, created) ->
-//            if (id < 0) {
-//                businessFieldQueries.insert(
-//                    getSnowId(),
-//                    businessId,
-//                    fieldName,
-//                    fieldType,
-//                    description,
-//                    validationRule,
-//                    groupId,
-//                    isFixed
-//                )
-//            } else {
-//                businessFieldQueries.update(
-//                    businessId,
-//                    fieldName,
-//                    fieldType,
-//                    description,
-//                    validationRule,
-//                    groupId,
-//                    isFixed,
-//                    id
-//                )
-//            }
-//        }
-    }
-
 
     override fun insertRelTplFieldBizField(
         businessFieldId: Long?,

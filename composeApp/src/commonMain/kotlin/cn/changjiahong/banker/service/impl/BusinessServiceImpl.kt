@@ -59,7 +59,7 @@ class BusinessServiceImpl(
         emit(NoData)
     }
 
-    override suspend fun saveOrUpdateBizFieldConfigs(value: List<BizFieldConfig>): Flow<NoData> = flow {
+    override suspend fun saveBizFieldConfigs(value: List<BizFieldConfig>): Flow<NoData> = flow {
         db.transaction {
             value.forEachIndexed { index, field ->
                 if (field.id < 0) {

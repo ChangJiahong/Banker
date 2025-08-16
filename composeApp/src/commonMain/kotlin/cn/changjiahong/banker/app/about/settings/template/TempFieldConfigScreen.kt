@@ -47,9 +47,9 @@ class TempFieldSettingScreen(val template: Template) : Screen {
     @Composable
     override fun Content() {
         val globalNavigator = GlobalNavigator.current
-        val tempFieldSettingScreenModel =
-            koinScreenModel<TempFieldSettingScreenModel> { parametersOf(template) }
-        tempFieldSettingScreenModel.handleEffect {
+        val tempFieldConfigScreenModel =
+            koinScreenModel<TempFieldConfigScreenModel> { parametersOf(template) }
+        tempFieldConfigScreenModel.handleEffect {
             when (it) {
                 is TFSUiEffect.SaveSuccess -> {
                     globalNavigator.pop()
@@ -60,9 +60,9 @@ class TempFieldSettingScreen(val template: Template) : Screen {
             }
         }
         ScaffoldWithTopBar("表单设置", iconOnClick = {
-            TFSUiEvent.AddNewFieldConfig.sendTo(tempFieldSettingScreenModel)
+            TFSUiEvent.AddNewFieldConfig.sendTo(tempFieldConfigScreenModel)
         }, iconPainter = painterResource(Res.drawable.home)) { pd ->
-            TempFieldView(Modifier.padding(pd), tempFieldSettingScreenModel)
+            TempFieldView(Modifier.padding(pd), tempFieldConfigScreenModel)
         }
     }
 }
@@ -70,14 +70,14 @@ class TempFieldSettingScreen(val template: Template) : Screen {
 @Composable
 fun TempFieldSettingScreen.TempFieldView(
     modifier: Modifier,
-    tempFieldSettingScreenModel: TempFieldSettingScreenModel
+    tempFieldConfigScreenModel: TempFieldConfigScreenModel
 ) {
 
 
     Column(modifier) {
 
-        val tempFieldConfigs by tempFieldSettingScreenModel.tempFieldConfigs.collectAsState()
-        val tempFieldConfigsError by tempFieldSettingScreenModel.tempFieldConfigsError.collectAsState()
+        val tempFieldConfigs by tempFieldConfigScreenModel.tempFieldConfigs.collectAsState()
+        val tempFieldConfigsError by tempFieldConfigScreenModel.tempFieldConfigsError.collectAsState()
 
         HorizontalDivider()
         val scrollState = rememberScrollState()
@@ -99,7 +99,7 @@ fun TempFieldSettingScreen.TempFieldView(
                 ) {
                     Column(Modifier.fillMaxWidth().horizontalScroll(scrollState)) {
 
-                        val tempFormFields by tempFieldSettingScreenModel.tempFormFields.collectAsState()
+                        val tempFormFields by tempFieldConfigScreenModel.tempFormFields.collectAsState()
 
                         val scope =
                             rememberDropdownScope(tempFormFields.map { Option(it.name, it) })
@@ -108,7 +108,7 @@ fun TempFieldSettingScreen.TempFieldView(
 
                             FieldConfigItem(scope, field, tempFieldConfigsError[index]) {
                                 TFSUiEvent.UpdateTempFieldConfig(index, it)
-                                    .sendTo(tempFieldSettingScreenModel)
+                                    .sendTo(tempFieldConfigScreenModel)
                             }
                         }
                     }
@@ -117,7 +117,7 @@ fun TempFieldSettingScreen.TempFieldView(
         }
 
         Button({
-            TFSUiEvent.SaveConfig.sendTo(tempFieldSettingScreenModel)
+            TFSUiEvent.SaveConfig.sendTo(tempFieldConfigScreenModel)
         }) {
             Text("保存")
         }

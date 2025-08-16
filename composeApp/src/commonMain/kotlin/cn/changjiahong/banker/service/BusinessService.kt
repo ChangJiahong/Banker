@@ -6,7 +6,6 @@ import cn.changjiahong.banker.RelBizFieldTplField
 import cn.changjiahong.banker.model.BizFieldConfig
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.model.RelTplFieldBizFieldConfig
-import cn.changjiahong.banker.model.TBField
 import kotlinx.coroutines.flow.Flow
 
 interface BusinessService {
@@ -31,7 +30,7 @@ interface BusinessService {
         fieldValues: Map<Long, String>
     ): Flow<NoData>
 
-    suspend fun saveOrUpdateBizFieldConfigs(value: List<BizFieldConfig>): Flow<NoData>
+    suspend fun saveBizFieldConfigs(value: List<BizFieldConfig>): Flow<NoData>
 
     fun saveRelTplFieldBizFieldConfig(data: List<RelTplFieldBizFieldConfig>): Flow<NoData>
 

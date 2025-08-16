@@ -70,7 +70,7 @@ class BusinessFieldConfigScreenModel(val business: Business, val businessService
                 return@launch
             }
 
-            businessService.saveOrUpdateBizFieldConfigs(_businessFiledConfigs.value).collect {
+            businessService.saveBizFieldConfigs(_businessFiledConfigs.value).collect {
                 println("SU OK OK")
             }
 
