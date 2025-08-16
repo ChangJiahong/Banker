@@ -5,13 +5,10 @@ import cn.changjiahong.banker.BasicField
 import cn.changjiahong.banker.RelBasicFieldTplField
 import cn.changjiahong.banker.User
 import cn.changjiahong.banker.model.BasicFieldConfig
-import cn.changjiahong.banker.model.BusinessRelated
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.model.RelTplFieldBasicFieldConfig
-import cn.changjiahong.banker.model.TUExtendField
-import cn.changjiahong.banker.model.UExtendField
-import cn.changjiahong.banker.model.UserDO
 import cn.changjiahong.banker.model.UserField
+import cn.changjiahong.banker.model.UserInfo
 import cn.changjiahong.banker.repository.UserRepository
 import cn.changjiahong.banker.service.UserService
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +16,10 @@ import kotlinx.coroutines.flow.flow
 import org.koin.core.annotation.Factory
 
 @Factory
-class UserServiceImpl(val db: BankerDb, val userRepository: UserRepository) : UserService {
+class UserServiceImpl(
+    val db: BankerDb,
+    val userRepository: UserRepository
+) : UserService {
 
     override suspend fun getUsers(): Flow<List<User>> {
         return userRepository.findAll()
@@ -71,11 +71,18 @@ class UserServiceImpl(val db: BankerDb, val userRepository: UserRepository) : Us
         emit(userFields)
     }
 
-    override suspend fun saveRelTplFieldBasicFieldConfig(businessId: Long, value: List<RelTplFieldBasicFieldConfig>): Flow<NoData> = flow {
+    override suspend fun saveRelTplFieldBasicFieldConfig(
+        businessId: Long,
+        value: List<RelTplFieldBasicFieldConfig>
+    ): Flow<NoData> = flow {
         db.transaction {
             value.forEachIndexed { index, field ->
                 if (field.id < 0) {
-                    userRepository.insertUserTempFieldMap(businessId,field.tempFieldId!!, field.userFieldId!!)
+                    userRepository.insertUserTempFieldMap(
+                        businessId,
+                        field.tempFieldId!!,
+                        field.userFieldId!!
+                    )
                 } else {
                     userRepository.updateUserTempFieldMap(
                         field.id,
@@ -96,4 +103,20 @@ class UserServiceImpl(val db: BankerDb, val userRepository: UserRepository) : Us
             val res = userRepository.findFieldConfigMapByTid(templateId, businessId)
             emit(res)
         }
+
+    override suspend fun getUserInfos(): Flow<List<UserInfo>> = flow {
+
+        val users = userRepository.findUsers()
+        val userinfos = mutableListOf<UserInfo>()
+        users.forEach { (uid, _) ->
+            val basicFields = userRepository.findUserBasicFieldsByUId(uid)
+                .associateBy { field -> field.fieldName }
+            val bizFields =
+                userRepository.findUserBizFieldsByUId(uid).associateBy { field -> field.fieldName }
+
+            userinfos += UserInfo(uid, basicFields + bizFields)
+        }
+
+        emit(userinfos)
+    }
 }

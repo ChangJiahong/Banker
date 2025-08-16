@@ -3,6 +3,7 @@ package cn.changjiahong.banker
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -24,12 +25,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -57,6 +60,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -72,10 +76,57 @@ import banker.composeapp.generated.resources.pdf
 import banker.composeapp.generated.resources.unknown_file
 import banker.composeapp.generated.resources.word
 import cn.changjiahong.banker.app.about.settings.business.BusinessGridView
+import cn.changjiahong.banker.model.UserDO
+import cn.changjiahong.banker.model.UserInfo
 import cn.changjiahong.banker.storage.FileType
 import cn.changjiahong.banker.utils.padding
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+
+@Composable
+fun ClienteleItem(userDO: UserInfo, onClick: () -> Unit, selected: Boolean = false) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+
+        RadioButton(
+            selected = selected,
+            onClick = onClick // null recommended for accessibility with screen readers
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth()
+                .padding(10.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xfff2f0f4)),
+            onClick = onClick
+        ) {
+            Column(Modifier.padding(10.dp)) {
+                Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+                    val name = userDO.fields["name"]?.fieldValue
+                    Text(name?:"未知", modifier = Modifier.weight(1f))
+//                    Text(
+//                        formatInstantToYMD(userDO.created),
+//                        modifier = Modifier.weight(1f),
+//                        textAlign = TextAlign.End
+//                    )
+                }
+                val idNum = userDO.fields["idNum"]?.fieldValue
+
+                Text(idNum?:"null")
+
+            }
+        }
+    }
+}
+
+
+fun formatInstantToYMD(instant: Instant): String {
+    val zone = TimeZone.currentSystemDefault()
+    val localDateTime = instant.toLocalDateTime(zone).date
+
+    return "${localDateTime.year}年${localDateTime.monthNumber}月${localDateTime.dayOfMonth}日"
+}
 
 
 @Composable

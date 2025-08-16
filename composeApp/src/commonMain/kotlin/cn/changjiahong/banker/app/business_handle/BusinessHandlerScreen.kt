@@ -41,12 +41,12 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cn.changjiahong.banker.Business
+import cn.changjiahong.banker.ClienteleItem
 import cn.changjiahong.banker.TipDialog
 import cn.changjiahong.banker.FoldersButton
 import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.PopupDialog
 import cn.changjiahong.banker.app.DirScreen
-import cn.changjiahong.banker.app.xinef.ClienteleItem
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parameterArrayOf
 
@@ -99,7 +99,7 @@ fun BusinessHandlerScreen.BusinessHandlerView(
             LazyColumn {
                 itemsIndexed(clienteles) { index, it ->
                     ClienteleItem(it, {
-                        BhUIEvent.SelectedClientele(it).sendTo(businessHandlerScreenModel)
+//                        BhUIEvent.SelectedClientele(it).sendTo(businessHandlerScreenModel)
                     }, currentlySelected == it)
                 }
             }
@@ -175,21 +175,20 @@ fun AddClienteleDialog(
 
                 val basicFields by businessHandlerScreenModel.basicFields.collectAsState()
 
-                var usernameFieldValue by remember { mutableStateOf(TextFieldValue(uiState.username)) }
+//                var usernameFieldValue by remember { mutableStateOf(TextFieldValue(uiState.username)) }
                 basicFields.forEachIndexed { index, field ->
 
 
                     InputView(
                         label = field.description,
-                        value = usernameFieldValue.copy(uiState.username),
+//                        value = usernameFieldValue.copy(uiState.username),
                         modifier = Modifier.width(200.dp).padding(10.dp, 0.dp),
                         onValueChange = { newValue ->
-                            usernameFieldValue = newValue
-                            BhUIEvent.EnterUsername(newValue.text)
-                                .sendTo(businessHandlerScreenModel)
+//                            usernameFieldValue = newValue
+
 
                         },
-                        errorText = uiState.usernameError,
+//                        errorText = uiState.usernameError,
                         leadingIcon = painterResource(Res.drawable.home)
                     )
 

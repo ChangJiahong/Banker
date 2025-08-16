@@ -17,3 +17,9 @@ selectBusinessFieldValuesById:
 SELECT *
 FROM BizFieldValue
 WHERE uid = ? AND bId = ?;
+
+selectUserBizFieldsByUId:
+SELECT bfv.uid ,fieldName ,fieldValue,fieldType,description,validationRule
+FROM BizFieldValue bfv
+LEFT JOIN BizField bf ON bf.id = bfv.fieldId
+WHERE bfv.uid = ?;

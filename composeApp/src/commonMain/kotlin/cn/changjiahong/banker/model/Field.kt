@@ -4,7 +4,7 @@ package cn.changjiahong.banker.model
 抽象出的属性类
  */
 data class Field(
-    val id: Long = -1,
+    val uid: Long = -1,
     val fieldName: String,
     val fieldType: String,
     val description: String = "",

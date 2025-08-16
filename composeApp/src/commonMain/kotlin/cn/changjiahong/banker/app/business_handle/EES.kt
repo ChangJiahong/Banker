@@ -15,14 +15,6 @@ data class BhUiState(
     val fieldValues: Map<Long, String> = emptyMap(),
     val fieldErrorMsg: Map<String, String> = emptyMap(),
 
-    val username: String = "",
-    val idNumber: String = "",
-    val phone: String = "",
-
-    val usernameError: String = "",
-    val idNumberError: String = "",
-    val phoneError: String = "",
-
     ) : UiState
 
 sealed interface BhUIEvent : UiEvent {
@@ -30,13 +22,6 @@ sealed interface BhUIEvent : UiEvent {
     object SaveBhDetail : BhUIEvent
 
     data class EnterField(val fieldId: Long, val fieldValue: String): BhUIEvent
-
-    data class EnterUsername(val username: String) : BhUIEvent
-    data class EnterIdNum(val idNum: String) : BhUIEvent
-    data class EnterPhone(val phone: String) : BhUIEvent
-    data class EnterBAddress(val bAddress: String) : BhUIEvent
-    data class EnterBScope(val bScope: String) : BhUIEvent
-    data class EnterBankerNum(val bankerNum: String) : BhUIEvent
 
     data class SelectedClientele(val userDO: UserDO) : BhUIEvent
 

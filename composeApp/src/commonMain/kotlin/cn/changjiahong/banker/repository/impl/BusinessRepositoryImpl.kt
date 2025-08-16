@@ -7,7 +7,6 @@ import cn.changjiahong.banker.BizField
 import cn.changjiahong.banker.RelBizFieldTplField
 import cn.changjiahong.banker.ExecuteError
 import cn.changjiahong.banker.ck
-import cn.changjiahong.banker.model.BField
 import cn.changjiahong.banker.model.FieldValuePair
 import cn.changjiahong.banker.repository.BusinessRepository
 import cn.changjiahong.banker.utils.getSnowId

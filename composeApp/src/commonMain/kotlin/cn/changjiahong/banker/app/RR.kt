@@ -16,7 +16,6 @@ import cn.changjiahong.banker.app.template.PreTemplateScreen
 import cn.changjiahong.banker.app.template.TemplateScreen
 import cn.changjiahong.banker.app.about.settings.template.TemplateSettingScreen
 import cn.changjiahong.banker.app.about.settings.user.UserExtendFieldSettingScreen
-import cn.changjiahong.banker.app.xinef.EPayScreen
 
 object RR {
     val MAIN = MainScreen
@@ -26,8 +25,6 @@ object RR {
 
 
     val OPTIONS_DIR = OptionsDirScreen
-
-    val E_PAY = EPayScreen
 
     val BUSINESS_HANDLER = { it: Business -> BusinessHandlerScreen(it) }
 

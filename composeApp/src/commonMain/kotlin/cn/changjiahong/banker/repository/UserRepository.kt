@@ -4,10 +4,13 @@ import cn.changjiahong.banker.User
 import cn.changjiahong.banker.BasicField
 import cn.changjiahong.banker.BasicFieldValue
 import cn.changjiahong.banker.RelBasicFieldTplField
+import cn.changjiahong.banker.model.Field
 import cn.changjiahong.banker.model.FieldValuePair
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
+
+    suspend fun findUsers(): List<User>
 
     suspend fun findAll(): Flow<List<User>>
 
@@ -39,9 +42,17 @@ interface UserRepository {
 
     suspend fun findUserExtendFields(): Flow<List<BasicField>>
     fun findUserExtFields(): List<BasicField>
-    fun insertUserTempFieldMap(businessId: Long,tempFieldId: Long, userFieldId: Long): Long
+    fun insertUserTempFieldMap(businessId: Long, tempFieldId: Long, userFieldId: Long): Long
     fun updateUserTempFieldMap(id: Long, userFieldId: Long, tempFieldId: Long)
-    suspend fun findFieldConfigMapByTid(templateId: Long,businessId: Long): List<RelBasicFieldTplField>
+    suspend fun findFieldConfigMapByTid(
+        templateId: Long,
+        businessId: Long
+    ): List<RelBasicFieldTplField>
+
     suspend fun findUserFieldsByBusinessId(businessId: Long): Flow<List<BasicField>>
+
+    fun findUserBasicFieldsByUId(uid: Long): List<Field>
+    fun findUserBizFieldsByUId(uid: Long): List<Field>
+
 
 }

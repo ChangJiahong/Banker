@@ -5,7 +5,6 @@ import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.ExecuteError
 import cn.changjiahong.banker.TplField
 import cn.changjiahong.banker.model.NoData
-import cn.changjiahong.banker.model.TempField
 import cn.changjiahong.banker.model.TemplateFillerItem
 import cn.changjiahong.banker.model.TplFieldConfig
 import cn.changjiahong.banker.repository.BusinessRepository

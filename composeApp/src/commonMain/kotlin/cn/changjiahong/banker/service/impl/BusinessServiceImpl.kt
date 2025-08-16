@@ -43,10 +43,7 @@ class BusinessServiceImpl(
         return businessRepository.findFieldsById(businessId)
     }
 
-    override suspend fun saveBusinessWithUserValue(
-        username: String,
-        idNumber: String,
-        phone: String,
+    override suspend fun saveUserFields(
         businessId: Long,
         fieldValues: Map<Long, String>
     ) = flow {

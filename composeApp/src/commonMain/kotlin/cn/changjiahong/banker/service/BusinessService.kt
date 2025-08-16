@@ -22,10 +22,7 @@ interface BusinessService {
 
 
 
-    suspend fun saveBusinessWithUserValue(
-        username: String,
-        idNumber: String,
-        phone: String,
+    suspend fun saveUserFields(
         businessId: Long,
         fieldValues: Map<Long, String>
     ): Flow<NoData>
