@@ -4,10 +4,10 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.composable.Option
-import cn.changjiahong.banker.model.TBField
-import cn.changjiahong.banker.model.TBFieldError
-import cn.changjiahong.banker.model.TUExtendField
-import cn.changjiahong.banker.model.TUExtendFieldError
+import cn.changjiahong.banker.model.RelTplFieldBizFieldConfig
+import cn.changjiahong.banker.model.RelTplFieldBizFieldConfigError
+import cn.changjiahong.banker.model.RelTplFieldBasicFieldConfig
+import cn.changjiahong.banker.model.RelTplFieldBasicFieldConfigError
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEffect
 import cn.changjiahong.banker.mvi.UiEvent
@@ -24,8 +24,11 @@ import org.koin.core.annotation.Factory
 sealed interface FieldConfigScreenUiEvent : UiEvent {
     object AddBFieldConfig : FieldConfigScreenUiEvent
     object AddUFieldConfig : FieldConfigScreenUiEvent
-    class UpdateBusinessFiled(val index: Int, val field: TBField) : FieldConfigScreenUiEvent
-    class UpdateUFiled(val index: Int, val field: TUExtendField) : FieldConfigScreenUiEvent
+    class UpdateBusinessFiled(val index: Int, val field: RelTplFieldBizFieldConfig) :
+        FieldConfigScreenUiEvent
+
+    class UpdateUFiled(val index: Int, val field: RelTplFieldBasicFieldConfig) :
+        FieldConfigScreenUiEvent
 
     object SaveConfig : UiEvent
 }
@@ -54,11 +57,13 @@ class FieldConfigScreenModel(
 
     val userOptions = _userOptions.asStateFlow()
 
-    private val _tuFieldConfigs = MutableStateFlow<List<TUExtendField>>(emptyList())
-    private val _tuFieldConfigsError = MutableStateFlow<List<TUExtendFieldError>>(emptyList())
+    private val _tuFieldConfigs = MutableStateFlow<List<RelTplFieldBasicFieldConfig>>(emptyList())
+    private val _tuFieldConfigsError =
+        MutableStateFlow<List<RelTplFieldBasicFieldConfigError>>(emptyList())
 
-    private val _btFieldConfigs = MutableStateFlow<List<TBField>>(emptyList())
-    private val _btFieldConfigsError = MutableStateFlow<List<TBFieldError>>(emptyList())
+    private val _btFieldConfigs = MutableStateFlow<List<RelTplFieldBizFieldConfig>>(emptyList())
+    private val _btFieldConfigsError =
+        MutableStateFlow<List<RelTplFieldBizFieldConfigError>>(emptyList())
 
     val btFieldConfigs = _btFieldConfigs.asStateFlow()
     val btFieldConfigsError = _btFieldConfigsError.asStateFlow()
@@ -70,13 +75,13 @@ class FieldConfigScreenModel(
 
         when (event) {
             is FieldConfigScreenUiEvent.AddBFieldConfig -> {
-                _btFieldConfigs.update { it + TBField() }
-                _btFieldConfigsError.update { it + TBFieldError() }
+                _btFieldConfigs.update { it + RelTplFieldBizFieldConfig() }
+                _btFieldConfigsError.update { it + RelTplFieldBizFieldConfigError() }
             }
 
             is FieldConfigScreenUiEvent.AddUFieldConfig -> {
-                _tuFieldConfigs.update { it + TUExtendField() }
-                _tuFieldConfigsError.update { it + TUExtendFieldError() }
+                _tuFieldConfigs.update { it + RelTplFieldBasicFieldConfig() }
+                _tuFieldConfigsError.update { it + RelTplFieldBasicFieldConfigError() }
             }
 
             is FieldConfigScreenUiEvent.UpdateBusinessFiled ->
@@ -91,7 +96,7 @@ class FieldConfigScreenModel(
 
     private fun saveConfig() {
         val btValue = btFieldConfigs.value
-        val error = mutableListOf<TBFieldError>()
+        val error = mutableListOf<RelTplFieldBizFieldConfigError>()
         var hasError = false
         btValue.forEach { (id, tempFieldId, businessFieldId, isFixed, fixedValue) ->
             var tf = ""
@@ -109,7 +114,7 @@ class FieldConfigScreenModel(
                 fv = "不能为空"
                 hasError = true
             }
-            error.add(TBFieldError(tf, bf, fv))
+            error.add(RelTplFieldBizFieldConfigError(tf, bf, fv))
         }
         _btFieldConfigsError.value = error
         if (hasError) {
@@ -118,11 +123,13 @@ class FieldConfigScreenModel(
 
         screenModelScope.launch {
 
-            userService.saveUserTempFieldConfig(business.id,_tuFieldConfigs.value).catchAndCollect {
-                businessService.saveBusinessTemplateFieldConfig(_btFieldConfigs.value).catchAndCollect {
-                    FieldConfigScreenUiEffect.SaveSuccess.trigger()
+            userService.saveRelTplFieldBasicFieldConfig(business.id, _tuFieldConfigs.value)
+                .catchAndCollect {
+                    businessService.saveRelTplFieldBizFieldConfig(_btFieldConfigs.value)
+                        .catchAndCollect {
+                            FieldConfigScreenUiEffect.SaveSuccess.trigger()
+                        }
                 }
-            }
         }
     }
 
@@ -145,22 +152,24 @@ class FieldConfigScreenModel(
         screenModelScope.launch {
             businessService.getFieldConfigMapByBidAndTid(business.id, template.id).collect { data ->
                 _btFieldConfigs.value = data.map {
-                    TBField(
+                    RelTplFieldBizFieldConfig(
                         it.id, it.tFieldId, it.bFieldId, it.isFixed > 0,
                         it.fixedValue
                     )
                 }
-                _btFieldConfigsError.value = MutableList(data.size) { TBFieldError() }
+                _btFieldConfigsError.value =
+                    MutableList(data.size) { RelTplFieldBizFieldConfigError() }
 
             }
 
         }
         screenModelScope.launch {
-            userService.getFieldConfigMapByTIdAndBId(template.id,business.id).collect { data->
+            userService.getFieldConfigMapByTIdAndBId(template.id, business.id).collect { data ->
                 _tuFieldConfigs.value = data.map {
-                    TUExtendField(it.id,it.tFieldId,it.uFieldId)
+                    RelTplFieldBasicFieldConfig(it.id, it.tFieldId, it.uFieldId)
                 }
-                _tuFieldConfigsError.value = MutableList(data.size){ TUExtendFieldError() }
+                _tuFieldConfigsError.value =
+                    MutableList(data.size) { RelTplFieldBasicFieldConfigError() }
             }
         }
     }

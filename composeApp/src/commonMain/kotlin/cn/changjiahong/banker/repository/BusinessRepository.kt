@@ -26,19 +26,19 @@ interface BusinessRepository {
 
     fun saveOrUpdateBusinessFields(fields: List<BizField>)
 
-    fun insertBusinessTemplateFieldMap(
+    fun insertRelTplFieldBizField(
         businessFieldId: Long?,
         tempFieldId: Long,
         fixed: Boolean,
-        fixedValue: String?
+        fixedValue: String
     ): Long
 
-    fun updateBusinessTemplateFieldMap(
+    fun updateRelTplFieldBizField(
         id: Long,
         businessFieldId: Long?,
         tempFieldId: Long,
         fixed: Boolean,
-        fixedValue: String?
+        fixedValue: String
     )
 
     fun findFieldConfigMapByBidAndTid(bId: Long, tId: Long): Flow<List<RelBizFieldTplField>>

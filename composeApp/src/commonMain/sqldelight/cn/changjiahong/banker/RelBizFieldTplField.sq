@@ -4,7 +4,7 @@ CREATE TABLE RelBizFieldTplField (
  bFieldId        INTEGER  REFERENCES BizField(id),
  tFieldId        INTEGER  NOT NULL REFERENCES TplField(id),
  isFixed         INTEGER NOT NULL ,
- fixedValue      TEXT ,
+ fixedValue      TEXT NOT NULL DEFAULT "",
  created INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
  PRIMARY KEY (bFieldId,tFieldId)
 );

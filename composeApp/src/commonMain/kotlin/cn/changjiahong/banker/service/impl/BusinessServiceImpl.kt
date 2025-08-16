@@ -4,10 +4,9 @@ import cn.changjiahong.banker.BankerDb
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.BizField
 import cn.changjiahong.banker.RelBizFieldTplField
-import cn.changjiahong.banker.model.BField
 import cn.changjiahong.banker.model.BizFieldConfig
 import cn.changjiahong.banker.model.NoData
-import cn.changjiahong.banker.model.TBField
+import cn.changjiahong.banker.model.RelTplFieldBizFieldConfig
 import cn.changjiahong.banker.repository.BusinessRepository
 import cn.changjiahong.banker.repository.UserRepository
 import cn.changjiahong.banker.service.BusinessService
@@ -90,18 +89,18 @@ class BusinessServiceImpl(
         emit(NoData)
     }
 
-    override fun saveBusinessTemplateFieldConfig(data: List<TBField>): Flow<NoData> = flow {
+    override fun saveRelTplFieldBizFieldConfig(data: List<RelTplFieldBizFieldConfig>): Flow<NoData> = flow {
         db.transaction {
             data.forEach { tBField ->
                 if (tBField.id < 0) {
-                    businessRepository.insertBusinessTemplateFieldMap(
+                    businessRepository.insertRelTplFieldBizField(
                         tBField.businessFieldId,
                         tBField.tempFieldId!!,
                         tBField.isFixed,
                         tBField.fixedValue
                     )
                 } else {
-                    businessRepository.updateBusinessTemplateFieldMap(
+                    businessRepository.updateRelTplFieldBizField(
                         tBField.id,
                         tBField.businessFieldId,
                         tBField.tempFieldId!!,

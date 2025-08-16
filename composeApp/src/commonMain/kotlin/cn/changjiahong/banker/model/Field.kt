@@ -33,6 +33,21 @@ data class BizFieldConfigError(
     val fixedValue: String = "",
 )
 
+data class RelTplFieldBizFieldConfig(
+    val id: Long = -1,
+    val tempFieldId: Long? = null,
+    val businessFieldId: Long? = null,
+    val isFixed: Boolean = false,
+    val fixedValue: String = "",
+)
+
+data class RelTplFieldBizFieldConfigError(
+    val tempFieldId: String = "",
+    val businessFieldId: String = "",
+    val isFixed: String = "",
+    val fixedValue: String = "",
+)
+
 
 data class BasicFieldConfig(
     val id: Long = -1,
@@ -72,6 +87,6 @@ data class RelTplFieldBasicFieldConfig(
 )
 
 data class RelTplFieldBasicFieldConfigError(
-    val tempFieldId: String,
-    val userFieldId: Long,
+    val tempFieldId: String = "",
+    val userFieldId: String = "",
 )

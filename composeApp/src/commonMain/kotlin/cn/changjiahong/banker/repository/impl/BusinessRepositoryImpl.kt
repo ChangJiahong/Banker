@@ -139,11 +139,11 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
     }
 
 
-    override fun insertBusinessTemplateFieldMap(
+    override fun insertRelTplFieldBizField(
         businessFieldId: Long?,
         tempFieldId: Long,
         fixed: Boolean,
-        fixedValue: String?
+        fixedValue: String
     ): Long {
         val id = getSnowId()
         relBizFieldTplFieldQueries.insert(
@@ -157,12 +157,12 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         return id
     }
 
-    override fun updateBusinessTemplateFieldMap(
+    override fun updateRelTplFieldBizField(
         id: Long,
         businessFieldId: Long?,
         tempFieldId: Long,
         fixed: Boolean,
-        fixedValue: String?
+        fixedValue: String
     ) {
         relBizFieldTplFieldQueries.update(
             businessFieldId,

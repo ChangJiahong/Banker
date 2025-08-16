@@ -3,11 +3,10 @@ package cn.changjiahong.banker.service
 import cn.changjiahong.banker.BasicField
 import cn.changjiahong.banker.RelBasicFieldTplField
 import cn.changjiahong.banker.User
-import cn.changjiahong.banker.model.BusinessRelated
 import cn.changjiahong.banker.model.NoData
+import cn.changjiahong.banker.model.RelTplFieldBasicFieldConfig
 import cn.changjiahong.banker.model.TUExtendField
 import cn.changjiahong.banker.model.UExtendField
-import cn.changjiahong.banker.model.UserDO
 import cn.changjiahong.banker.model.UserField
 import kotlinx.coroutines.flow.Flow
 
@@ -22,7 +21,7 @@ interface UserService {
     suspend fun getUserExtendFields(): Flow<List<BasicField>>
 
     suspend fun getUserFields(): Flow<List<UserField>>
-    suspend fun saveUserTempFieldConfig(businessId: Long,value: List<TUExtendField>): Flow<NoData>
+    suspend fun saveRelTplFieldBasicFieldConfig(businessId: Long, value: List<RelTplFieldBasicFieldConfig>): Flow<NoData>
     suspend fun getFieldConfigMapByTIdAndBId(templateId: Long, businessId: Long): Flow<List<RelBasicFieldTplField>>
 
 }

@@ -3,9 +3,9 @@ package cn.changjiahong.banker.service
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.BizField
 import cn.changjiahong.banker.RelBizFieldTplField
-import cn.changjiahong.banker.model.BField
 import cn.changjiahong.banker.model.BizFieldConfig
 import cn.changjiahong.banker.model.NoData
+import cn.changjiahong.banker.model.RelTplFieldBizFieldConfig
 import cn.changjiahong.banker.model.TBField
 import kotlinx.coroutines.flow.Flow
 
@@ -33,7 +33,7 @@ interface BusinessService {
 
     suspend fun saveOrUpdateBizFieldConfigs(value: List<BizFieldConfig>): Flow<NoData>
 
-    fun saveBusinessTemplateFieldConfig(data: List<TBField>): Flow<NoData>
+    fun saveRelTplFieldBizFieldConfig(data: List<RelTplFieldBizFieldConfig>): Flow<NoData>
 
     fun getFieldConfigMapByBidAndTid(bId: Long, tId: Long): Flow<List<RelBizFieldTplField>>
     fun addTemplate(businessId: Long, templateId: Long): Flow<NoData>

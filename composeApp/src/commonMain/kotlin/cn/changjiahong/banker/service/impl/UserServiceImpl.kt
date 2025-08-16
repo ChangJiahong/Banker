@@ -6,6 +6,7 @@ import cn.changjiahong.banker.RelBasicFieldTplField
 import cn.changjiahong.banker.User
 import cn.changjiahong.banker.model.BusinessRelated
 import cn.changjiahong.banker.model.NoData
+import cn.changjiahong.banker.model.RelTplFieldBasicFieldConfig
 import cn.changjiahong.banker.model.TUExtendField
 import cn.changjiahong.banker.model.UExtendField
 import cn.changjiahong.banker.model.UserDO
@@ -69,7 +70,7 @@ class UserServiceImpl(val db: BankerDb, val userRepository: UserRepository) : Us
         emit(userFields)
     }
 
-    override suspend fun saveUserTempFieldConfig(businessId: Long,value: List<TUExtendField>): Flow<NoData> = flow {
+    override suspend fun saveRelTplFieldBasicFieldConfig(businessId: Long, value: List<RelTplFieldBasicFieldConfig>): Flow<NoData> = flow {
         db.transaction {
             value.forEachIndexed { index, field ->
                 if (field.id < 0) {
