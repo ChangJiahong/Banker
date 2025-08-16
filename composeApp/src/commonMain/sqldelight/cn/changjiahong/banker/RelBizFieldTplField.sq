@@ -14,7 +14,7 @@ SELECT bf.*
 FROM RelBizFieldTplField bf
 LEFT JOIN BizField b ON b.id = bFieldId
 LEFT JOIN TplField t ON t.id = tFieldId
-WHERE b.businessId = ? AND t.templateId = ?;
+WHERE b.bId = ? AND t.templateId = ?;
 
 insert:
 INSERT INTO RelBizFieldTplField(id,bFieldId,tFieldId,isFixed,fixedValue)

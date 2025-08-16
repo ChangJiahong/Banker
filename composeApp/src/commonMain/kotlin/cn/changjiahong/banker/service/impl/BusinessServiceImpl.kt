@@ -5,7 +5,6 @@ import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.BizField
 import cn.changjiahong.banker.RelBizFieldTplField
 import cn.changjiahong.banker.model.BField
-import cn.changjiahong.banker.model.BusinessRelated
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.model.TBField
 import cn.changjiahong.banker.repository.BusinessRepository
@@ -53,28 +52,39 @@ class BusinessServiceImpl(
     ) = flow {
 
         db.transaction {
-            val uid = userRepository.insertUser(
-                name = username,
-                idNumber = idNumber,
-                phone = phone,
-                businessRelated = BusinessRelated.EPay
-            )
+            val uid = userRepository.newUser()
             businessRepository.insertBusinessFieldValues(uid, businessId, fieldValues)
         }
 
         emit(NoData)
     }
 
-    override suspend fun saveBFieldConfigs(value: List<BField>): Flow<NoData> = flow {
-        val data = value.map {
-            BizField(
-                it.id, it.businessId, it.fieldName,
-                "", it.fieldType, it.description, it.validationRule, 0, 0, "",
-                0
-            )
-        }
+    override suspend fun saveOrUpdateBizFieldConfigs(value: List<BField>): Flow<NoData> = flow {
         db.transaction {
-            businessRepository.saveOrUpdateBusinessFields(data)
+            value.forEachIndexed { index, field ->
+                if (field.id < 0) {
+                    businessRepository.insertBizField(
+                        field.fieldName,
+                        field.businessId,
+                        field.fieldType,
+                        field.description,
+                        field.validationRule,
+                        field.isFixed,
+                        field.fixedValue
+                    )
+                } else {
+                    businessRepository.updateBizField(
+                        field.id,
+                        field.fieldName,
+                        field.businessId,
+                        field.fieldType,
+                        field.description,
+                        field.validationRule,
+                        field.isFixed,
+                        field.fixedValue
+                    )
+                }
+            }
         }
         emit(NoData)
     }

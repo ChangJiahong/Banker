@@ -18,10 +18,10 @@ import org.koin.core.annotation.Factory
 @Factory
 class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
     private val businessQueries = db.businessQueries
-    private val businessTemplatesQueries = db.relBizTplQueries
-    private val businessFieldQueries = db.bizFieldQueries
-    private val businessFieldValueQueries = db.bizFieldValueQueries
-    private val businessFiledTemplateFiledMapQueries = db.relBizFieldTplFieldQueries
+    private val relBizTplQueries = db.relBizTplQueries
+    private val bizFieldQueries = db.bizFieldQueries
+    private val bizFieldValueQueries = db.bizFieldValueQueries
+    private val relBizFieldTplFieldQueries = db.relBizFieldTplFieldQueries
 
     override suspend fun findBusinessTypes(): Flow<List<Business>> {
         return businessQueries.selectAll().asFlow().list()
@@ -32,11 +32,11 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
      */
     override suspend fun findFieldsByBusinessId(businessId: Long): Flow<List<BizField>> {
 
-        return businessFieldQueries.selectFieldsByBusinessId(businessId).asFlow().list()
+        return bizFieldQueries.selectFieldsByBusinessId(businessId).asFlow().list()
     }
 
     override fun findFieldsById(businessId: Long): Flow<List<BizField>> {
-        return businessFieldQueries.selectBusinessFieldsByBusinessId(businessId).asFlow().list()
+        return bizFieldQueries.selectBusinessFieldsByBusinessId(businessId).asFlow().list()
     }
 
     override fun insertBusinessFieldValues(
@@ -45,7 +45,7 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         fieldValues: Map<Long, String>
     ) {
         fieldValues.forEach { (fieldId, fieldValue) ->
-            businessFieldValueQueries.insertBusinessFieldValues(
+            bizFieldValueQueries.insertBusinessFieldValues(
                 getSnowId(),
                 uid,
                 businessId,
@@ -60,10 +60,10 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         userId: Long
     ): Map<String, FieldValuePair> {
         val businessFields =
-            businessFieldQueries.selectBusinessFieldsByBusinessId(businessId).executeAsList()
-        val businessFieldValues = businessFieldValueQueries.selectBusinessFieldValuesById(
+            bizFieldQueries.selectBusinessFieldsByBusinessId(businessId).executeAsList()
+        val businessFieldValues = bizFieldValueQueries.selectBusinessFieldValuesById(
             uid = userId,
-            businessId = businessId
+            bId = businessId
         ).executeAsList()
 
         val businessFieldValueMap = mutableMapOf<String, FieldValuePair>()
@@ -111,31 +111,31 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
     }
 
     override fun saveOrUpdateBusinessFields(fields: List<BizField>) {
-        fields.forEach { (id, businessId, fieldName, toFormFieldName, fieldType, description, validationRule, groupId, isFixed, fixedValue, created) ->
-            if (id < 0) {
-                businessFieldQueries.insert(
-                    getSnowId(),
-                    businessId,
-                    fieldName,
-                    fieldType,
-                    description,
-                    validationRule,
-                    groupId,
-                    isFixed
-                )
-            } else {
-                businessFieldQueries.update(
-                    businessId,
-                    fieldName,
-                    fieldType,
-                    description,
-                    validationRule,
-                    groupId,
-                    isFixed,
-                    id
-                )
-            }
-        }
+//        fields.forEach { (id, businessId, fieldName, fieldType, description, validationRule, groupId, isFixed, fixedValue, created) ->
+//            if (id < 0) {
+//                businessFieldQueries.insert(
+//                    getSnowId(),
+//                    businessId,
+//                    fieldName,
+//                    fieldType,
+//                    description,
+//                    validationRule,
+//                    groupId,
+//                    isFixed
+//                )
+//            } else {
+//                businessFieldQueries.update(
+//                    businessId,
+//                    fieldName,
+//                    fieldType,
+//                    description,
+//                    validationRule,
+//                    groupId,
+//                    isFixed,
+//                    id
+//                )
+//            }
+//        }
     }
 
 
@@ -146,7 +146,7 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         fixedValue: String?
     ): Long {
         val id = getSnowId()
-        businessFiledTemplateFiledMapQueries.insert(
+        relBizFieldTplFieldQueries.insert(
             id,
             businessFieldId,
             tempFieldId,
@@ -164,7 +164,7 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         fixed: Boolean,
         fixedValue: String?
     ) {
-        businessFiledTemplateFiledMapQueries.update(
+        relBizFieldTplFieldQueries.update(
             businessFieldId,
             tempFieldId, if (fixed) 1 else 0,
             fixedValue, id
@@ -175,18 +175,18 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         bId: Long,
         tId: Long
     ): Flow<List<RelBizFieldTplField>> {
-        return businessFiledTemplateFiledMapQueries.selectByBidAndTid(bId, tId).asFlow().list()
+        return relBizFieldTplFieldQueries.selectByBidAndTid(bId, tId).asFlow().list()
     }
 
     override suspend fun insertTemplateIntoBusiness(businessId: Long, templateId: Long): Long {
 
-        val re = businessTemplatesQueries.selectByBusinessAndTemplate(businessId, templateId)
+        val re = relBizTplQueries.selectByBusinessAndTemplate(businessId, templateId)
             .executeAsOneOrNull()
         if (re != null) {
             throw ExecuteError("已添加该模版，请勿重复添加")
         }
         val id = getSnowId()
-        businessTemplatesQueries.insert(id, businessId, templateId).ck()
+        relBizTplQueries.insert(id, businessId, templateId).ck()
         return id
     }
 
@@ -198,5 +198,50 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         val id = getSnowId()
         businessQueries.insert(id, name).ck()
         return id
+    }
+
+    override fun insertBizField(
+        fieldName: String,
+        businessId: Long,
+        fieldType: String,
+        description: String,
+        validationRule: String,
+        fixed: Boolean,
+        fixedValue: String
+    ): Long {
+        val id = getSnowId()
+        bizFieldQueries.insert(
+            id,
+            businessId,
+            fieldName,
+            fieldType,
+            description,
+            validationRule,
+            if (fixed) 1 else 0,
+            fixedValue
+        ).ck()
+        return id
+    }
+
+    override fun updateBizField(
+        id: Long,
+        fieldName: String,
+        businessId: Long,
+        fieldType: String,
+        description: String,
+        validationRule: String,
+        fixed: Boolean,
+        fixedValue: String
+    ) {
+        bizFieldQueries.update(
+            businessId,
+            fieldName,
+            fieldType,
+            description,
+            validationRule,
+            if (fixed) 1 else 0,
+            fixedValue,
+            id
+        )
     }
 }

@@ -1,16 +1,16 @@
 CREATE TABLE RelBizTpl (
     id INTEGER NOT NULL ,
-    businessId INTEGER NOT NULL REFERENCES Business(id),
-    templateId INTEGER NOT NULL REFERENCES Template(id),
+    bId INTEGER NOT NULL REFERENCES Business(id),
+    tId INTEGER NOT NULL REFERENCES Template(id),
     created INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-    PRIMARY KEY (businessId,templateId)
+    PRIMARY KEY (bId,tId)
 );
 
 selectByBusinessAndTemplate:
 SELECT *
 FROM RelBizTpl
-WHERE businessId=? AND templateId=?;
+WHERE bId=? AND tId=?;
 
 insert:
-INSERT INTO RelBizTpl(id,businessId,templateId)
+INSERT INTO RelBizTpl(id,bId,tId)
 VALUES (?,?,?);

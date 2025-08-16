@@ -1,40 +1,39 @@
 -- 业务属性
 CREATE TABLE BizField (
  id              INTEGER  PRIMARY KEY NOT NULL ,
- businessId      INTEGER  NOT NULL REFERENCES Business(id)      ,
+ bId      INTEGER  NOT NULL REFERENCES Business(id)      ,
  fieldName       TEXT     NOT NULL ,
- toFormFieldName TEXT      ,
  fieldType       TEXT     NOT NULL ,
  description     TEXT     NOT NULL ,
  validationRule  TEXT          ,
- groupId         INTEGER  NOT NULL REFERENCES FieldGroup(id),
- isFixed INTEGER NOT NULL ,
- fixedValue TEXT,
+--  groupId         INTEGER  NOT NULL REFERENCES FieldGroup(id),
+ isFixed         INTEGER NOT NULL DEFAULT 0,
+ fixedValue      TEXT NOT NULL DEFAULT "", -- 固定值
  created         INTEGER  NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
 insert:
-INSERT INTO BizField(id,businessId,fieldName,fieldType,description,validationRule,groupId,isFixed)
+INSERT INTO BizField(id,bId,fieldName,fieldType,description,validationRule,isFixed,fixedValue)
 VALUES (?,?,?,?,?,?,?,?) ;
 
 update:
 UPDATE BizField
-SET businessId=?, fieldName=?, fieldType=?, description=?, validationRule=?, groupId=?, isFixed=?, fixedValue='', toFormFieldName=''
+SET bId=?, fieldName=?, fieldType=?, description=?, validationRule=?, isFixed=?, fixedValue=?
 WHERE id=?;
 
 selectFieldsByBusinessId:
 SELECT *
 FROM BizField bf
-WHERE bf.businessId = ?;
+WHERE bf.bId = ?;
 
 selectBusinessFieldsMapById:
 SELECT BF.*, BFV.*
 FROM BizField BF
-         LEFT JOIN BizFieldValue BFV ON BF.businessId = BFV.businessId AND BF.id = BFV.fieldId
-WHERE BFV.uid = ? AND BF.businessId = ?;
+         LEFT JOIN BizFieldValue BFV ON BF.bId = BFV.bId AND BF.id = BFV.fieldId
+WHERE BFV.uid = ? AND BF.bId = ?;
 
 
 selectBusinessFieldsByBusinessId:
 SELECT BF.*
 FROM BizField BF
-WHERE  BF.businessId = ?;
+WHERE  BF.bId = ?;

@@ -16,6 +16,7 @@ import cn.changjiahong.banker.utils.getSnowId
 import cn.changjiahong.banker.utils.list
 import cn.changjiahong.banker.utils.one
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import org.koin.core.annotation.Factory
@@ -27,22 +28,17 @@ class UserRepositoryImpl(db: BankerDb) : UserRepository {
     private val userFieldTempFieldMapQueries = db.relBasicFieldTplFieldQueries
     private val userExtendFieldValueQueries = db.basicFieldValueQueries
 
-    override suspend fun selectAll(): Flow<List<UserDO>> {
-        return userQueries.selectAll().asFlow().list().map { it.map(map) }
+    override suspend fun findAll(): Flow<List<User>> {
+        return userQueries.selectAll().asFlow().list()
     }
 
     override fun selectById(id: Long): User {
         return userQueries.selectById(id).executeAsOne()
     }
 
-    override fun insertUser(
-        name: String,
-        idNumber: String,
-        phone: String,
-        businessRelated: BusinessRelated
-    ): Long {
+    override fun newUser(): Long {
         val id = getSnowId()
-        userQueries.insertUser(id, name, idNumber, phone, businessRelated.flag).ck()
+        userQueries.insertUser(id).ck()
         return id
     }
 
@@ -58,12 +54,6 @@ class UserRepositoryImpl(db: BankerDb) : UserRepository {
             userExtendFieldValueQueries.selectUserFieldValuesByUid(userId).executeAsList()
         val fieldMap = mutableMapOf<String, FieldValuePair>()
         fieldMap.apply {
-            put("user:phone", FieldValuePair(0, "phone", "TEXT", "手机号码", userDetail.phone))
-            put(
-                "user:idNumber",
-                FieldValuePair(0, "idNumber", "TEXT", "身份证号码", userDetail.idNumber)
-            )
-            put("user:name", FieldValuePair(0, "name", "TEXT", "姓名", userDetail.name))
 
             userFields.forEach { field ->
                 val fv = userFieldValues.find { it.fieldId == field.id }
@@ -90,30 +80,7 @@ class UserRepositoryImpl(db: BankerDb) : UserRepository {
      */
     override suspend fun findUserFieldsMapById(userId: Long): Flow<Map<BasicField, BasicFieldValue>> {
 
-        return userQueries.selectUserFieldsMapById(userId)
-        { id, uid, fieldName, fieldType, forced, description, validationRule, created, UEFV_id, UEFV_uid, fieldId, fieldValue, created_ ->
-            val uef =
-                BasicField(
-                    id,
-                    uid,
-                    fieldName,
-                    fieldType,
-                    forced,
-                    description,
-                    validationRule,
-                    created
-                )
-
-            val uefv = BasicFieldValue(UEFV_id, UEFV_uid, fieldId, fieldValue, created_)
-
-            Pair(uef, uefv)
-        }.asFlow().list().map {
-            val map = mutableStateMapOf<BasicField, BasicFieldValue>()
-            it.forEach { (key, value) ->
-                map.put(key, value)
-            }
-            map
-        }
+        return flow {  }
     }
 
     override fun insertUserExtendField(
@@ -187,15 +154,4 @@ class UserRepositoryImpl(db: BankerDb) : UserRepository {
         return userExtendFieldQueries.findUserFieldsByBId(businessId).asFlow().list()
     }
 
-    private val map: (User) -> UserDO =
-        { (id, name, idNumber, phone, businessRelated, created) ->
-            UserDO(
-                id,
-                name,
-                idNumber,
-                phone,
-                BusinessRelated(businessRelated),
-                created = Instant.fromEpochSeconds(created)
-            )
-        }
 }

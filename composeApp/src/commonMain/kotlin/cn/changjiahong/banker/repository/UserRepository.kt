@@ -4,23 +4,16 @@ import cn.changjiahong.banker.User
 import cn.changjiahong.banker.BasicField
 import cn.changjiahong.banker.BasicFieldValue
 import cn.changjiahong.banker.RelBasicFieldTplField
-import cn.changjiahong.banker.model.BusinessRelated
 import cn.changjiahong.banker.model.FieldValuePair
-import cn.changjiahong.banker.model.UserDO
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
 
-    suspend fun selectAll(): Flow<List<UserDO>>
+    suspend fun findAll(): Flow<List<User>>
 
     fun selectById(id: Long): User
 
-    fun insertUser(
-        name: String,
-        idNumber: String,
-        phone: String,
-        businessRelated: BusinessRelated
-    ): Long
+    fun newUser(): Long
 
 
     suspend fun findUserById(userId: Long): Flow<User>

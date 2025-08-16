@@ -5,6 +5,7 @@ import cn.changjiahong.banker.TplField
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.model.TempField
 import cn.changjiahong.banker.model.TemplateFillerItem
+import cn.changjiahong.banker.model.TplFieldConfig
 import kotlinx.coroutines.flow.Flow
 
 interface TemplateService {
@@ -26,7 +27,7 @@ interface TemplateService {
     ): Flow<Boolean>
 
     suspend fun getFieldsByTemplateId(id: Long): Flow<List<TplField>>
-    fun saveOrUpdateFieldsConfig(templateId: Long,fieldConfigs: List<TempField>): Flow<NoData>
+    fun saveOrUpdateFieldsConfig(templateId: Long,fieldConfigs: List<TplFieldConfig>): Flow<NoData>
     suspend fun fuzzySearchByTempName(tempName: String): Flow<List<Template>>
     suspend fun addNewTemplate(path: String, templateName: String, fileType: String): Flow<NoData>
 

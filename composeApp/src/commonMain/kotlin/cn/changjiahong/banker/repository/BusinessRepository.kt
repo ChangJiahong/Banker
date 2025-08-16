@@ -42,7 +42,28 @@ interface BusinessRepository {
     )
 
     fun findFieldConfigMapByBidAndTid(bId: Long, tId: Long): Flow<List<RelBizFieldTplField>>
-    suspend fun insertTemplateIntoBusiness(businessId: Long, templateId: Long):Long
+    suspend fun insertTemplateIntoBusiness(businessId: Long, templateId: Long): Long
     suspend fun insertBusiness(name: String): Long
+
+    fun insertBizField(
+        fieldName: String,
+        businessId: Long,
+        fieldType: String,
+        description: String,
+        validationRule: String,
+        fixed: Boolean,
+        fixedValue: String
+    ): Long
+
+    fun updateBizField(
+        id: Long,
+        fieldName: String,
+        businessId: Long,
+        fieldType: String,
+        description: String,
+        validationRule: String,
+        fixed: Boolean,
+        fixedValue: String
+    )
 
 }

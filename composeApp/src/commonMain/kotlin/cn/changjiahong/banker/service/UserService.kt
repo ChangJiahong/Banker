@@ -2,6 +2,7 @@ package cn.changjiahong.banker.service
 
 import cn.changjiahong.banker.BasicField
 import cn.changjiahong.banker.RelBasicFieldTplField
+import cn.changjiahong.banker.User
 import cn.changjiahong.banker.model.BusinessRelated
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.model.TUExtendField
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserService {
 
-    suspend fun getUsersByBR(br: BusinessRelated): Flow<List<UserDO>>
+    suspend fun getUsers(): Flow<List<User>>
 
     suspend fun getUserFieldsByBusinessId(id: Long): Flow<List<BasicField>>
 

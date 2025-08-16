@@ -70,7 +70,7 @@ class BusinessFieldConfigScreenModel(val business: Business, val businessService
                 return@launch
             }
 
-            businessService.saveBFieldConfigs(_businessFiledConfigs.value).collect {
+            businessService.saveOrUpdateBizFieldConfigs(_businessFiledConfigs.value).collect {
                 println("SU OK OK")
             }
 
@@ -92,7 +92,7 @@ class BusinessFieldConfigScreenModel(val business: Business, val businessService
                 _businessFiledConfigs.value = it.map { field ->
                     field.run {
                         BField(
-                            id, businessId, fieldName,
+                            id, bId, fieldName,
                             "",
                             fieldType,
                             description, validationRule ?: "", isFixed > 0, fixedValue ?: ""

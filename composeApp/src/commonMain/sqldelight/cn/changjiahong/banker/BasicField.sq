@@ -1,11 +1,10 @@
 CREATE TABLE BasicField (
     id INTEGER PRIMARY KEY NOT NULL ,
-    uid INTEGER REFERENCES User(id),
     fieldName  TEXT UNIQUE NOT NULL,
-    fieldType  TEXT ,
-    forced INTEGER NOT NULL DEFAULT 0,
+    fieldType  TEXT NOT NULL DEFAULT "TEXT",
+    forced INTEGER NOT NULL DEFAULT 0, --是否固定
     description     TEXT    NOT NULL ,
-    validationRule  TEXT    ,
+    validationRule  TEXT   NOT NULL DEFAULT "",
     created INTEGER NOT NULL DEFAULT (strftime('%s','now')) -- 时间戳格式
 );
 

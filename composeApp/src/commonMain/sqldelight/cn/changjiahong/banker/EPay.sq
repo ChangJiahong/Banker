@@ -10,8 +10,7 @@ CREATE TABLE EPay (
 selectMerchantEPayByUserIdNumber:
 SELECT *
 FROM EPay e
-JOIN User u ON u.id = e.uid
-WHERE u.idNumber = ?;
+JOIN User u ON u.id = e.uid;
 
 insertEPay:
 INSERT INTO EPay (

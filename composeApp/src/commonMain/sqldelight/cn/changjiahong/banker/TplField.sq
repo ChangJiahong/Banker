@@ -3,9 +3,7 @@ CREATE TABLE TplField (
     templateId INTEGER NOT NULL,
     formFieldName TEXT NOT NULL,
     alias TEXT NOT NULL ,
-    formFieldType TEXT ,
-    sourceFieldName TEXT NOT NULL,
-    sourceFieldType TEXT NOT NULL,
+    formFieldType TEXT NOT NULL DEFAULT "TEXT",
     created INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
@@ -17,8 +15,8 @@ FROM TplField
 WHERE templateId = ?;
 
 insert:
-INSERT INTO TplField(id,templateId,formFieldName,formFieldType,alias,sourceFieldName,sourceFieldType)
-VALUES (?,?,?,?,?,"","");
+INSERT INTO TplField(id,templateId,formFieldName,formFieldType,alias)
+VALUES (?,?,?,?,?);
 
 update:
 UPDATE TplField SET formFieldName=?,formFieldType=?,alias=?

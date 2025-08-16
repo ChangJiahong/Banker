@@ -114,9 +114,9 @@ class BusinessHandlerScreenModel(
      */
     fun loadClientele() {
         screenModelScope.launch {
-            userService.getUsersByBR(BusinessRelated.EPay).collect {
-                _clientelesData.value = it
-            }
+//            userService.getUsersByBR(BusinessRelated.EPay).collect {
+//                _clientelesData.value = it
+//            }
         }
     }
 

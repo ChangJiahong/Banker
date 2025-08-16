@@ -7,6 +7,7 @@ import cn.changjiahong.banker.TplField
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.model.TempField
 import cn.changjiahong.banker.model.TemplateFillerItem
+import cn.changjiahong.banker.model.TplFieldConfig
 import cn.changjiahong.banker.repository.BusinessRepository
 import cn.changjiahong.banker.repository.TemplateRepository
 import cn.changjiahong.banker.repository.UserRepository
@@ -46,12 +47,12 @@ class TemplateServiceImpl(
         val templateFields =
             templateRepository.findTemplateFieldsById2(templateId)
 
-        templateFields.forEach { tempField ->
-            if (!fieldsMap.contains(tempField.sourceFieldName)) {
-                emit(false)
-                return@flow
-            }
-        }
+//        templateFields.forEach { tempField ->
+//            if (!fieldsMap.contains(tempField.sourceFieldName)) {
+//                emit(false)
+//                return@flow
+//            }
+//        }
         emit(true)
     }
 
@@ -72,21 +73,21 @@ class TemplateServiceImpl(
 
         val tempFillerList = mutableListOf<TemplateFillerItem>()
 
-        templateFields.forEach { tempField ->
-
-            if (fieldsMap.contains(tempField.formFieldName)) {
-                tempFillerList.add(
-                    TemplateFillerItem(
-                        tempField.formFieldName,
-                        tempField.sourceFieldType,
-                        fieldsMap[tempField.sourceFieldName]!!.fieldValue
-                    )
-                )
-            } else {
-                throw ExecuteError("必要的属性缺失，请完善相关信息")
-            }
-
-        }
+//        templateFields.forEach { tempField ->
+//
+//            if (fieldsMap.contains(tempField.formFieldName)) {
+//                tempFillerList.add(
+//                    TemplateFillerItem(
+//                        tempField.formFieldName,
+//                        tempField.sourceFieldType,
+//                        fieldsMap[tempField.sourceFieldName]!!.fieldValue
+//                    )
+//                )
+//            } else {
+//                throw ExecuteError("必要的属性缺失，请完善相关信息")
+//            }
+//
+//        }
         emit(tempFillerList)
     }
 
@@ -96,7 +97,7 @@ class TemplateServiceImpl(
 
     override fun saveOrUpdateFieldsConfig(
         templateId: Long,
-        fieldConfigs: List<TempField>
+        fieldConfigs: List<TplFieldConfig>
     ): Flow<NoData> = flow {
         db.transaction {
             fieldConfigs.forEach { tempField ->

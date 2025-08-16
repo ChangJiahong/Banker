@@ -3,28 +3,25 @@ package cn.changjiahong.banker.service.impl
 import cn.changjiahong.banker.BankerDb
 import cn.changjiahong.banker.BasicField
 import cn.changjiahong.banker.RelBasicFieldTplField
+import cn.changjiahong.banker.User
 import cn.changjiahong.banker.model.BusinessRelated
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.model.TUExtendField
 import cn.changjiahong.banker.model.UExtendField
 import cn.changjiahong.banker.model.UserDO
 import cn.changjiahong.banker.model.UserField
-import cn.changjiahong.banker.model.are
 import cn.changjiahong.banker.repository.UserRepository
 import cn.changjiahong.banker.service.UserService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Factory
 
 @Factory
 class UserServiceImpl(val db: BankerDb, val userRepository: UserRepository) : UserService {
 
-    override suspend fun getUsersByBR(br: BusinessRelated): Flow<List<UserDO>> {
-        return userRepository.selectAll()
-            .map {
-                it.filter { user -> user.businessRelated are BusinessRelated.EPay }
-            }
+    override suspend fun getUsers(): Flow<List<User>> {
+        return userRepository.findAll()
+
     }
 
     override suspend fun getUserFieldsByBusinessId(id: Long): Flow<List<BasicField>> {

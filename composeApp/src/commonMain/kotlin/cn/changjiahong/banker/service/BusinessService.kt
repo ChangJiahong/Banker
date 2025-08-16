@@ -30,7 +30,7 @@ interface BusinessService {
         fieldValues: Map<Long, String>
     ): Flow<NoData>
 
-    suspend fun saveBFieldConfigs(value: List<BField>): Flow<NoData>
+    suspend fun saveOrUpdateBizFieldConfigs(value: List<BField>): Flow<NoData>
 
     fun saveBusinessTemplateFieldConfig(data: List<TBField>): Flow<NoData>
 

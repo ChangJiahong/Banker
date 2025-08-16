@@ -14,8 +14,8 @@ FROM Template;
 selectTemplatesByBusinessId:
 SELECT DT.*
 FROM Template DT
-LEFT JOIN RelBizTpl BT ON DT.id = BT.templateId
-WHERE businessId = ?;
+LEFT JOIN RelBizTpl BT ON DT.id = BT.tId
+WHERE bId = ?;
 
 selectTemplatesByFuzzyName:
 SELECT *

@@ -1,7 +1,6 @@
 package cn.changjiahong.banker.service.impl
 
 import cn.changjiahong.banker.BankerDb
-import cn.changjiahong.banker.model.BusinessRelated
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.repository.EPayRepository
 import cn.changjiahong.banker.repository.UserRepository
@@ -26,12 +25,7 @@ class EPayServiceImpl(
         bankerNum: String
     ): Flow<NoData> = flow {
         db.transaction {
-            val uid = userRepository.insertUser(
-                name = username,
-                idNumber = idNum,
-                phone = phone,
-                businessRelated = BusinessRelated.EPay
-            )
+            val uid = userRepository.newUser()
 //            val uid = userRepository.getLastUserId()
             ePayRepository.insertEPay(uid, bAddress, bScope, bankerNum)
         }

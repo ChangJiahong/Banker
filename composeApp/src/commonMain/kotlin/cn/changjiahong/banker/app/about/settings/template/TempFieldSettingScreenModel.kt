@@ -3,8 +3,8 @@ package cn.changjiahong.banker.app.about.settings.template
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.model.FormField
-import cn.changjiahong.banker.model.TempField
-import cn.changjiahong.banker.model.TempFieldError
+import cn.changjiahong.banker.model.TplFieldConfig
+import cn.changjiahong.banker.model.TplFieldConfigError
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEffect
 import cn.changjiahong.banker.mvi.UiEvent
@@ -23,7 +23,7 @@ sealed interface TFSUiEvent : UiEvent {
 
     object SaveConfig : TFSUiEvent
 
-    class UpdateTempFieldConfig(val index: Int, val tempField: TempField) : TFSUiEvent
+    class UpdateTempFieldConfig(val index: Int, val tempField: TplFieldConfig) : TFSUiEvent
 
 }
 
@@ -35,8 +35,8 @@ sealed interface TFSUiEffect : UiEffect {
 class TempFieldSettingScreenModel(val template: Template, val templateService: TemplateService) :
     MviScreenModel() {
 
-    private val _tempFieldConfigs = MutableStateFlow<List<TempField>>(emptyList())
-    private val _tempFieldConfigsError = MutableStateFlow<List<TempFieldError>>(emptyList())
+    private val _tempFieldConfigs = MutableStateFlow<List<TplFieldConfig>>(emptyList())
+    private val _tempFieldConfigsError = MutableStateFlow<List<TplFieldConfigError>>(emptyList())
     private val _tempFormFields = MutableStateFlow<List<FormField>>(emptyList())
 
     val tempFieldConfigs = _tempFieldConfigs.asStateFlow()
@@ -54,20 +54,20 @@ class TempFieldSettingScreenModel(val template: Template, val templateService: T
                     var fE = ""
                     var tE = ""
                     var aE = ""
-                    if (lastItem.fieldName == null || lastItem.fieldName.isEmpty()) {
+                    if (lastItem.fieldName.isEmpty()) {
                         fE = "不能为空"
                         hasE = true
                     }
-                    if (lastItem.fieldType == null || lastItem.fieldType.isEmpty()) {
+                    if (lastItem.fieldType.isEmpty()) {
                         tE = "不能为空"
                         hasE = true
                     }
-                    if (lastItem.alias == null || lastItem.alias.isEmpty()) {
+                    if (lastItem.alias.isEmpty()) {
                         aE = "不能为空"
                         hasE = true
                     }
                     _tempFieldConfigsError.replace(_tempFieldConfigsError.value.lastIndex) {
-                        TempFieldError(
+                        TplFieldConfigError(
                             fE,
                             aE,
                             tE
@@ -76,8 +76,8 @@ class TempFieldSettingScreenModel(val template: Template, val templateService: T
                 }
                 if (hasE) return
 
-                _tempFieldConfigs.update { it + TempField() }
-                _tempFieldConfigsError.update { it + TempFieldError() }
+                _tempFieldConfigs.update { it + TplFieldConfig() }
+                _tempFieldConfigsError.update { it + TplFieldConfigError() }
             }
 
             is TFSUiEvent.UpdateTempFieldConfig -> {
@@ -93,24 +93,24 @@ class TempFieldSettingScreenModel(val template: Template, val templateService: T
         val values = _tempFieldConfigs.value
         println(values)
         var hasE = false
-        val error = mutableListOf<TempFieldError>()
+        val error = mutableListOf<TplFieldConfigError>()
         values.forEachIndexed { index, field ->
             var fE = ""
             var tE = ""
             var aE = ""
-            if (field.fieldName == null || field.fieldName.isBlank()) {
+            if (field.fieldName.isBlank()) {
                 fE = "不能为空"
                 hasE = true
             }
-            if (field.fieldType == null || field.fieldType.isBlank()) {
+            if (field.fieldType.isBlank()) {
                 tE = "不能为空"
                 hasE = true
             }
-            if (field.alias == null || field.alias.isBlank()) {
+            if (field.alias.isBlank()) {
                 aE = "不能为空"
                 hasE = true
             }
-            error += TempFieldError(fE, aE, tE)
+            error += TplFieldConfigError(fE, aE, tE)
         }
 
         _tempFieldConfigsError.value = error
@@ -142,9 +142,9 @@ class TempFieldSettingScreenModel(val template: Template, val templateService: T
         screenModelScope.launch {
             templateService.getFieldsByTemplateId(template.id).collect { data ->
                 _tempFieldConfigs.value =
-                    data.map { TempField(it.id, it.formFieldName, it.alias,it.formFieldType) }
+                    data.map { TplFieldConfig(it.id, it.formFieldName, it.alias,it.formFieldType) }
 
-                _tempFieldConfigsError.value = MutableList(data.size) { TempFieldError() }
+                _tempFieldConfigsError.value = MutableList(data.size) { TplFieldConfigError() }
             }
         }
     }

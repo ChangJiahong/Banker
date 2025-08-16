@@ -37,8 +37,8 @@ import cn.changjiahong.banker.composable.TextFieldDropdown
 import cn.changjiahong.banker.composable.TextFieldDropdownScope
 import cn.changjiahong.banker.composable.rememberDropdownScope
 import cn.changjiahong.banker.model.FormField
-import cn.changjiahong.banker.model.TempField
-import cn.changjiahong.banker.model.TempFieldError
+import cn.changjiahong.banker.model.TplFieldConfigError
+import cn.changjiahong.banker.model.TplFieldConfig
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parametersOf
@@ -130,14 +130,14 @@ fun TempFieldSettingScreen.TempFieldView(
 @Composable
 private fun FieldConfigItem(
     scope: TextFieldDropdownScope<FormField>,
-    tempField: TempField,
-    tempFieldError: TempFieldError,
-    updateTempField: (TempField) -> Unit
+    tempField: TplFieldConfig,
+    tempFieldError: TplFieldConfigError,
+    updateTempField: (TplFieldConfig) -> Unit
 ) {
     var item by remember(tempField) { mutableStateOf(tempField) }
     var error by remember(tempFieldError) { mutableStateOf(tempFieldError) }
 
-    var field by remember() { mutableStateOf<FormField?>(scope.options.find { it.label == item.fieldName }?.value) }
+    var field by remember { mutableStateOf(scope.options.find { it.label == item.fieldName }?.value) }
 
     Row {
 
@@ -146,28 +146,29 @@ private fun FieldConfigItem(
             field,
             {
                 field = it
-                item = item.copy(fieldName = it?.name)
-                if (item.fieldType == null) {
-                    item = item.copy(fieldType = it?.type)
+                item = item.copy(fieldName = it?.name ?: "")
+                if (item.fieldType != it?.type) {
+                    item = item.copy(fieldType = it?.type ?: "")
                 }
-                if (item.alias == null) {
-                    item = item.copy(alias = it?.name)
+                if (item.alias.isBlank()) {
+                    item = item.copy(alias = it?.name ?: "")
                 }
                 updateTempField(item)
             }, "字段名",
             enableEdit = false,
+            errorText = error.fieldName,
             modifier = Modifier.width(200.dp)
                 .padding { paddingHorizontal(2.dp) }
         )
 
 
         TextFieldDropdown(
-            value = item.fieldType ?: "",
+            value = item.fieldType,
             onValueChange = {
                 item = item.copy(fieldType = it)
                 updateTempField(item)
             },
-            options = listOf("TEXT","CHECK", "IMAGE"),
+            options = listOf("TEXT", "CHECK", "IMAGE"),
             enableEdit = false,
             label = "字段类型",
             errorText = error.fieldType,
@@ -176,7 +177,7 @@ private fun FieldConfigItem(
         )
 
         InputView(
-            value = item.alias ?: "",
+            value = item.alias,
             onValueChange = {
                 item = item.copy(alias = it)
                 updateTempField(item)
