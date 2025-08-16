@@ -180,7 +180,7 @@ fun AddClienteleDialog(
 
 
                     InputView(
-                        label = field.fieldName,
+                        label = field.description,
                         value = usernameFieldValue.copy(uiState.username),
                         modifier = Modifier.width(200.dp).padding(10.dp, 0.dp),
                         onValueChange = { newValue ->
@@ -250,32 +250,5 @@ fun AddClienteleDialog(
                 }
             }
         }
-
-//        Column {
-//            val uiState by businessHandlerScreenModel.uiState.collectAsState()
-//            var t by remember { mutableStateOf("") }
-//            InputView(
-//                label = "电话号码",
-//                modifier = Modifier.width(250.dp).padding(10.dp, 0.dp),
-//                value = t,
-//                onValueChange = {
-//                    t = it
-//                },
-//            )
-//            // 用 rememberSaveable 保留状态和光标信息
-//            var username by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-//                mutableStateOf(TextFieldValue(uiState.username))
-//            }
-//
-//            InputView(
-//                label = "电话号码",
-//                modifier = Modifier.width(250.dp).padding(10.dp, 0.dp),
-//                value = username.copy(text = uiState.username),
-//                onValueChange = {
-//                    username=it
-//                    BhUIEvent.EnterUsername(it.text).sendTo(businessHandlerScreenModel)
-//                },
-//            )
-//        }
     }
 }

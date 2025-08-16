@@ -3,6 +3,7 @@ package cn.changjiahong.banker.service
 import cn.changjiahong.banker.BasicField
 import cn.changjiahong.banker.RelBasicFieldTplField
 import cn.changjiahong.banker.User
+import cn.changjiahong.banker.model.BasicFieldConfig
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.model.RelTplFieldBasicFieldConfig
 import cn.changjiahong.banker.model.TUExtendField
@@ -17,7 +18,7 @@ interface UserService {
     suspend fun getUserFieldsByBusinessId(id: Long): Flow<List<BasicField>>
 
 
-    suspend fun saveUFieldConfigs(value: List<UExtendField>): Flow<NoData>
+    suspend fun saveUFieldConfigs(value: List<BasicFieldConfig>): Flow<NoData>
     suspend fun getUserExtendFields(): Flow<List<BasicField>>
 
     suspend fun getUserFields(): Flow<List<UserField>>

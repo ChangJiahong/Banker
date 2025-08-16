@@ -1,8 +1,8 @@
 package cn.changjiahong.banker.app.about.settings.user
 
 import cafe.adriel.voyager.core.model.screenModelScope
-import cn.changjiahong.banker.model.UExtendField
-import cn.changjiahong.banker.model.UExtendFieldError
+import cn.changjiahong.banker.model.BasicFieldConfig
+import cn.changjiahong.banker.model.BasicFieldConfigError
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.mvi.replace
@@ -15,16 +15,16 @@ import org.koin.core.annotation.Factory
 
 sealed interface UserExtendFieldSettingScreenUiEvent : UiEvent {
     object AddFieldConfig : UiEvent
-    class UpdateBusinessFiled(val index: Int, val uField: UExtendField) : UiEvent
+    class UpdateBusinessFiled(val index: Int, val uField: BasicFieldConfig) : UiEvent
     object SaveFiledConfig : UiEvent
 }
 
 @Factory
 class UserExtendFieldSettingScreenModel(val userService: UserService) : MviScreenModel() {
 
-    private val _uFiledConfigs = MutableStateFlow<List<UExtendField>>(emptyList())
+    private val _uFiledConfigs = MutableStateFlow<List<BasicFieldConfig>>(emptyList())
 
-    private val _uFiledErrors = MutableStateFlow<List<UExtendFieldError>>(emptyList())
+    private val _uFiledErrors = MutableStateFlow<List<BasicFieldConfigError>>(emptyList())
 
     val uFiledConfigs = _uFiledConfigs.asStateFlow()
     val uFiledErrors = _uFiledErrors.asStateFlow()
@@ -33,10 +33,10 @@ class UserExtendFieldSettingScreenModel(val userService: UserService) : MviScree
         when (event) {
             is UserExtendFieldSettingScreenUiEvent.AddFieldConfig -> {
                 _uFiledConfigs.update {
-                    it + UExtendField()
+                    it + BasicFieldConfig()
                 }
                 _uFiledErrors.update {
-                    it + UExtendFieldError()
+                    it + BasicFieldConfigError()
                 }
             }
 
@@ -51,7 +51,7 @@ class UserExtendFieldSettingScreenModel(val userService: UserService) : MviScree
     private fun saveConfig() {
         screenModelScope.launch {
             val bf = uFiledConfigs.value
-            val be = mutableListOf<UExtendFieldError>()
+            val be = mutableListOf<BasicFieldConfigError>()
             bf.forEachIndexed { index, field ->
                 var fE = ""
                 var dE = ""
@@ -61,7 +61,7 @@ class UserExtendFieldSettingScreenModel(val userService: UserService) : MviScree
                 if (field.description.isEmpty()) {
                     dE = "描述不能为空"
                 }
-                val error = UExtendFieldError(fE, dE, "")
+                val error = BasicFieldConfigError(fE, dE, "")
                 be.add(error)
             }
 
@@ -86,13 +86,13 @@ class UserExtendFieldSettingScreenModel(val userService: UserService) : MviScree
             userService.getUserExtendFields().collect {
                 _uFiledErrors.value =
                     MutableList(it.size) {
-                        UExtendFieldError()
+                        BasicFieldConfigError()
                     }
 
                 _uFiledConfigs.value = it.map { field ->
                     field.run {
-                        UExtendField(
-                            id, fieldName, description, validationRule ?: "",forced==1L
+                        BasicFieldConfig(
+                            id, fieldName, "", description, validationRule, forced == 1L
                         )
                     }
                 }

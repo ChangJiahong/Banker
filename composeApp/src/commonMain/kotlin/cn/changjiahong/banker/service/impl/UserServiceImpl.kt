@@ -4,6 +4,7 @@ import cn.changjiahong.banker.BankerDb
 import cn.changjiahong.banker.BasicField
 import cn.changjiahong.banker.RelBasicFieldTplField
 import cn.changjiahong.banker.User
+import cn.changjiahong.banker.model.BasicFieldConfig
 import cn.changjiahong.banker.model.BusinessRelated
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.model.RelTplFieldBasicFieldConfig
@@ -29,7 +30,7 @@ class UserServiceImpl(val db: BankerDb, val userRepository: UserRepository) : Us
         return userRepository.findUserFieldsByBusinessId(id)
     }
 
-    override suspend fun saveUFieldConfigs(value: List<UExtendField>): Flow<NoData> = flow {
+    override suspend fun saveUFieldConfigs(value: List<BasicFieldConfig>): Flow<NoData> = flow {
         db.transaction {
             value.forEachIndexed { index, field ->
                 if (field.id < 0) {
