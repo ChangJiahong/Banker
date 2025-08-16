@@ -5,6 +5,7 @@ import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.BizField
 import cn.changjiahong.banker.RelBizFieldTplField
 import cn.changjiahong.banker.model.BField
+import cn.changjiahong.banker.model.BizFieldConfig
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.model.TBField
 import cn.changjiahong.banker.repository.BusinessRepository
@@ -59,13 +60,13 @@ class BusinessServiceImpl(
         emit(NoData)
     }
 
-    override suspend fun saveOrUpdateBizFieldConfigs(value: List<BField>): Flow<NoData> = flow {
+    override suspend fun saveOrUpdateBizFieldConfigs(value: List<BizFieldConfig>): Flow<NoData> = flow {
         db.transaction {
             value.forEachIndexed { index, field ->
                 if (field.id < 0) {
                     businessRepository.insertBizField(
                         field.fieldName,
-                        field.businessId,
+                        field.bId,
                         field.fieldType,
                         field.description,
                         field.validationRule,
@@ -76,7 +77,7 @@ class BusinessServiceImpl(
                     businessRepository.updateBizField(
                         field.id,
                         field.fieldName,
-                        field.businessId,
+                        field.bId,
                         field.fieldType,
                         field.description,
                         field.validationRule,

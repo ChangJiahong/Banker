@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,7 +32,6 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.ScaffoldWithTopBar
-import cn.changjiahong.banker.composable.BooleanFieldDropdown
 import cn.changjiahong.banker.composable.TextFieldDropdown
 import cn.changjiahong.banker.platform.HorizontalScrollbar
 import cn.changjiahong.banker.utils.padding
@@ -57,11 +55,6 @@ fun BusinessFieldConfigScreen.FieldConfigView(modifier: Modifier) {
     Column(modifier.padding { paddingHorizontal(10.dp) }) {
         val businessFields by fieldConfigScreenModel.businessFiledConfigs.collectAsState()
         val businessFiledErrors by fieldConfigScreenModel.businessFiledErrors.collectAsState()
-//
-//        val templateFields by fieldConfigScreenModel.templateFields.collectAsState()
-//        val tempFieldOptions = templateFields.map { it.formFieldName }
-
-        val groups = remember { mutableStateListOf("") }
 
         Row(Modifier.padding {
             paddingVertical(5.dp)
@@ -95,12 +88,6 @@ fun BusinessFieldConfigScreen.FieldConfigView(modifier: Modifier) {
                                 val englishRegex = Regex("^$|^(?=.*[a-zA-Z])[a-zA-Z0-9]*$")
 
 
-                                val fieldNameEdit = item.toFormFieldName.isNotEmpty()
-                                if (fieldNameEdit) {
-                                    item = item.copy(fieldName = item.toFormFieldName)
-                                    BFieldConfigScreenUiEvent.UpdateBusinessFiled(index, item)
-                                        .sendTo(fieldConfigScreenModel)
-                                }
                                 InputView(
                                     value = item.fieldName,
                                     onValueChange = {
@@ -113,26 +100,26 @@ fun BusinessFieldConfigScreen.FieldConfigView(modifier: Modifier) {
                                     },
                                     label = "字段名",
                                     errorText = error.fieldName,
-                                    readOnly = fieldNameEdit,
+                                    readOnly = false,
                                     modifier = Modifier.width(150.dp)
                                         .padding { paddingHorizontal(2.dp) }
                                 )
-//                                TextFieldDropdown(
-//                                    item.fieldType,
-//                                    onValueChange = {
-//                                        item = item.copy(fieldType = it)
-//                                        BFieldConfigScreenUiEvent.UpdateBusinessFiled(
-//                                            index,
-//                                            item
-//                                        )
-//                                            .sendTo(fieldConfigScreenModel)
-//                                    },
-//                                    listOf("TEXT", "IMAGE"),
-//                                    enableEdit = false,
-//                                    label = "字段类型",
-//                                    modifier = Modifier.width(140.dp)
-//                                        .padding { paddingHorizontal(2.dp) }
-//                                )
+                                TextFieldDropdown(
+                                    listOf("TEXT", "IMAGE"),
+                                    item.fieldType,
+                                    onValueChange = {
+                                        item = item.copy(fieldType = it)
+                                        BFieldConfigScreenUiEvent.UpdateBusinessFiled(
+                                            index,
+                                            item
+                                        )
+                                            .sendTo(fieldConfigScreenModel)
+                                    },
+                                    enableEdit = false,
+                                    label = "字段类型",
+                                    modifier = Modifier.width(140.dp)
+                                        .padding { paddingHorizontal(2.dp) }
+                                )
                                 InputView(
                                     value = item.description,
                                     onValueChange = {

@@ -2,8 +2,8 @@ package cn.changjiahong.banker.app.about.settings.business.tmp
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
-import cn.changjiahong.banker.model.BField
-import cn.changjiahong.banker.model.BFieldError
+import cn.changjiahong.banker.model.BizFieldConfig
+import cn.changjiahong.banker.model.BizFieldConfigError
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.mvi.replace
@@ -16,7 +16,7 @@ import org.koin.core.annotation.Factory
 
 sealed interface BFieldConfigScreenUiEvent : UiEvent {
     object AddFieldConfig : UiEvent
-    class UpdateBusinessFiled(val index: Int, val bField: BField) : UiEvent
+    class UpdateBusinessFiled(val index: Int, val bField: BizFieldConfig) : UiEvent
     object SaveFiledConfig : UiEvent
 }
 
@@ -24,9 +24,9 @@ sealed interface BFieldConfigScreenUiEvent : UiEvent {
 class BusinessFieldConfigScreenModel(val business: Business, val businessService: BusinessService) :
     MviScreenModel() {
 
-    private val _businessFiledConfigs = MutableStateFlow<List<BField>>(emptyList())
+    private val _businessFiledConfigs = MutableStateFlow<List<BizFieldConfig>>(emptyList())
 
-    private val _businessFiledErrors = MutableStateFlow<List<BFieldError>>(emptyList())
+    private val _businessFiledErrors = MutableStateFlow<List<BizFieldConfigError>>(emptyList())
 
     val businessFiledConfigs = _businessFiledConfigs.asStateFlow()
     val businessFiledErrors = _businessFiledErrors.asStateFlow()
@@ -35,10 +35,10 @@ class BusinessFieldConfigScreenModel(val business: Business, val businessService
         when (event) {
             is BFieldConfigScreenUiEvent.AddFieldConfig -> {
                 _businessFiledConfigs.update {
-                    it + BField(businessId = business.id)
+                    it + BizFieldConfig(bId = business.id)
                 }
                 _businessFiledErrors.update {
-                    it + BFieldError()
+                    it + BizFieldConfigError()
                 }
             }
 
@@ -51,7 +51,7 @@ class BusinessFieldConfigScreenModel(val business: Business, val businessService
     private fun saveConfig() {
         screenModelScope.launch {
             val bf = businessFiledConfigs.value
-            val be = mutableListOf<BFieldError>()
+            val be = mutableListOf<BizFieldConfigError>()
             bf.forEachIndexed { index, field ->
                 var fE = ""
                 var dE = ""
@@ -61,7 +61,7 @@ class BusinessFieldConfigScreenModel(val business: Business, val businessService
                 if (field.description.isEmpty()) {
                     dE = "描述不能为空"
                 }
-                val error = BFieldError(fE, dE, "")
+                val error = BizFieldConfigError(fE, dE, "")
                 be.add(error)
             }
 
@@ -86,16 +86,15 @@ class BusinessFieldConfigScreenModel(val business: Business, val businessService
             businessService.getFieldsById(business.id).collect {
                 _businessFiledErrors.value =
                     MutableList(it.size) {
-                        BFieldError()
+                        BizFieldConfigError()
                     }
 
                 _businessFiledConfigs.value = it.map { field ->
                     field.run {
-                        BField(
+                        BizFieldConfig(
                             id, bId, fieldName,
-                            "",
                             fieldType,
-                            description, validationRule ?: "", isFixed > 0, fixedValue ?: ""
+                            description, validationRule, isFixed > 0, fixedValue
                         )
                     }
                 }
