@@ -55,16 +55,16 @@ class TemplateSettingScreenModel(val templateService: TemplateService) : MviScre
 
     private fun addDocTemplate(file: PlatformFile) {
         if (!file.exists()) {
-            snack("选择的模版文件不存在！")
+            toast("选择的模版文件不存在！")
             return
         }
         if (file.isDirectory()) {
-            snack("不允许选择文件夹")
+            toast("不允许选择文件夹")
             return
         }
         val fileType = FileType.getFileType(file.extension)
         if (!FileType.supported(fileType)) {
-            snack("不受支持的文件类型")
+            toast("不受支持的文件类型")
             return
         }
         val fileName = file.name
@@ -76,13 +76,13 @@ class TemplateSettingScreenModel(val templateService: TemplateService) : MviScre
                 newFile = Storage.getTemplatesFile(fileName)
                 file.copyTo(newFile)
             } else {
-                snack("已存在同名文件！！")
+                toast("已存在同名文件！！")
                 return@launch
             }
 
             templateService.addNewTemplate(newFile.path, newFile.nameWithoutExtension, fileType)
                 .catchAndCollect {
-                    snack("添加成功")
+                    toast("添加成功")
                     TempSettingUiEffect.AddTempSuccess.trigger()
                 }
         }

@@ -1,30 +1,17 @@
 package cn.changjiahong.banker.app.about.settings.business
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,28 +23,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.add_box
-import banker.composeapp.generated.resources.arrow_back
-import banker.composeapp.generated.resources.dir
-import banker.composeapp.generated.resources.home
-import banker.composeapp.generated.resources.pdf
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.FoldersButton
-import cn.changjiahong.banker.GlobalNavigator
 import cn.changjiahong.banker.RightClickMenu
 import cn.changjiahong.banker.ScaffoldWithTopBar
-import cn.changjiahong.banker.SimpleSearchBar
-import cn.changjiahong.banker.app.about.settings.business.tmp.BusinessTmpDetailScreenModel
-import cn.changjiahong.banker.app.about.settings.business.tmp.BusinessTmpDetailUiEffect
-import cn.changjiahong.banker.app.about.settings.business.tmp.BusinessTmpDetailUiEvent
-import cn.changjiahong.banker.app.about.settings.template.TempFileGridView
-import cn.changjiahong.banker.app.about.settings.template.TempSettingUiEvent
-import cn.changjiahong.banker.app.about.settings.template.TemplateSettingScreenModel
 import cn.changjiahong.banker.composable.PopupDialog
-import cn.changjiahong.banker.composable.PopupDialogState
+import cn.changjiahong.banker.composable.DialogState
 import cn.changjiahong.banker.composable.RoundedInputField
-import cn.changjiahong.banker.composable.rememberPopupDialogState
-import cn.changjiahong.banker.storage.FileType
+import cn.changjiahong.banker.composable.rememberDialogState
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
 
@@ -81,7 +55,7 @@ fun BusinessGridView(
     modifier: Modifier = Modifier,
     businessSettingScreenModel: BusinessSettingScreenModel
 ) {
-    val popupDialogState = rememberPopupDialogState()
+    val popupDialogState = rememberDialogState()
 
     val businessList by businessSettingScreenModel.businessList.collectAsState()
     LazyVerticalGrid(
@@ -122,7 +96,7 @@ fun BusinessGridView(
 
 @Composable
 fun AddBusinessDialog(
-    popupDialogState: PopupDialogState,
+    popupDialogState: DialogState,
     businessSettingScreenModel: BusinessSettingScreenModel
 ) {
     businessSettingScreenModel.handleEffect {

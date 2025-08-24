@@ -31,22 +31,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.home
-import banker.composeapp.generated.resources.pdf
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.ClienteleItem
-import cn.changjiahong.banker.TipDialog
 import cn.changjiahong.banker.FoldersButton
 import cn.changjiahong.banker.InputView
-import cn.changjiahong.banker.PopupDialog
 import cn.changjiahong.banker.app.DirScreen
+import cn.changjiahong.banker.composable.DialogState
+import cn.changjiahong.banker.model.FieldValue
+import cn.changjiahong.banker.uieffect.Tip
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parameterArrayOf
 
@@ -66,20 +65,19 @@ fun BusinessHandlerScreen.BusinessHandlerView(
         parameters = { parameterArrayOf(business) }
     )
 ) {
-    val openAlertDialog = remember { mutableStateOf(false) }
-    var openErrorDialog by remember { mutableStateOf(false) }
+    val openAlertDialog = businessHandlerScreenModel.clienteleDialog
 
     val uiState by businessHandlerScreenModel.uiState.collectAsState()
 
     businessHandlerScreenModel.handleEffect { effect ->
         when (effect) {
             is BhEffect.CloseDialog -> {
-                openAlertDialog.value = false
+//                openAlertDialog.value = false
                 true
             }
 
             is BhEffect.OpenDialog -> {
-                openAlertDialog.value = true
+//                openAlertDialog.value = true
             }
         }
         false
@@ -88,10 +86,18 @@ fun BusinessHandlerScreen.BusinessHandlerView(
     Row {
         Column(modifier = Modifier.width(400.dp)) {
             val navigator = LocalNavigator.currentOrThrow
-            Button({
-                BhUIEvent.AddClientele.sendTo(businessHandlerScreenModel)
-            }) {
-                Text("新增")
+            Row {
+
+                Button({
+                    BhUIEvent.NewClientele.sendTo(businessHandlerScreenModel)
+                }) {
+                    Text("新增")
+                }
+                Button({
+                    BhUIEvent.EditClientele.sendTo(businessHandlerScreenModel)
+                }) {
+                    Text("编辑")
+                }
             }
 
             val clienteles by businessHandlerScreenModel.clientelesData.collectAsState()
@@ -99,7 +105,7 @@ fun BusinessHandlerScreen.BusinessHandlerView(
             LazyColumn {
                 itemsIndexed(clienteles) { index, it ->
                     ClienteleItem(it, {
-//                        BhUIEvent.SelectedClientele(it).sendTo(businessHandlerScreenModel)
+                        BhUIEvent.SelectedClientele(it).sendTo(businessHandlerScreenModel)
                     }, currentlySelected == it)
                 }
             }
@@ -118,11 +124,7 @@ fun BusinessHandlerScreen.BusinessHandlerView(
             ) {
                 itemsIndexed(templates) { index, it ->
                     FoldersButton(it.templateName, fileType = it.fileType) {
-                        if (currentlySelected == null) {
-                            openErrorDialog = true
-                            return@FoldersButton
-                        }
-                        BhUIEvent.GoPreTemplate(business.id, it, currentlySelected!!.id)
+                        BhUIEvent.ClickTplItem( it)
                             .sendTo(businessHandlerScreenModel)
                     }
                 }
@@ -131,35 +133,26 @@ fun BusinessHandlerScreen.BusinessHandlerView(
 
     }
 
-    when {
-        openAlertDialog.value -> {
-            AddClienteleDialog(businessHandlerScreenModel) {
-                openAlertDialog.value = false
-            }
-        }
-
-        openErrorDialog -> {
-            TipDialog("请先勾选一个客户") { openErrorDialog = false }
-        }
-    }
-
+    ClienteleDialog(businessHandlerScreenModel, openAlertDialog)
 
 }
 
-@Composable
-fun AddClienteleDialog(
-    businessHandlerScreenModel: BusinessHandlerScreenModel,
-    onDismissRequest: () -> Unit
-) {
 
-    PopupDialog(
+@Composable
+fun ClienteleDialog(
+    businessHandlerScreenModel: BusinessHandlerScreenModel,
+    dialogState: DialogState
+) {
+    cn.changjiahong.banker.composable.PopupDialog(
         title = "新增信息",
-        onDismissRequest = onDismissRequest,
-        modifier = Modifier.width(650.dp).padding(30.dp)
+        popupDialogState = dialogState,
+        modifier = Modifier.width(850.dp).fillMaxHeight().padding(30.dp)
     ) {
         Column {
 
             val uiState by businessHandlerScreenModel.uiState.collectAsState()
+
+            val fieldValues by businessHandlerScreenModel.fieldValues.collectAsState()
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("基本信息", modifier = Modifier.padding(10.dp, 0.dp), fontSize = 24.sp)
                 IconButton(onClick = {}, modifier = Modifier) {
@@ -171,21 +164,29 @@ fun AddClienteleDialog(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth().padding(10.dp)
             ) {
-                val uiState by businessHandlerScreenModel.uiState.collectAsState()
-
                 val basicFields by businessHandlerScreenModel.basicFields.collectAsState()
 
-//                var usernameFieldValue by remember { mutableStateOf(TextFieldValue(uiState.username)) }
                 basicFields.forEachIndexed { index, field ->
 
+                    var fieldValue by remember {
+                        mutableStateOf(
+                            fieldValues[field.id] ?: FieldValue(
+                                field.id,
+                                isBasic = true
+                            )
+                        )
+                    }
 
                     InputView(
                         label = field.description,
-//                        value = usernameFieldValue.copy(uiState.username),
+                        value = fieldValue.fieldValue,
                         modifier = Modifier.width(200.dp).padding(10.dp, 0.dp),
                         onValueChange = { newValue ->
-//                            usernameFieldValue = newValue
-
+                            fieldValue = fieldValue.copy(fieldValue = newValue)
+                            BhUIEvent.UpdateFieldValue(
+                                field.id,
+                                fieldValue
+                            ).sendTo(businessHandlerScreenModel)
 
                         },
 //                        errorText = uiState.usernameError,
@@ -213,21 +214,18 @@ fun AddClienteleDialog(
                 businessFields.forEach { field ->
                     var fieldValue by remember {
                         mutableStateOf(
-                            TextFieldValue(
-                                uiState.fieldValues[field.id] ?: ""
-                            )
+                            fieldValues[field.id] ?: FieldValue(field.id)
                         )
                     }
-
                     InputView(
                         label = field.description,
                         modifier = Modifier.width(250.dp).padding(10.dp, 0.dp),
-                        value = fieldValue.copy(uiState.fieldValues[field.id] ?: ""),
+                        value = fieldValue.fieldValue,
                         onValueChange = {
-                            fieldValue = it
-                            BhUIEvent.EnterField(
+                            fieldValue = fieldValue.copy(fieldValue = it)
+                            BhUIEvent.UpdateFieldValue(
                                 field.id,
-                                it.text
+                                fieldValue
                             ).sendTo(businessHandlerScreenModel)
 
                         },

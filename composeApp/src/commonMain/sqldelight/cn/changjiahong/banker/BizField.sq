@@ -26,11 +26,11 @@ SELECT *
 FROM BizField bf
 WHERE bf.bId = ?;
 
-selectBusinessFieldsMapById:
-SELECT BF.*, BFV.*
-FROM BizField BF
-         LEFT JOIN BizFieldValue BFV ON BF.bId = BFV.bId AND BF.id = BFV.fieldId
-WHERE BFV.uid = ? AND BF.bId = ?;
+-- selectBusinessFieldsMapById:
+-- SELECT BF.*, BFV.*
+-- FROM BizField BF
+--          LEFT JOIN BizFieldValue BFV ON BF.bId = BFV.bId AND BF.id = BFV.fieldId
+-- WHERE BFV.uid = ? AND BF.bId = ?;
 
 
 selectBusinessFieldsByBusinessId:

@@ -2,13 +2,14 @@ package cn.changjiahong.banker.mvi
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import cn.changjiahong.banker.uieffect.DIREffect
 import cn.changjiahong.banker.uieffect.GoDIREffect
 import cn.changjiahong.banker.uieffect.GoDIREvent
 import cn.changjiahong.banker.uieffect.GoEffect
 import cn.changjiahong.banker.uieffect.GoEvent
-import cn.changjiahong.banker.uieffect.ShowSnack
-import cn.changjiahong.banker.uieffect.ShowSnackbar
+import cn.changjiahong.banker.uieffect.ShowTip
+import cn.changjiahong.banker.uieffect.Toast
+import cn.changjiahong.banker.uieffect.ShowToast
+import cn.changjiahong.banker.uieffect.Tip
 import cn.changjiahong.banker.uieffect.UiEffectDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -44,8 +45,12 @@ abstract class MviScreenModel : ScreenModel, KoinComponent {
                         GoEffect(value.screen, value.isReplace).trigger()
                     }
 
-                    is ShowSnack -> {
-                        snack(value.text)
+                    is Toast -> {
+                        toast(value.text)
+                    }
+
+                    is Tip -> {
+                        tip(value.tip)
                     }
 
                     else ->
@@ -86,12 +91,16 @@ abstract class MviScreenModel : ScreenModel, KoinComponent {
 
     suspend fun <T> Flow<T>.catchAndCollect(collector: FlowCollector<T>) {
         catch {
-            snack(it.message ?: "")
+            toast(it.message ?: "")
         }.collect(collector)
     }
 
-    fun snack(text: String) {
-        ShowSnackbar(text).trigger()
+    fun toast(text: String) {
+        ShowToast(text).trigger()
+    }
+
+    fun tip(text: String) {
+        ShowTip(text).trigger()
     }
 }
 
@@ -102,6 +111,17 @@ inline fun <T> MutableStateFlow<List<T>>.replace(
     this.update { list ->
         list.toMutableList().apply {
             this[index] = transform(this[index])
+        }
+    }
+}
+
+inline fun <T, V> MutableStateFlow<Map<T, V>>.replace(
+    key: T,
+    transform: (V?) -> V
+) {
+    this.update { map ->
+        map.toMutableMap().apply {
+            this[key] = transform(this[key])
         }
     }
 }

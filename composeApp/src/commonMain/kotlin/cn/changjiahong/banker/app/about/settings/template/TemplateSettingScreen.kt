@@ -1,26 +1,19 @@
 package cn.changjiahong.banker.app.about.settings.template
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,32 +22,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.isSecondaryPressed
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.add_box
-import banker.composeapp.generated.resources.arrow_back
 import banker.composeapp.generated.resources.home
-import banker.composeapp.generated.resources.pdf
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.FoldersButton
 import cn.changjiahong.banker.RightClickMenu
 import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.composable.PopupDialog
-import cn.changjiahong.banker.composable.PopupDialogState
+import cn.changjiahong.banker.composable.DialogState
 import cn.changjiahong.banker.composable.RoundedInputField
-import cn.changjiahong.banker.composable.rememberPopupDialogState
+import cn.changjiahong.banker.composable.rememberDialogState
 import cn.changjiahong.banker.storage.FileType
-import cn.changjiahong.banker.uieffect.ShowSnack
-import cn.changjiahong.banker.uieffect.ShowSnackbar
+import cn.changjiahong.banker.uieffect.Toast
 import cn.changjiahong.banker.utils.padding
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
-import io.github.vinceglb.filekit.dialogs.openFilePicker
 import io.github.vinceglb.filekit.path
 import org.jetbrains.compose.resources.painterResource
 
@@ -78,7 +64,7 @@ fun TempFileGridView(
     tempSettingScreenModel: TemplateSettingScreenModel
 ) {
 
-    val popupDialogState = rememberPopupDialogState()
+    val popupDialogState = rememberDialogState()
 
     val tempFiles by tempSettingScreenModel.tempFiles.collectAsState()
     LazyVerticalGrid(
@@ -118,7 +104,7 @@ fun TempFileGridView(
 
 @Composable
 fun AddDocTemplate(
-    popupDialogState: PopupDialogState,
+    popupDialogState: DialogState,
     tempSettingScreenModel: TemplateSettingScreenModel
 ) {
     tempSettingScreenModel.handleEffect {
@@ -160,7 +146,7 @@ fun AddDocTemplate(
 
             Button({
                 if (selectFile == null) {
-                    ShowSnack("请选择一个文件").sendTo(tempSettingScreenModel)
+                    Toast("请选择一个文件").sendTo(tempSettingScreenModel)
                     return@Button
                 }
                 TempSettingUiEvent.AddDocTemplate(selectFile!!).sendTo(tempSettingScreenModel)

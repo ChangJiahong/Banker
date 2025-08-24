@@ -176,7 +176,7 @@ class FieldConfigScreenModel(
 
     private fun loadBusinessFields() {
         screenModelScope.launch {
-            businessService.getFieldsById(business.id).collect { data ->
+            businessService.getFieldsByBusinessId(business.id).collect { data ->
                 _businessOptions.value = data.map { Option(it.description, it.id) }
             }
         }

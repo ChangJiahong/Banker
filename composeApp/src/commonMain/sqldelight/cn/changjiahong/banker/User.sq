@@ -5,7 +5,7 @@ CREATE TABLE User (
 
 
 selectAll:
-SELECT * FROM User;
+SELECT * FROM User ORDER BY created DESC ;
 
 selectById:
 SELECT * FROM User WHERE id = ?;

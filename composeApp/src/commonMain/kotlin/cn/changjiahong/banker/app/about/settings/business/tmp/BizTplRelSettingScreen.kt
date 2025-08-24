@@ -38,9 +38,9 @@ import cn.changjiahong.banker.FoldersButton
 import cn.changjiahong.banker.RightClickMenu
 import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.composable.PopupDialog
-import cn.changjiahong.banker.composable.PopupDialogState
+import cn.changjiahong.banker.composable.DialogState
 import cn.changjiahong.banker.composable.RoundedInputField
-import cn.changjiahong.banker.composable.rememberPopupDialogState
+import cn.changjiahong.banker.composable.rememberDialogState
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parameterArrayOf
 
@@ -67,7 +67,7 @@ fun BusinessTmpDetailScreen.BusinessTmpDetailView(
     modifier: Modifier,
     businessTmpDetailScreenModel: BusinessTmpDetailScreenModel
 ) {
-    val popupDialogState = rememberPopupDialogState()
+    val popupDialogState = rememberDialogState()
 
     val tmpDetails by businessTmpDetailScreenModel.tmpDetails.collectAsState()
     LazyVerticalGrid(
@@ -110,7 +110,7 @@ fun BusinessTmpDetailScreen.BusinessTmpDetailView(
 
 @Composable
 fun AddTemplateDialog(
-    popupDialogState: PopupDialogState,
+    popupDialogState: DialogState,
     businessTmpDetailScreenModel: BusinessTmpDetailScreenModel
 ) {
     businessTmpDetailScreenModel.handleEffect {

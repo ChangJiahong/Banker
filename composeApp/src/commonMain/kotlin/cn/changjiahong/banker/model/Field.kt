@@ -5,13 +5,27 @@ package cn.changjiahong.banker.model
  */
 data class Field(
     val uid: Long = -1,
+    val fieldId: Long,
+    val fieldValueId: Long,
     val fieldName: String,
     val fieldType: String,
     val description: String = "",
     val validationRule: String = "",
-    val fieldValue: String
+    val fieldValue: String,
+    val isBasic: Boolean = false
 )
 
+data class FieldValue(
+    val fieldId: Long,
+    val fieldValueId: Long = -1,
+    val fieldValue: String = "",
+    val isBasic: Boolean = false
+)
+
+data class Fields(
+    val basicFields: List<Field>,
+    val bizFields: List<Field>
+)
 
 data class BizFieldConfig(
     val id: Long = -1,

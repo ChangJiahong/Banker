@@ -10,7 +10,7 @@ import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.service.BusinessService
 import cn.changjiahong.banker.service.TemplateService
 import cn.changjiahong.banker.uieffect.GoEffect
-import cn.changjiahong.banker.uieffect.ShowSnackbar
+import cn.changjiahong.banker.uieffect.ShowToast
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -73,7 +73,7 @@ class BusinessTmpDetailScreenModel(
         screenModelScope.launch {
             businessService.addTemplate(business.id, template.id)
                 .catch {
-                    ShowSnackbar(it.message?:"").trigger()
+                    ShowToast(it.message?:"").trigger()
                 }.collect {
                 BusinessTmpDetailUiEffect.AddTempSuccess.trigger()
             }

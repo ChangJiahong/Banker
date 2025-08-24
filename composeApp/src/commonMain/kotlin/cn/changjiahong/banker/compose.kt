@@ -263,14 +263,7 @@ fun ScaffoldWithTopBar(
 }
 
 
-@Composable
-fun TipDialog(tipText: String, onDismissRequest: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = { Button(onClick = { onDismissRequest() }) { Text("确定") } },
-        title = { Text("提示") },
-        text = { Text(tipText) })
-}
+
 
 
 @Composable

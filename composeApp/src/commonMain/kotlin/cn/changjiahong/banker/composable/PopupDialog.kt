@@ -1,11 +1,8 @@
 package cn.changjiahong.banker.composable
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,10 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import banker.composeapp.generated.resources.Res
@@ -31,27 +25,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.jetbrains.compose.resources.painterResource
 
-class PopupDialogState {
-    private val _visible = MutableStateFlow(false)
-    val visible = _visible.asStateFlow()
-
-    fun show() {
-        _visible.value = true
-    }
-
-    fun dismiss() {
-        _visible.value = false
-    }
-}
-
-@Composable
-fun rememberPopupDialogState(): PopupDialogState {
-    return remember { PopupDialogState() }
-}
 
 @Composable
 fun PopupDialog(
-    popupDialogState: PopupDialogState,
+    popupDialogState: DialogState,
     title: String = "",
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
@@ -65,7 +42,7 @@ fun PopupDialog(
     Popup(
         alignment = Alignment.Center,
         onDismissRequest = { popupDialogState.dismiss() },
-        properties = PopupProperties(focusable=true)
+        properties = PopupProperties(focusable = true)
     ) {
 
         Card(

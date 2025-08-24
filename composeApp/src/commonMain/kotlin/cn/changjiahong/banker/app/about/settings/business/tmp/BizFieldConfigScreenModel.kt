@@ -83,7 +83,7 @@ class BusinessFieldConfigScreenModel(val business: Business, val businessService
 
     private fun loadFiledConfigs() {
         screenModelScope.launch {
-            businessService.getFieldsById(business.id).collect {
+            businessService.getFieldsByBusinessId(business.id).collect {
                 _businessFiledErrors.value =
                     MutableList(it.size) {
                         BizFieldConfigError()

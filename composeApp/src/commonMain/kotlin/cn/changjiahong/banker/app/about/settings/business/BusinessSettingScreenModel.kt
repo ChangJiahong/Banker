@@ -8,10 +8,8 @@ import cn.changjiahong.banker.mvi.UiEffect
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.service.BusinessService
 import cn.changjiahong.banker.uieffect.GoEffect
-import cn.changjiahong.banker.uieffect.ShowSnackbar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.Factory
 
@@ -47,7 +45,7 @@ class BusinessSettingScreenModel(val businessService: BusinessService) : MviScre
 
     private fun addBusiness(name: String) {
         if (name.isBlank()){
-            snack("不能为空")
+            toast("不能为空")
             return
         }
         screenModelScope.launch {

@@ -4,6 +4,7 @@ import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.BizField
 import cn.changjiahong.banker.RelBizFieldTplField
 import cn.changjiahong.banker.model.BizFieldConfig
+import cn.changjiahong.banker.model.FieldValue
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.model.RelTplFieldBizFieldConfig
 import kotlinx.coroutines.flow.Flow
@@ -13,18 +14,12 @@ interface BusinessService {
 
     suspend fun getFieldsByBusinessId(businessId: Long): Flow<List<BizField>>
 
-    /**
-     * 通过业务id和模版id，获取模版对应的业务属性
-     */
-    suspend fun getFieldsById(businessId: Long,templateId:Long): Flow<List<BizField>>
-
-    suspend fun getFieldsById(businessId: Long): Flow<List<BizField>>
 
 
-
-    suspend fun saveUserFields(
+    suspend fun saveFields(
+        uId: Long?,
         businessId: Long,
-        fieldValues: Map<Long, String>
+        fieldValues: Map<Long, FieldValue>
     ): Flow<NoData>
 
     suspend fun saveBizFieldConfigs(value: List<BizFieldConfig>): Flow<NoData>

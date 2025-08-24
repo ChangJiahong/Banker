@@ -156,14 +156,40 @@ class UserRepositoryImpl(db: BankerDb) : UserRepository {
     }
 
     override fun findUserBasicFieldsByUId(uid: Long): List<Field> {
-        return basicFieldValueQueries.selectUserBasicFieldsByUId(uid) { uid, fieldName, fieldValue, fieldType, description, validationRule ->
-            Field(uid, fieldName!!, fieldType!!, description!!, validationRule!!, fieldValue)
+        return basicFieldValueQueries.selectUserBasicFieldsByUId(uid) { uid, fieldId, fieldValueId, fieldName, fieldValue, fieldType, description, validationRule ->
+            Field(
+                uid,
+                fieldId,
+                fieldValueId,
+                fieldName!!,
+                fieldType!!,
+                description!!, validationRule!!, fieldValue,
+                isBasic = true
+            )
         }.executeAsList()
     }
 
     override fun findUserBizFieldsByUId(uid: Long): List<Field> {
-        return bizFieldValueQueries.selectUserBizFieldsByUId(uid) { uid, fieldName, fieldValue, fieldType, description, validationRule ->
-            Field(uid, fieldName!!, fieldType!!, description!!, validationRule!!, fieldValue)
+        return bizFieldValueQueries.selectUserBizFieldsByUId(uid) { uid, fieldId, fieldValueId, fieldName, fieldValue, fieldType, description, validationRule ->
+            Field(
+                uid,
+                fieldId, fieldValueId,
+                fieldName!!, fieldType!!, description!!, validationRule!!, fieldValue
+            )
         }.executeAsList()
+    }
+
+    override fun updateFieldValue(fieldValueId: Long, fieldValue: String) {
+        basicFieldValueQueries.update(fieldValue, fieldValueId).ck()
+    }
+
+    override fun newFieldValue(
+        uid: Long,
+        fieldId: Long,
+        fieldValue: String
+    ): Long {
+        val id = getSnowId()
+        basicFieldValueQueries.insert(id, uid, fieldId, fieldValue)
+        return id
     }
 }

@@ -53,6 +53,8 @@ interface UserRepository {
 
     fun findUserBasicFieldsByUId(uid: Long): List<Field>
     fun findUserBizFieldsByUId(uid: Long): List<Field>
+    fun updateFieldValue(fieldValueId: Long, fieldValue: String)
+    fun newFieldValue(uid: Long, fieldId: Long, fieldValue: String): Long
 
 
 }

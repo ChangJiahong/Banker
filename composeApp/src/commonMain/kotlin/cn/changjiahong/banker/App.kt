@@ -8,9 +8,12 @@ import androidx.compose.runtime.*
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import cn.changjiahong.banker.app.RR
-import cn.changjiahong.banker.app.main.MainScreen
+import cn.changjiahong.banker.composable.TipDialog
+import cn.changjiahong.banker.composable.rememberDialogState
+import cn.changjiahong.banker.composable.rememberTipState
 import cn.changjiahong.banker.uieffect.NavigatorEffectRegister
-import cn.changjiahong.banker.uieffect.ShowSnackbarRegister
+import cn.changjiahong.banker.uieffect.TipDialogRegister
+import cn.changjiahong.banker.uieffect.ToastRegister
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.module.Module
@@ -34,7 +37,10 @@ fun App() {
             NavigatorEffectRegister(globalNavigator)
             val snackbarHostState = remember { SnackbarHostState() }
             val scope = rememberCoroutineScope()
-            ShowSnackbarRegister(snackbarHostState, scope)
+            ToastRegister(snackbarHostState, scope)
+            val tipDialogState = rememberTipState()
+            TipDialogRegister(tipDialogState)
+
             MaterialTheme {
                 Scaffold(
                     snackbarHost = {
@@ -43,6 +49,7 @@ fun App() {
                 ) {
                     CurrentScreen()
                 }
+                TipDialog(tipDialogState)
             }
 
         }

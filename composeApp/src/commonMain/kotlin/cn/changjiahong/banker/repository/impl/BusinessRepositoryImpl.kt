@@ -35,7 +35,7 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
     }
 
     override fun findFieldsById(businessId: Long): Flow<List<BizField>> {
-        return bizFieldQueries.selectBusinessFieldsByBusinessId(businessId).asFlow().list()
+        return bizFieldQueries.selectFieldsByBusinessId(businessId).asFlow().list()
     }
 
     override fun insertBusinessFieldValues(
@@ -44,7 +44,7 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         fieldValues: Map<Long, String>
     ) {
         fieldValues.forEach { (fieldId, fieldValue) ->
-            bizFieldValueQueries.insertBusinessFieldValues(
+            bizFieldValueQueries.insert(
                 getSnowId(),
                 uid,
                 businessId,
@@ -205,6 +205,21 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
             if (fixed) 1 else 0,
             fixedValue,
             id
-        )
+        ).ck()
+    }
+
+    override fun updateFieldValue(fieldValueId: Long, fieldValue: String) {
+        bizFieldValueQueries.update(fieldValue,fieldValueId).ck()
+    }
+
+    override fun newFieldValue(
+        uid: Long,
+        businessId: Long,
+        fieldId: Long,
+        fieldValue: String
+    ): Long {
+        val id = getSnowId()
+        bizFieldValueQueries.insert(id,uid,businessId,fieldId,fieldValue).ck()
+        return id
     }
 }

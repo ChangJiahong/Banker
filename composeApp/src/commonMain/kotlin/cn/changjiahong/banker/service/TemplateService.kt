@@ -30,4 +30,6 @@ interface TemplateService {
     suspend fun fuzzySearchByTempName(tempName: String): Flow<List<Template>>
     suspend fun addNewTemplate(path: String, templateName: String, fileType: String): Flow<NoData>
 
+    fun getFillFieldsByTplIdAndBizId(templateId: Long, businessId: Long): Flow<NoData>
+
 }

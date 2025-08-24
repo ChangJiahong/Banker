@@ -9,9 +9,14 @@ CREATE TABLE BizFieldValue (
  PRIMARY KEY (uid,bId,fieldId)
 );
 
-insertBusinessFieldValues:
+insert:
 INSERT INTO BizFieldValue(id,uid,bId,fieldId,fieldValue)
 VALUES (?,?,?,?,?);
+
+update:
+UPDATE BizFieldValue
+SET fieldValue = ?
+WHERE id = ?;
 
 selectBusinessFieldValuesById:
 SELECT *
@@ -19,7 +24,7 @@ FROM BizFieldValue
 WHERE uid = ? AND bId = ?;
 
 selectUserBizFieldsByUId:
-SELECT bfv.uid ,fieldName ,fieldValue,fieldType,description,validationRule
+SELECT bfv.uid ,fieldId,bfv.id fieldValueId,fieldName ,fieldValue,fieldType,description,validationRule
 FROM BizFieldValue bfv
 LEFT JOIN BizField bf ON bf.id = bfv.fieldId
 WHERE bfv.uid = ?;

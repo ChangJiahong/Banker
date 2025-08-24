@@ -133,4 +133,10 @@ class TemplateServiceImpl(
         templateRepository.insertNewTemplate(templateName, path, fileType)
         emit(NoData)
     }
+
+    override fun getFillFieldsByTplIdAndBizId(templateId: Long, businessId: Long ): Flow<NoData> = flow {
+//        val basicFieldConfigs = userRepository.findFieldConfigMapByTid(templateId,businessId).associate {  }
+//        val bizFieldConfigs = businessRepository.findFieldConfigMapByBidAndTid(businessId,templateId)
+
+    }
 }

@@ -59,4 +59,7 @@ interface BusinessRepository {
         fixedValue: String
     )
 
+    fun updateFieldValue(fieldValueId: Long, fieldValue: String)
+    fun newFieldValue(uid: Long, businessId: Long, fieldId: Long, fieldValue: String): Long
+
 }
