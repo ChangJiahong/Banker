@@ -91,7 +91,8 @@ abstract class MviScreenModel : ScreenModel, KoinComponent {
 
     suspend fun <T> Flow<T>.catchAndCollect(collector: FlowCollector<T>) {
         catch {
-            toast(it.message ?: "")
+            it.printStackTrace()
+            toast(it.message ?: it.stackTraceToString())
         }.collect(collector)
     }
 

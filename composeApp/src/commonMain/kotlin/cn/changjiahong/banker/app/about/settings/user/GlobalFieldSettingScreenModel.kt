@@ -1,14 +1,13 @@
-package cn.changjiahong.banker.app.about.settings.business.tmp
+package cn.changjiahong.banker.app.about.settings.user
 
 import cafe.adriel.voyager.core.model.screenModelScope
-import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.app.about.settings.ConfigUiEffect
+import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.model.FieldConf
 import cn.changjiahong.banker.model.FieldConfError
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.mvi.replace
-import cn.changjiahong.banker.service.BusinessService
 import cn.changjiahong.banker.service.FieldService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,47 +15,46 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.Factory
 
-sealed interface BFieldConfigScreenUiEvent : UiEvent {
-    object AddFieldConfig : UiEvent
-    class UpdateBusinessFiled(val index: Int, val bField: FieldConf) : UiEvent
-    object SaveFiledConfig : UiEvent
+sealed interface GlobalConfigUiEvent : UiEvent {
+
+    class Update(val index: Int, val item: FieldConf) : GlobalConfigUiEvent
+
 }
 
 @Factory
-class BusinessFieldConfigScreenModel(
-    val business: Business,
-    val businessService: BusinessService,
+class GlobalFieldSettingScreenModel(
     val fieldService: FieldService
-) :
-    MviScreenModel() {
+) : MviScreenModel() {
 
-    private val _businessFiledConfigs = MutableStateFlow<List<FieldConf>>(emptyList())
+    private val _filedConfigs = MutableStateFlow<List<FieldConf>>(emptyList())
 
-    private val _businessFiledErrors = MutableStateFlow<List<FieldConfError>>(emptyList())
+    private val _filedErrors = MutableStateFlow<List<FieldConfError>>(emptyList())
 
-    val businessFiledConfigs = _businessFiledConfigs.asStateFlow()
-    val businessFiledErrors = _businessFiledErrors.asStateFlow()
+    val filedConfigs = _filedConfigs.asStateFlow()
+    val filedErrors = _filedErrors.asStateFlow()
 
     override fun handleEvent(event: UiEvent) {
         when (event) {
-            is BFieldConfigScreenUiEvent.AddFieldConfig -> {
-                _businessFiledConfigs.update {
-                    it + FieldConf(bId = business.id)
+            is ConfigUiEvent.Add -> {
+                _filedConfigs.update {
+                    it + FieldConf(bId = -1)
                 }
-                _businessFiledErrors.update {
+                _filedErrors.update {
                     it + FieldConfError()
                 }
             }
 
-            is BFieldConfigScreenUiEvent.SaveFiledConfig -> saveConfig()
+            is ConfigUiEvent.Save -> saveConfig()
 
-            is BFieldConfigScreenUiEvent.UpdateBusinessFiled -> _businessFiledConfigs.replace(event.index) { event.bField }
+            is GlobalConfigUiEvent.Update -> _filedConfigs.replace(
+                event.index
+            ) { event.item }
         }
     }
 
     private fun saveConfig() {
         screenModelScope.launch {
-            val bf = businessFiledConfigs.value
+            val bf = filedConfigs.value
             val be = mutableListOf<FieldConfError>()
             bf.forEachIndexed { index, field ->
                 var fE = ""
@@ -72,14 +70,13 @@ class BusinessFieldConfigScreenModel(
             }
 
             if (be.any { b -> b.fieldName.isNotEmpty() || b.alias.isNotEmpty() || b.validationRule.isNotEmpty() }) {
-                _businessFiledErrors.value = be
+                _filedErrors.value = be
                 return@launch
             }
 
-            fieldService.saveBizFieldConfigs(_businessFiledConfigs.value).catchAndCollect {
+            fieldService.saveGlobalFieldConfigs(_filedConfigs.value).catchAndCollect {
                 ConfigUiEffect.SaveSuccess.trigger()
             }
-
         }
     }
 
@@ -89,25 +86,20 @@ class BusinessFieldConfigScreenModel(
 
     private fun loadFiledConfigs() {
         screenModelScope.launch {
-
-            fieldService.getBizFieldConfigsByBid(business.id).catchAndCollect {
-                _businessFiledErrors.value =
+            fieldService.getGlobalFieldConfigs().catchAndCollect {
+                _filedErrors.value =
                     MutableList(it.size) {
                         FieldConfError()
                     }
 
-                _businessFiledConfigs.value = it.map { field ->
+                _filedConfigs.value = it.map { field ->
                     field.run {
                         FieldConf(
-                            fieldId, bId, fieldName,
-                            fieldType,
-                            alias, validationRule, field.forced>0
+                            fieldId, -1,fieldName, fieldType,alias, validationRule, forced == 1L
                         )
                     }
                 }
             }
-
-
         }
     }
 }

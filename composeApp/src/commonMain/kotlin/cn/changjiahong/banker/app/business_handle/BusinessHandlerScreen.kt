@@ -44,8 +44,7 @@ import cn.changjiahong.banker.FoldersButton
 import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.app.DirScreen
 import cn.changjiahong.banker.composable.DialogState
-import cn.changjiahong.banker.model.FieldValue
-import cn.changjiahong.banker.uieffect.Tip
+import cn.changjiahong.banker.model.FieldVal
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parameterArrayOf
 
@@ -168,24 +167,23 @@ fun ClienteleDialog(
 
                 basicFields.forEachIndexed { index, field ->
 
-                    var fieldValue by remember {
+                    var fieldVal by remember {
                         mutableStateOf(
-                            fieldValues[field.id] ?: FieldValue(
-                                field.id,
-                                isBasic = true
+                            fieldValues[field.fieldId] ?: FieldVal(
+                                field.fieldId,
                             )
                         )
                     }
 
                     InputView(
-                        label = field.description,
-                        value = fieldValue.fieldValue,
+                        label = field.alias,
+                        value = fieldVal.fieldValue,
                         modifier = Modifier.width(200.dp).padding(10.dp, 0.dp),
                         onValueChange = { newValue ->
-                            fieldValue = fieldValue.copy(fieldValue = newValue)
+                            fieldVal = fieldVal.copy(fieldValue = newValue)
                             BhUIEvent.UpdateFieldValue(
-                                field.id,
-                                fieldValue
+                                field.fieldId,
+                                fieldVal
                             ).sendTo(businessHandlerScreenModel)
 
                         },
@@ -212,20 +210,20 @@ fun ClienteleDialog(
             ) {
 
                 businessFields.forEach { field ->
-                    var fieldValue by remember {
+                    var fieldVal by remember {
                         mutableStateOf(
-                            fieldValues[field.id] ?: FieldValue(field.id)
+                            fieldValues[field.fieldId] ?: FieldVal(field.fieldId)
                         )
                     }
                     InputView(
-                        label = field.description,
+                        label = field.alias,
                         modifier = Modifier.width(250.dp).padding(10.dp, 0.dp),
-                        value = fieldValue.fieldValue,
+                        value = fieldVal.fieldValue,
                         onValueChange = {
-                            fieldValue = fieldValue.copy(fieldValue = it)
+                            fieldVal = fieldVal.copy(fieldValue = it)
                             BhUIEvent.UpdateFieldValue(
-                                field.id,
-                                fieldValue
+                                field.fieldId,
+                                fieldVal
                             ).sendTo(businessHandlerScreenModel)
 
                         },

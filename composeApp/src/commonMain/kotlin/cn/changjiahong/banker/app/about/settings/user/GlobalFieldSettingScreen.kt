@@ -29,38 +29,51 @@ import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.home
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
+import cn.changjiahong.banker.GlobalNavigator
 import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.ScaffoldWithTopBar
+import cn.changjiahong.banker.app.about.settings.ConfigUiEffect
+import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.composable.BooleanFieldDropdown
 import cn.changjiahong.banker.platform.HorizontalScrollbar
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
 
-class UserExtendFieldSettingScreen : Screen {
+class GlobalFieldSettingScreen : Screen {
 
     @Composable
     override fun Content() {
 
-        ScaffoldWithTopBar("客户扩展信息") { pd ->
+        ScaffoldWithTopBar("全局字段信息") { pd ->
             ExtendFieldSettingView(Modifier.padding(pd))
         }
     }
 }
 
 @Composable
-private fun UserExtendFieldSettingScreen.ExtendFieldSettingView(modifier: Modifier) {
-    val fieldConfigScreenModel = koinScreenModel<UserExtendFieldSettingScreenModel>()
+private fun GlobalFieldSettingScreen.ExtendFieldSettingView(modifier: Modifier) {
+    val fieldConfigScreenModel = koinScreenModel<GlobalFieldSettingScreenModel>()
 
+    val global = GlobalNavigator.current
+    fieldConfigScreenModel.handleEffect {
+        when{
+            it is ConfigUiEffect.SaveSuccess -> {
+                global.pop()
+                true
+            }
+            else -> false
+        }
+    }
     Column(modifier) {
-        val uFields by fieldConfigScreenModel.uFiledConfigs.collectAsState()
-        val uFiledErrors by fieldConfigScreenModel.uFiledErrors.collectAsState()
+        val fields by fieldConfigScreenModel.filedConfigs.collectAsState()
+        val filedErrors by fieldConfigScreenModel.filedErrors.collectAsState()
 
         Row(Modifier.padding {
             paddingVertical(5.dp)
         }, verticalAlignment = Alignment.CenterVertically) {
             Text("业务信息", fontSize = 24.sp)
             IconButton({
-                UserExtendFieldSettingScreenUiEvent.AddFieldConfig.sendTo(fieldConfigScreenModel)
+                ConfigUiEvent.Add.sendTo(fieldConfigScreenModel)
             }) {
                 Icon(painter = painterResource(Res.drawable.home), contentDescription = "")
             }
@@ -76,10 +89,10 @@ private fun UserExtendFieldSettingScreen.ExtendFieldSettingView(modifier: Modifi
                     .verticalScroll(rememberScrollState())
             ) {
                 Column(Modifier.fillMaxWidth().horizontalScroll(scrollState)) {
-                    uFields.forEachIndexed { index, uField ->
+                    fields.forEachIndexed { index, uField ->
                         Row {
 
-                            val bfe = uFiledErrors[index]
+                            val bfe = filedErrors[index]
 
                             var item by remember(uField) { mutableStateOf(uField) }
                             var error by remember(bfe) { mutableStateOf(bfe) }
@@ -88,7 +101,7 @@ private fun UserExtendFieldSettingScreen.ExtendFieldSettingView(modifier: Modifi
                                 value = item.fieldName,
                                 onValueChange = {
                                     item = item.copy(fieldName = it)
-                                    UserExtendFieldSettingScreenUiEvent.UpdateBusinessFiled(index, item)
+                                    GlobalConfigUiEvent.Update(index, item)
                                         .sendTo(fieldConfigScreenModel)
                                 },
                                 label = "字段名",
@@ -98,15 +111,15 @@ private fun UserExtendFieldSettingScreen.ExtendFieldSettingView(modifier: Modifi
                                     .padding { paddingHorizontal(2.dp) }
                             )
                             InputView(
-                                value = item.description,
+                                value = item.alias,
                                 onValueChange = {
-                                    item = item.copy(description = it)
-                                    UserExtendFieldSettingScreenUiEvent.UpdateBusinessFiled(index, item)
+                                    item = item.copy(alias = it)
+                                    GlobalConfigUiEvent.Update(index, item)
                                         .sendTo(fieldConfigScreenModel)
 
                                 },
                                 label = "描述",
-                                errorText = error.description,
+                                errorText = error.alias,
                                 modifier = Modifier.width(150.dp)
                                     .padding { paddingHorizontal(2.dp) }
                             )
@@ -114,7 +127,7 @@ private fun UserExtendFieldSettingScreen.ExtendFieldSettingView(modifier: Modifi
                                 value = item.validationRule,
                                 onValueChange = {
                                     item = item.copy(validationRule = it)
-                                    UserExtendFieldSettingScreenUiEvent.UpdateBusinessFiled(index, item)
+                                    GlobalConfigUiEvent.Update(index, item)
                                         .sendTo(fieldConfigScreenModel)
 
                                 },
@@ -128,7 +141,7 @@ private fun UserExtendFieldSettingScreen.ExtendFieldSettingView(modifier: Modifi
                                 value = item.forced,
                                 onValueChange = {
                                     item = item.copy(forced = it)
-                                    UserExtendFieldSettingScreenUiEvent.UpdateBusinessFiled(index, item)
+                                    GlobalConfigUiEvent.Update(index, item)
                                         .sendTo(fieldConfigScreenModel)
                                 },
                                 label = "是否必输项",
@@ -146,7 +159,7 @@ private fun UserExtendFieldSettingScreen.ExtendFieldSettingView(modifier: Modifi
         }
 
         Button({
-            UserExtendFieldSettingScreenUiEvent.SaveFiledConfig.sendTo(fieldConfigScreenModel)
+            ConfigUiEvent.Save.sendTo(fieldConfigScreenModel)
         }) {
             Text("保存")
         }

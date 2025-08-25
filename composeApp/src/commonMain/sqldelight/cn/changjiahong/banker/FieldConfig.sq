@@ -3,23 +3,30 @@ CREATE TABLE FieldConfig (
  bId             INTEGER  NOT NULL DEFAULT -1, -- bId=-1表示全局属性
  fieldName       TEXT     NOT NULL ,
  fieldType       TEXT     NOT NULL ,
- description     TEXT     NOT NULL ,
+ alias           TEXT     NOT NULL , -- 别名
  validationRule  TEXT   NOT NULL DEFAULT "",
  forced          INTEGER NOT NULL DEFAULT 0, --是否必须，bId=-1 才有效，针对全局属性是否必输
  created         INTEGER  NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
--- 查找全局属性
-selectBasicFieldConifgs:
-SELECT *
-FROM FieldConfig
-WHERE bId = -1;
+
+--查找涉及bid业务的属性配置，包括全局属性
+selectFieldConfigInvolveTplFieldRel:
+SELECT fc.*
+FROM FieldConfig fc
+LEFT JOIN RelFieldTplField rf ON rf.fieldId = fc.fieldId
+WHERE (rf.bId = ? AND rf.isFixed = 0) OR (forced = 1 AND fc.bId=-1);
 
 -- 查找某个业务项下的属性
 selectBizFieldConfigsByBid:
 SELECT *
 FROM FieldConfig
 WHERE bId = ?;
+
+selectFieldConfigsByBidWithGlobal:
+SELECT *
+FROM FieldConfig
+WHERE bId = ? OR bId = -1;
 
 -- 查找业务项下的和全局已关联模版的属性
 
@@ -29,11 +36,11 @@ WHERE bId = ?;
 
 
 insert:
-INSERT INTO FieldConfig(fieldId,bId,fieldName,fieldType,description,
+INSERT INTO FieldConfig(fieldId,bId,fieldName,fieldType,alias,
 validationRule,forced)
 VALUES (?,?,?,?,?,?,?) ;
 
 update:
 UPDATE FieldConfig
-SET bId=?, fieldName=?, fieldType=?, description=?, validationRule=?,forced=?
+SET bId=?, fieldName=?, fieldType=?, alias=?, validationRule=?,forced=?
 WHERE fieldId=?;

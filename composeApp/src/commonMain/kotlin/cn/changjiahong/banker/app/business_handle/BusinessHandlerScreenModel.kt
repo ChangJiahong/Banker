@@ -2,16 +2,16 @@ package cn.changjiahong.banker.app.business_handle
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
-import cn.changjiahong.banker.BizField
 import cn.changjiahong.banker.Template
-import cn.changjiahong.banker.BasicField
+import cn.changjiahong.banker.FieldConfig
 import cn.changjiahong.banker.composable.DialogState
-import cn.changjiahong.banker.model.FieldValue
+import cn.changjiahong.banker.model.FieldVal
 import cn.changjiahong.banker.model.UserInfo
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.mvi.replace
 import cn.changjiahong.banker.service.BusinessService
+import cn.changjiahong.banker.service.FieldService
 import cn.changjiahong.banker.service.TemplateService
 import cn.changjiahong.banker.service.UserService
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +22,9 @@ import org.koin.core.annotation.Factory
 @Factory
 class BusinessHandlerScreenModel(
     val business: Business,
-    val userService: UserService, val businessService: BusinessService,
+    val userService: UserService,
+    val fieldService: FieldService,
+    val businessService: BusinessService,
     val templateService: TemplateService
 ) : MviScreenModel() {
     private val _clientelesData = MutableStateFlow<List<UserInfo>>(listOf())
@@ -32,19 +34,19 @@ class BusinessHandlerScreenModel(
     /**
      * 基本信息
      */
-    private val _basicFields = MutableStateFlow<List<BasicField>>(listOf())
+    private val _basicFields = MutableStateFlow<List<FieldConfig>>(listOf())
     val basicFields = _basicFields.asStateFlow()
 
     private val _templatesData = MutableStateFlow<List<Template>>(listOf())
     val templatesData = _templatesData.asStateFlow()
 
-    private val _fieldValues = MutableStateFlow<Map<Long, FieldValue>>(emptyMap())
+    private val _fieldValues = MutableStateFlow<Map<Long, FieldVal>>(emptyMap())
     val fieldValues = _fieldValues.asStateFlow()
 
     /**
      * 业务信息
      */
-    private val _bizFields = MutableStateFlow<List<BizField>>(emptyList())
+    private val _bizFields = MutableStateFlow<List<FieldConfig>>(emptyList())
     val businessFields = _bizFields.asStateFlow()
 
     private val _currentlySelected = MutableStateFlow<UserInfo?>(null)
@@ -86,12 +88,11 @@ class BusinessHandlerScreenModel(
 
     init {
         loadClientele()
-        loadDocTemplates()
-        loadBasicFields()
-        loadBusinessTypeFields()
+        loadTemplates()
+        loadFieldConfigs()
     }
 
-    private fun loadDocTemplates() {
+    private fun loadTemplates() {
         screenModelScope.launch {
             templateService.getDocTempsByBusinessId(business.id).collect {
                 _templatesData.value = it
@@ -105,29 +106,21 @@ class BusinessHandlerScreenModel(
      */
     fun loadClientele() {
         screenModelScope.launch {
-            userService.getUserInfos().catchAndCollect {
+            userService.getUserInfos(business.id).catchAndCollect {
                 _clientelesData.value = it
             }
         }
     }
 
 
-    fun loadBasicFields() {
+    fun loadFieldConfigs() {
         screenModelScope.launch {
-            userService.getUserFieldsByBusinessId(business.id).collect {
-                _basicFields.value = it
-            }
-        }
-    }
+            fieldService.getFieldConfigsForBiz(business.id).catchAndCollect { data ->
+                _basicFields.value = data.filter { f -> f.bId == -1L }
 
-    /**
-     * 初始化业务属性信息
-     */
-    fun loadBusinessTypeFields() {
-        screenModelScope.launch {
-            businessService.getFieldsByBusinessId(business.id).collect { businessFields ->
-                _bizFields.value = businessFields
+                _bizFields.value = data.filterNot { f -> f.bId == -1L }
             }
+
         }
     }
 
@@ -142,10 +135,9 @@ class BusinessHandlerScreenModel(
 
         screenModelScope.launch {
 
-            businessService.saveFields(
-                currentlySelected.value?.id,
-                business.id,
-                _fieldValues.value,
+            fieldService.saveFieldValues(
+                currentlySelected.value?.uid,
+                business.id, _fieldValues.value.values.toList()
             ).catchAndCollect {
                 toast("OK")
                 loadClientele()
@@ -174,24 +166,19 @@ class BusinessHandlerScreenModel(
 
         val currentUser = currentlySelected.value!!
 
-        val fvs = mutableMapOf<Long, FieldValue>()
-
-        currentUser.fields.values.forEach { field ->
-            fvs[field.fieldId] = FieldValue(
-                field.fieldId,
-                field.fieldValueId,
-                field.fieldValue,
-                isBasic = field.isBasic
+        _fieldValues.value = currentUser.fields.values.associate {
+            it.fieldId to FieldVal(
+                it.fieldId,
+                it.fieldValueId,
+                it.fieldValue
             )
         }
-
-        _fieldValues.value = fvs
 
         clienteleDialog.show()
     }
 
-    fun clickTplItem(template: Template){
-        if (currentlySelected.value == null || currentlySelected.value!!.id < 0) {
+    fun clickTplItem(template: Template) {
+        if (currentlySelected.value == null || currentlySelected.value!!.uid < 0) {
             tip("请先勾选一个客户")
             return
         }

@@ -2,8 +2,6 @@ package cn.changjiahong.banker.app.about.settings.template
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Template
-import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
-import cn.changjiahong.banker.model.BizFieldConfig
 import cn.changjiahong.banker.model.FormField
 import cn.changjiahong.banker.model.TplFieldConfig
 import cn.changjiahong.banker.model.TplFieldConfigError

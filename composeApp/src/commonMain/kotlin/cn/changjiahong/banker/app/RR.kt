@@ -15,7 +15,7 @@ import cn.changjiahong.banker.app.main.MainScreen
 import cn.changjiahong.banker.app.template.PreTemplateScreen
 import cn.changjiahong.banker.app.template.TemplateScreen
 import cn.changjiahong.banker.app.about.settings.template.TemplateSettingScreen
-import cn.changjiahong.banker.app.about.settings.user.UserExtendFieldSettingScreen
+import cn.changjiahong.banker.app.about.settings.user.GlobalFieldSettingScreen
 
 object RR {
     val MAIN = MainScreen
@@ -34,7 +34,7 @@ object RR {
 
     val BUSINESS_SETTING = BusinessSettingScreen
     val BUSINESS_TMP_DETAIL = { b: Business -> BusinessTmpDetailScreen(b) }
-    val USER_EXTEND_FIELD_SETTING = { UserExtendFieldSettingScreen() }
+    val GLOBAL_FIELD_SETTING = { GlobalFieldSettingScreen() }
 
     val TEMPLATE = { bId: Long, t: Template, uId: Long -> TemplateScreen(bId, t, uId) }
     val PRE_TEMPLATE = { t: Template -> PreTemplateScreen(t) }

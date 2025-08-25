@@ -25,7 +25,12 @@ interface TemplateService {
         userId: Long
     ): Flow<Boolean>
 
+    /**
+     * 获取模版的属性配置
+     */
     suspend fun getFieldsByTemplateId(id: Long): Flow<List<TplField>>
+
+
     fun saveOrUpdateFieldsConfig(templateId: Long,fieldConfigs: List<TplFieldConfig>): Flow<NoData>
     suspend fun fuzzySearchByTempName(tempName: String): Flow<List<Template>>
     suspend fun addNewTemplate(path: String, templateName: String, fileType: String): Flow<NoData>

@@ -9,17 +9,16 @@ data class Field(
     val fieldValueId: Long,
     val fieldName: String,
     val fieldType: String,
-    val description: String = "",
+    val alias: String = "",
     val validationRule: String = "",
     val fieldValue: String,
     val isBasic: Boolean = false
 )
 
-data class FieldValue(
+data class FieldVal(
     val fieldId: Long,
     val fieldValueId: Long = -1,
     val fieldValue: String = "",
-    val isBasic: Boolean = false
 )
 
 data class Fields(
@@ -27,35 +26,32 @@ data class Fields(
     val bizFields: List<Field>
 )
 
-data class BizFieldConfig(
-    val id: Long = -1,
+data class FieldConf(
+    val fieldId: Long = -1,
     val bId: Long,
     val fieldName: String = "",
     val fieldType: String = "TEXT",
-    val description: String = "",
+    val alias: String = "",
     val validationRule: String = "",
-    val isFixed: Boolean = false,
-    val fixedValue: String = "",
+    val forced: Boolean = false
 )
 
-data class BizFieldConfigError(
+data class FieldConfError(
     val fieldName: String = "",
     val fieldType: String = "",
-    val description: String = "",
+    val alias: String = "",
     val validationRule: String = "",
-    val isFixed: String = "",
-    val fixedValue: String = "",
 )
 
-data class RelTplFieldBizFieldConfig(
+data class RelFieldConfigTplField(
     val id: Long = -1,
-    val tempFieldId: Long? = null,
-    val businessFieldId: Long? = null,
+    val tFieldId: Long? = null,
+    val fieldId: Long? = null,
     val isFixed: Boolean = false,
     val fixedValue: String = "",
 )
 
-data class RelTplFieldBizFieldConfigError(
+data class RelFieldConfigTplFieldError(
     val tempFieldId: String = "",
     val businessFieldId: String = "",
     val isFixed: String = "",
@@ -64,7 +60,7 @@ data class RelTplFieldBizFieldConfigError(
 
 
 data class BasicFieldConfig(
-    val id: Long = -1,
+    val fieldId: Long = -1,
     val fieldName: String = "",
     val fieldType: String = "",
     val description: String = "",

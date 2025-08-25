@@ -30,8 +30,10 @@ import banker.composeapp.generated.resources.home
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.Business
+import cn.changjiahong.banker.GlobalNavigator
 import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.ScaffoldWithTopBar
+import cn.changjiahong.banker.app.about.settings.ConfigUiEffect
 import cn.changjiahong.banker.composable.TextFieldDropdown
 import cn.changjiahong.banker.platform.HorizontalScrollbar
 import cn.changjiahong.banker.utils.padding
@@ -51,7 +53,16 @@ class BusinessFieldConfigScreen(val business: Business) : Screen {
 @Composable
 fun BusinessFieldConfigScreen.FieldConfigView(modifier: Modifier) {
     val fieldConfigScreenModel = koinScreenModel<BusinessFieldConfigScreenModel> { parametersOf(business) }
-
+    val global = GlobalNavigator.current
+    fieldConfigScreenModel.handleEffect {
+        when{
+            it is ConfigUiEffect.SaveSuccess -> {
+                global.pop()
+                true
+            }
+            else -> false
+        }
+    }
     Column(modifier.padding { paddingHorizontal(10.dp) }) {
         val businessFields by fieldConfigScreenModel.businessFiledConfigs.collectAsState()
         val businessFiledErrors by fieldConfigScreenModel.businessFiledErrors.collectAsState()
@@ -121,9 +132,9 @@ fun BusinessFieldConfigScreen.FieldConfigView(modifier: Modifier) {
                                         .padding { paddingHorizontal(2.dp) }
                                 )
                                 InputView(
-                                    value = item.description,
+                                    value = item.alias,
                                     onValueChange = {
-                                        item = item.copy(description = it)
+                                        item = item.copy(alias = it)
                                         BFieldConfigScreenUiEvent.UpdateBusinessFiled(
                                             index,
                                             item
@@ -131,7 +142,7 @@ fun BusinessFieldConfigScreen.FieldConfigView(modifier: Modifier) {
                                             .sendTo(fieldConfigScreenModel)
                                     },
                                     label = "描述",
-                                    errorText = error.description,
+                                    errorText = error.alias,
                                     modifier = Modifier.width(150.dp)
                                         .padding { paddingHorizontal(2.dp) }
                                 )

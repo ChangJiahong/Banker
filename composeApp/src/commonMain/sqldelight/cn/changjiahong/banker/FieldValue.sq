@@ -1,9 +1,26 @@
 CREATE TABLE FieldValue (
  fieldValueId           INTEGER  NOT NULL ,
  uid          INTEGER  NOT NULL REFERENCES  User(id),
- bId          INTEGER  NOT NULL DEFAULT -1, -- bId = -1 表示全局值，唯一性
  fieldId      INTEGER  NOT NULL REFERENCES FieldConfig(fieldId),
  fieldValue   TEXT     NOT NULL ,
  created      INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
- PRIMARY KEY (uid,bId,fieldId)
+ PRIMARY KEY (uid,fieldId)
 );
+
+selectFieldsByUidAndBid:
+SELECT fc.fieldId ,fv.fieldValueId ,fv.uid ,fc.bId,fc.fieldName ,
+fv.fieldValue ,fc.fieldType ,fc.alias ,fc.validationRule ,
+fc.forced,CASE WHEN fc.bId = -1 THEN 1 ELSE 0 END AS global
+FROM FieldValue fv
+LEFT JOIN FieldConfig fc ON fc.fieldId = fv.fieldId
+WHERE (fc.bId = ? OR fc.bId =-1) AND fv.uid = ?;
+
+
+insert:
+INSERT INTO FieldValue(fieldValueId,uid,fieldId,fieldValue)
+VALUES (?,?,?,?);
+
+update:
+UPDATE FieldValue
+SET fieldValue = ?
+WHERE fieldValueId = ?;

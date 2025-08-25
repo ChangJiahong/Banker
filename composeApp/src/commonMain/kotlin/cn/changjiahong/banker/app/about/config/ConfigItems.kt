@@ -10,7 +10,7 @@ import org.jetbrains.compose.resources.DrawableResource
 val menusConfig = listOf(
     TempConfigItem,
     BusinessConfigItem,
-    UserFiledConfigItem,
+    GlobalFiledConfigItem,
     PwdConfigItem
 )
 
@@ -32,13 +32,13 @@ object BusinessConfigItem : MenusConfig {
         get() = RR.BUSINESS_SETTING
 }
 
-object UserFiledConfigItem : MenusConfig {
+object GlobalFiledConfigItem : MenusConfig {
     override val menuName: String
-        get() = "用户扩展字段设置"
+        get() = "全局字段配置"
     override val menuIcon: DrawableResource
         get() = Res.drawable.home
     override val screen: Screen?
-        get() = RR.USER_EXTEND_FIELD_SETTING()
+        get() = RR.GLOBAL_FIELD_SETTING()
 }
 
 object PwdConfigItem: MenusConfig{

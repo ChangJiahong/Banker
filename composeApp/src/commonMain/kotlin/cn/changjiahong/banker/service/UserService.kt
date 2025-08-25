@@ -31,6 +31,6 @@ interface UserService {
         businessId: Long
     ): Flow<List<RelBasicFieldTplField>>
 
-    suspend fun getUserInfos(): Flow<List<UserInfo>>
+    suspend fun getUserInfos(bid: Long): Flow<List<UserInfo>>
 
 }

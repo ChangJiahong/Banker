@@ -4,10 +4,10 @@ import cn.changjiahong.banker.BankerDb
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.BizField
 import cn.changjiahong.banker.RelBizFieldTplField
-import cn.changjiahong.banker.model.BizFieldConfig
-import cn.changjiahong.banker.model.FieldValue
+import cn.changjiahong.banker.model.FieldConf
+import cn.changjiahong.banker.model.FieldVal
 import cn.changjiahong.banker.model.NoData
-import cn.changjiahong.banker.model.RelTplFieldBizFieldConfig
+import cn.changjiahong.banker.model.RelFieldConfigTplField
 import cn.changjiahong.banker.repository.BusinessRepository
 import cn.changjiahong.banker.repository.UserRepository
 import cn.changjiahong.banker.service.BusinessService
@@ -36,7 +36,7 @@ class BusinessServiceImpl(
     override suspend fun saveFields(
         uId: Long?,
         businessId: Long,
-        fieldValues: Map<Long, FieldValue>
+        fieldValues: Map<Long, FieldVal>
     ) = flow {
 
         db.transaction {
@@ -47,32 +47,32 @@ class BusinessServiceImpl(
             fieldValues.values.forEach { fieldValue ->
                 if (fieldValue.fieldId > 0) {
                     if (fieldValue.fieldValueId > 0) {
-                        if (fieldValue.isBasic) {
-                            userRepository.updateFieldValue(
-                                fieldValue.fieldValueId,
-                                fieldValue.fieldValue
-                            )
-                        } else {
-                            businessRepository.updateFieldValue(
-                                fieldValue.fieldValueId,
-                                fieldValue.fieldValue
-                            )
-                        }
+//                        if (fieldValue.isBasic) {
+//                            userRepository.updateFieldValue(
+//                                fieldValue.fieldValueId,
+//                                fieldValue.fieldValue
+//                            )
+//                        } else {
+//                            businessRepository.updateFieldValue(
+//                                fieldValue.fieldValueId,
+//                                fieldValue.fieldValue
+//                            )
+//                        }
                     } else {
-                        if (fieldValue.isBasic) {
-                            userRepository.newFieldValue(
-                                uid,
-                                fieldValue.fieldId,
-                                fieldValue.fieldValue
-                            )
-                        } else {
-                            businessRepository.newFieldValue(
-                                uid,
-                                businessId,
-                                fieldValue.fieldId,
-                                fieldValue.fieldValue
-                            )
-                        }
+//                        if (fieldValue.isBasic) {
+//                            userRepository.newFieldValue(
+//                                uid,
+//                                fieldValue.fieldId,
+//                                fieldValue.fieldValue
+//                            )
+//                        } else {
+//                            businessRepository.newFieldValue(
+//                                uid,
+//                                businessId,
+//                                fieldValue.fieldId,
+//                                fieldValue.fieldValue
+//                            )
+//                        }
                     }
                 }
             }
@@ -81,29 +81,29 @@ class BusinessServiceImpl(
         emit(NoData)
     }
 
-    override suspend fun saveBizFieldConfigs(value: List<BizFieldConfig>): Flow<NoData> = flow {
+    override suspend fun saveBizFieldConfigs(value: List<FieldConf>): Flow<NoData> = flow {
         db.transaction {
             value.forEachIndexed { index, field ->
-                if (field.id < 0) {
+                if (field.fieldId < 0) {
                     businessRepository.insertBizField(
                         field.fieldName,
                         field.bId,
                         field.fieldType,
-                        field.description,
+                        field.alias,
                         field.validationRule,
-                        field.isFixed,
-                        field.fixedValue
+                        false,
+                        ""
                     )
                 } else {
                     businessRepository.updateBizField(
-                        field.id,
+                        field.fieldId,
                         field.fieldName,
                         field.bId,
                         field.fieldType,
-                        field.description,
+                        field.alias,
                         field.validationRule,
-                        field.isFixed,
-                        field.fixedValue
+                        false,
+                        ""
                     )
                 }
             }
@@ -111,22 +111,22 @@ class BusinessServiceImpl(
         emit(NoData)
     }
 
-    override fun saveRelTplFieldBizFieldConfig(data: List<RelTplFieldBizFieldConfig>): Flow<NoData> =
+    override fun saveRelTplFieldBizFieldConfig(data: List<RelFieldConfigTplField>): Flow<NoData> =
         flow {
             db.transaction {
                 data.forEach { tBField ->
                     if (tBField.id < 0) {
                         businessRepository.insertRelTplFieldBizField(
-                            tBField.businessFieldId,
-                            tBField.tempFieldId!!,
+                            tBField.fieldId,
+                            tBField.tFieldId!!,
                             tBField.isFixed,
                             tBField.fixedValue
                         )
                     } else {
                         businessRepository.updateRelTplFieldBizField(
                             tBField.id,
-                            tBField.businessFieldId,
-                            tBField.tempFieldId!!,
+                            tBField.fieldId,
+                            tBField.tFieldId!!,
                             tBField.isFixed,
                             tBField.fixedValue
                         )

@@ -3,7 +3,8 @@ package cn.changjiahong.banker.app.business_handle
 import androidx.compose.runtime.Stable
 import cn.changjiahong.banker.BizField
 import cn.changjiahong.banker.Template
-import cn.changjiahong.banker.model.FieldValue
+import cn.changjiahong.banker.model.Field
+import cn.changjiahong.banker.model.FieldVal
 import cn.changjiahong.banker.model.UserInfo
 import cn.changjiahong.banker.mvi.UiEffect
 import cn.changjiahong.banker.mvi.UiEvent
@@ -23,7 +24,7 @@ sealed interface BhUIEvent : UiEvent {
     object EditClientele : BhUIEvent
     object SaveBhDetail : BhUIEvent
 
-    data class UpdateFieldValue(val fieldId: Long, val fieldValue: FieldValue): BhUIEvent
+    data class UpdateFieldValue(val fieldId: Long, val fieldValue: FieldVal): BhUIEvent
 
     data class SelectedClientele(val user: UserInfo) : BhUIEvent
 

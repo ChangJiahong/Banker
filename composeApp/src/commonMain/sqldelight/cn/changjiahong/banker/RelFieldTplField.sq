@@ -1,10 +1,27 @@
+-- 在这个表中，看不出那个字段是全局的，只有通过fieldId去查询
 CREATE TABLE RelFieldTplField (
  id              INTEGER  NOT NULL ,
- fieldId        INTEGER  REFERENCES FieldConfig(fieldId),
+ fieldId         INTEGER  REFERENCES FieldConfig(fieldId),
  tFieldId        INTEGER  NOT NULL REFERENCES TplField(id),
- bId             INTEGER  NOT NULL REFERENCES Business(id),
+ bId             INTEGER  NOT NULL REFERENCES Business(id), -- 这里的bId表示在这个业务项下的映射关系
  isFixed         INTEGER NOT NULL ,
  fixedValue      TEXT NOT NULL DEFAULT "",
  created INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
  PRIMARY KEY (fieldId,tFieldId)
 );
+
+selectFieldConfigAndTplFieldMap:
+SELECT ff.*
+FROM RelFieldTplField ff
+LEFT JOIN TplField t ON t.id = tFieldId
+WHERE ff.bId = ? AND t.templateId = ?;
+
+
+insert:
+INSERT INTO RelFieldTplField(id,fieldId,tFieldId,bId,isFixed,fixedValue)
+VALUES (?,?,?,?,?,?);
+
+update:
+UPDATE RelFieldTplField
+SET fieldId=?,tFieldId=?,isFixed=?,fixedValue=?
+WHERE id = ?;

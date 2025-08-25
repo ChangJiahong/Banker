@@ -4,15 +4,15 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.composable.Option
-import cn.changjiahong.banker.model.RelTplFieldBizFieldConfig
-import cn.changjiahong.banker.model.RelTplFieldBizFieldConfigError
+import cn.changjiahong.banker.model.RelFieldConfigTplField
+import cn.changjiahong.banker.model.RelFieldConfigTplFieldError
 import cn.changjiahong.banker.model.RelTplFieldBasicFieldConfig
-import cn.changjiahong.banker.model.RelTplFieldBasicFieldConfigError
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEffect
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.mvi.replace
 import cn.changjiahong.banker.service.BusinessService
+import cn.changjiahong.banker.service.FieldService
 import cn.changjiahong.banker.service.TemplateService
 import cn.changjiahong.banker.service.UserService
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,9 +22,9 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Factory
 
 sealed interface FieldConfigScreenUiEvent : UiEvent {
-    object AddBFieldConfig : FieldConfigScreenUiEvent
+    object AddFieldConfig : FieldConfigScreenUiEvent
     object AddUFieldConfig : FieldConfigScreenUiEvent
-    class UpdateBusinessFiled(val index: Int, val field: RelTplFieldBizFieldConfig) :
+    class UpdateFiledConfig(val index: Int, val field: RelFieldConfigTplField) :
         FieldConfigScreenUiEvent
 
     class UpdateUFiled(val index: Int, val field: RelTplFieldBasicFieldConfig) :
@@ -42,61 +42,43 @@ class FieldConfigScreenModel(
     val business: Business, val template: Template,
     val templateService: TemplateService,
     val businessService: BusinessService,
+    val fieldService: FieldService,
     val userService: UserService,
 ) : MviScreenModel() {
 
-    private val _templateOptions = MutableStateFlow<List<Option<Long>>>(emptyList())
+    private val _tplFieldOptions = MutableStateFlow<List<Option<Long>>>(emptyList())
 
-    val templateOptions = _templateOptions.asStateFlow()
+    val tplFieldOptions = _tplFieldOptions.asStateFlow()
 
-    private val _businessOptions = MutableStateFlow<List<Option<Long>>>(emptyList())
+    private val _fieldOptions = MutableStateFlow<List<Option<Long>>>(emptyList())
 
-    val businessOptions = _businessOptions.asStateFlow()
+    val fieldOptions = _fieldOptions.asStateFlow()
 
-    private val _userOptions = MutableStateFlow<List<Option<Long>>>(emptyList())
+    private val _fieldConfigs = MutableStateFlow<List<RelFieldConfigTplField>>(emptyList())
+    private val _fieldConfigsError =
+        MutableStateFlow<List<RelFieldConfigTplFieldError>>(emptyList())
 
-    val userOptions = _userOptions.asStateFlow()
-
-    private val _tuFieldConfigs = MutableStateFlow<List<RelTplFieldBasicFieldConfig>>(emptyList())
-    private val _tuFieldConfigsError =
-        MutableStateFlow<List<RelTplFieldBasicFieldConfigError>>(emptyList())
-
-    private val _btFieldConfigs = MutableStateFlow<List<RelTplFieldBizFieldConfig>>(emptyList())
-    private val _btFieldConfigsError =
-        MutableStateFlow<List<RelTplFieldBizFieldConfigError>>(emptyList())
-
-    val btFieldConfigs = _btFieldConfigs.asStateFlow()
-    val btFieldConfigsError = _btFieldConfigsError.asStateFlow()
-
-    val tuFieldConfigs = _tuFieldConfigs.asStateFlow()
-    val tuFieldConfigsError = _tuFieldConfigsError.asStateFlow()
+    val fieldConfigs = _fieldConfigs.asStateFlow()
+    val fieldConfigsError = _fieldConfigsError.asStateFlow()
 
     override fun handleEvent(event: UiEvent) {
 
         when (event) {
-            is FieldConfigScreenUiEvent.AddBFieldConfig -> {
-                _btFieldConfigs.update { it + RelTplFieldBizFieldConfig() }
-                _btFieldConfigsError.update { it + RelTplFieldBizFieldConfigError() }
+            is FieldConfigScreenUiEvent.AddFieldConfig -> {
+                _fieldConfigs.update { it + RelFieldConfigTplField() }
+                _fieldConfigsError.update { it + RelFieldConfigTplFieldError() }
             }
 
-            is FieldConfigScreenUiEvent.AddUFieldConfig -> {
-                _tuFieldConfigs.update { it + RelTplFieldBasicFieldConfig() }
-                _tuFieldConfigsError.update { it + RelTplFieldBasicFieldConfigError() }
-            }
-
-            is FieldConfigScreenUiEvent.UpdateBusinessFiled ->
-                _btFieldConfigs.replace(event.index) { event.field }
-
-            is FieldConfigScreenUiEvent.UpdateUFiled ->
-                _tuFieldConfigs.replace(event.index) { event.field }
+            is FieldConfigScreenUiEvent.UpdateFiledConfig ->
+                _fieldConfigs.replace(event.index) { event.field }
 
             is FieldConfigScreenUiEvent.SaveConfig -> saveConfig()
         }
     }
 
     private fun saveConfig() {
-        val btValue = btFieldConfigs.value
-        val error = mutableListOf<RelTplFieldBizFieldConfigError>()
+        val btValue = fieldConfigs.value
+        val error = mutableListOf<RelFieldConfigTplFieldError>()
         var hasError = false
         btValue.forEach { (id, tempFieldId, businessFieldId, isFixed, fixedValue) ->
             var tf = ""
@@ -114,70 +96,52 @@ class FieldConfigScreenModel(
                 fv = "不能为空"
                 hasError = true
             }
-            error.add(RelTplFieldBizFieldConfigError(tf, bf, fv))
+            error.add(RelFieldConfigTplFieldError(tf, bf, fv))
         }
-        _btFieldConfigsError.value = error
+        _fieldConfigsError.value = error
         if (hasError) {
             return
         }
 
         screenModelScope.launch {
 
-            userService.saveRelTplFieldBasicFieldConfig(business.id, _tuFieldConfigs.value)
-                .catchAndCollect {
-                    businessService.saveRelTplFieldBizFieldConfig(_btFieldConfigs.value)
-                        .catchAndCollect {
-                            FieldConfigScreenUiEffect.SaveSuccess.trigger()
-                        }
-                }
+            fieldService.saveFieldConfigAndTplFieldMap(business.id,_fieldConfigs.value).catchAndCollect {
+                FieldConfigScreenUiEffect.SaveSuccess.trigger()
+            }
+
         }
     }
 
     init {
         loadTemplateFields()
-        loadUserFields()
-        loadBusinessFields()
+        loadFieldConfigs()
         loadFieldMap()
-    }
-
-    private fun loadUserFields() {
-        screenModelScope.launch {
-            userService.getUserFields().collect { data ->
-                _userOptions.value = data.map { Option(it.description, it.id) }
-            }
-        }
     }
 
     private fun loadFieldMap() {
         screenModelScope.launch {
-            businessService.getFieldConfigMapByBidAndTid(business.id, template.id).collect { data ->
-                _btFieldConfigs.value = data.map {
-                    RelTplFieldBizFieldConfig(
-                        it.id, it.tFieldId, it.bFieldId, it.isFixed > 0,
-                        it.fixedValue
-                    )
-                }
-                _btFieldConfigsError.value =
-                    MutableList(data.size) { RelTplFieldBizFieldConfigError() }
 
-            }
-
-        }
-        screenModelScope.launch {
-            userService.getFieldConfigMapByTIdAndBId(template.id, business.id).collect { data ->
-                _tuFieldConfigs.value = data.map {
-                    RelTplFieldBasicFieldConfig(it.id, it.tFieldId, it.uFieldId)
+            /*
+            获取业务项（全局）属性和模版的属性映射关系
+             */
+            fieldService.getFieldConfigAndTplFieldMap(business.id, template.id)
+                .catchAndCollect { data ->
+                    _fieldConfigs.value = data.map {
+                        RelFieldConfigTplField(
+                            it.id, it.tFieldId, it.fieldId, it.isFixed > 0,
+                            it.fixedValue
+                        )
+                    }
+                    _fieldConfigsError.value =
+                        MutableList(data.size) { RelFieldConfigTplFieldError() }
                 }
-                _tuFieldConfigsError.value =
-                    MutableList(data.size) { RelTplFieldBasicFieldConfigError() }
-            }
         }
     }
 
-    private fun loadBusinessFields() {
+    private fun loadFieldConfigs() {
         screenModelScope.launch {
-            businessService.getFieldsByBusinessId(business.id).collect { data ->
-                _businessOptions.value = data.map { Option(it.description, it.id) }
+            fieldService.getFieldConfigs(business.id).catchAndCollect { data ->
+                _fieldOptions.value = data.map { Option(it.alias, it.fieldId) }
             }
         }
     }
@@ -185,7 +149,7 @@ class FieldConfigScreenModel(
     private fun loadTemplateFields() {
         screenModelScope.launch {
             templateService.getFieldsByTemplateId(template.id).collect { data ->
-                _templateOptions.value = data.map { Option(it.formFieldName, it.id) }
+                _tplFieldOptions.value = data.map { Option(it.formFieldName, it.id) }
             }
         }
     }
