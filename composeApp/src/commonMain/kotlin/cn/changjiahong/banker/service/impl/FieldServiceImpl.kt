@@ -65,8 +65,8 @@ class FieldServiceImpl(
     override fun getFieldConfigsForTemplate(
         bId: Long,
         tid: Long
-    ): Flow<List<FieldConfig>> {
-        TODO("Not yet implemented")
+    ): Flow<List<FieldConfig>> =returnFlow{
+        fieldRepository.findFieldConfigsForTpl(bId,tid)
     }
 
     override fun saveBizFieldConfigs(fieldConfigs: List<FieldConf>) = okFlow {

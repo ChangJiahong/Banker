@@ -28,7 +28,13 @@ SELECT *
 FROM FieldConfig
 WHERE bId = ? OR bId = -1;
 
--- 查找业务项下的和全局已关联模版的属性
+--获取业务项下的某个模版的属性配置
+selectFieldConfigsForTpl:
+SELECT fc.*
+FROM FieldConfig fc
+LEFT JOIN RelFieldTplField rftf ON rftf.fieldId  = fc.fieldId
+LEFT JOIN TplField tf ON tf.id = rftf.tFieldId
+WHERE rftf.bId = ? AND tf.templateId = ?;
 
 
 

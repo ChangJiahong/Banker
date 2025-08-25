@@ -13,7 +13,7 @@ import banker.composeapp.generated.resources.Res
 import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.model.TemplateFillerItem
 import cn.changjiahong.banker.pdfutils.PDFViewer
-import cn.changjiahong.banker.pdfutils.PdfTemplateProcessor
+import cn.changjiahong.banker.template.PdfTemplateProcessor
 
 @Composable
 fun DOCTemplateView(

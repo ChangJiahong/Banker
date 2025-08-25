@@ -11,9 +11,16 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.app.DirScreen
+import cn.changjiahong.banker.model.Field
+import cn.changjiahong.banker.model.TemplateFillerItem
 import org.koin.core.parameter.parametersOf
 
-class TemplateScreen(val businessId: Long, val template: Template, val userId: Long) :
+class TemplateScreen(
+    val userId: Long,
+    val businessId: Long,
+    val template: Template,
+    val fields: List<Field>
+) :
     DirScreen {
     override val dirName: String
         get() = template.templateName
@@ -24,15 +31,25 @@ class TemplateScreen(val businessId: Long, val template: Template, val userId: L
     @Composable
     override fun Content() {
 
-        val templateScreenModel = koinScreenModel<TemplateScreenModel>(parameters = { parametersOf(businessId,template,userId) })
+        val templateScreenModel = koinScreenModel<TemplateScreenModel>(parameters = {
+            parametersOf(
+                businessId,
+                template,
+                userId
+            )
+        })
 
 
-        val templateFillerData by templateScreenModel.templateFillerData.collectAsState()
+        val templateFillerData = fields.map {
+            TemplateFillerItem(
+                it.fieldName, it.fieldType,it.fieldValue
+            )
+        }
 
 
         when (template.fileType) {
-//            PDF -> PDFTemplateView(template,templateFillerData)
-            PDF -> DOCTemplateView(template,templateFillerData)
+            PDF -> PDFTemplateView(template, templateFillerData)
+            DOC -> DOCTemplateView(template, templateFillerData)
             else -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("未知的文件类型，尚不受支持。请联系管理员！！！")
             }

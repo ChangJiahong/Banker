@@ -16,6 +16,7 @@ import cn.changjiahong.banker.app.template.PreTemplateScreen
 import cn.changjiahong.banker.app.template.TemplateScreen
 import cn.changjiahong.banker.app.about.settings.template.TemplateSettingScreen
 import cn.changjiahong.banker.app.about.settings.user.GlobalFieldSettingScreen
+import cn.changjiahong.banker.model.Field
 
 object RR {
     val MAIN = MainScreen
@@ -36,7 +37,7 @@ object RR {
     val BUSINESS_TMP_DETAIL = { b: Business -> BusinessTmpDetailScreen(b) }
     val GLOBAL_FIELD_SETTING = { GlobalFieldSettingScreen() }
 
-    val TEMPLATE = { bId: Long, t: Template, uId: Long -> TemplateScreen(bId, t, uId) }
+    val TEMPLATE = {  uId: Long,bId: Long, t: Template,fields: List<Field> -> TemplateScreen(uId,bId, t, fields) }
     val PRE_TEMPLATE = { t: Template -> PreTemplateScreen(t) }
     val FIELD_CONFIG = { b:Business,t: Template -> FieldConfigScreen(b,t) }
     val BUSINESS_FIELD_CONFIG = { b:Business -> BusinessFieldConfigScreen(b) }

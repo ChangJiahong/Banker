@@ -83,4 +83,9 @@ interface FieldRepository {
     fun newFieldValue(uid: Long, fieldId: Long, fieldValue: String): Long
 
     fun updateFieldValueById(fieldValueId: Long, fieldValue: String)
+
+    /**
+     * 获取业务项下的某个模版的属性配置
+     */
+    suspend fun findFieldConfigsForTpl(bId: Long, tid: Long): List<FieldConfig>
 }

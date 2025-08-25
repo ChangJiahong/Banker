@@ -138,4 +138,11 @@ class FieldRepositoryImpl(db: BankerDb) : FieldRepository {
         fieldValueQueries.update(fieldValue, fieldValueId).ck()
 
     }
+
+    override suspend fun findFieldConfigsForTpl(
+        bId: Long,
+        tid: Long
+    ): List<FieldConfig> {
+        return fieldConfigQueries.selectFieldConfigsForTpl(bId, tid).executeAsList()
+    }
 }

@@ -34,14 +34,7 @@ class TemplateScreenModel(
     }
 
     private fun loadFields() {
-        screenModelScope.launch {
-            templateService.getTemplateFillerData(businessId,template.id,userId).catch {
-                it.printStackTrace()
-                println(it.message)
-            }.collect {
-                _templateFillerData.value = it
-            }
-        }
+
     }
 
 

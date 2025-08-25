@@ -18,6 +18,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
@@ -28,9 +30,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import banker.composeapp.generated.resources.Res
+import banker.composeapp.generated.resources.home
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.Business
@@ -43,6 +49,7 @@ import cn.changjiahong.banker.composable.TextFieldDropdown
 import cn.changjiahong.banker.composable.rememberDropdownScope
 import cn.changjiahong.banker.platform.HorizontalScrollbar
 import cn.changjiahong.banker.utils.padding
+import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parametersOf
 
 class FieldConfigScreen(val business: Business, val template: Template) : Screen {
@@ -84,16 +91,16 @@ fun FieldConfigScreen.FieldConfigView(modifier: Modifier) {
         val fieldConfigOptions =
             rememberDropdownScope(fieldOptions)
 
-//        Row(Modifier.padding {
-//            paddingVertical(5.dp)
-//        }, verticalAlignment = Alignment.CenterVertically) {
-//            Text("业务信息", fontSize = 24.sp)
-//            IconButton({
-//                FieldConfigScreenUiEvent.AddFieldConfig.sendTo(fieldConfigScreenModel)
-//            }) {
-//                Icon(painter = painterResource(Res.drawable.home), contentDescription = "")
-//            }
-//        }
+        Row(Modifier.padding {
+            paddingVertical(5.dp)
+        }, verticalAlignment = Alignment.CenterVertically) {
+            Text("业务信息", fontSize = 24.sp)
+            IconButton({
+                FieldConfigScreenUiEvent.AddFieldConfig.sendTo(fieldConfigScreenModel)
+            }) {
+                Icon(painter = painterResource(Res.drawable.home), contentDescription = "")
+            }
+        }
         HorizontalDivider()
         val scrollState = rememberScrollState()
 
