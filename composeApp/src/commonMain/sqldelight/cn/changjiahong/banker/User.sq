@@ -10,15 +10,6 @@ SELECT * FROM User ORDER BY created DESC ;
 selectById:
 SELECT * FROM User WHERE id = ?;
 
-selectUserFieldsMapById:
-SELECT UEF.*, UEFV.*
-FROM BasicField UEF
-         INNER JOIN BasicFieldValue UEFV ON  UEF.id = UEFV.fieldId;
-
-
-lastInsertRowId:
-SELECT last_insert_rowid();
-
 insertUser:
 INSERT INTO User (id) VALUES (?);
 

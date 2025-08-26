@@ -3,7 +3,6 @@ package cn.changjiahong.banker.service
 import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.TplField
 import cn.changjiahong.banker.model.NoData
-import cn.changjiahong.banker.model.TemplateFillerItem
 import cn.changjiahong.banker.model.TplFieldConfig
 import kotlinx.coroutines.flow.Flow
 
@@ -12,19 +11,6 @@ interface TemplateService {
     suspend fun getAllDocTemps(): Flow<List<Template>>
 
     suspend fun getDocTempsByBusinessId(businessId: Long): Flow<List<Template>>
-
-    suspend fun getTemplateFillerData(
-        businessId: Long,
-        templateId: Long,
-        userId: Long
-    ): Flow<List<TemplateFillerItem>>
-
-    suspend fun checkTemplateFillerDataIsComplete(
-        businessId: Long,
-        templateId: Long,
-        userId: Long
-    ): Flow<Boolean>
-
     /**
      * 获取模版的属性配置
      */
@@ -35,6 +21,5 @@ interface TemplateService {
     suspend fun fuzzySearchByTempName(tempName: String): Flow<List<Template>>
     suspend fun addNewTemplate(path: String, templateName: String, fileType: String): Flow<NoData>
 
-    fun getFillFieldsByTplIdAndBizId(templateId: Long, businessId: Long): Flow<NoData>
 
 }

@@ -18,9 +18,7 @@ import org.koin.core.annotation.Factory
 @Factory
 class TemplateServiceImpl(
     val db: BankerDb,
-    val templateRepository: TemplateRepository,
-    val businessRepository: BusinessRepository,
-    val userRepository: UserRepository
+    val templateRepository: TemplateRepository
 ) : TemplateService {
 
     override suspend fun getAllDocTemps(): Flow<List<Template>> {
@@ -29,65 +27,6 @@ class TemplateServiceImpl(
 
     override suspend fun getDocTempsByBusinessId(businessId: Long): Flow<List<Template>> {
         return templateRepository.findTemplatesByBusinessId(businessId)
-    }
-
-    override suspend fun checkTemplateFillerDataIsComplete(
-        businessId: Long,
-        templateId: Long,
-        userId: Long
-    ): Flow<Boolean> = flow {
-
-        val businessFieldsMap = businessRepository.findFieldMapById(businessId, userId)
-
-        val userFieldsMap = userRepository.findFieldMapById(userId)
-
-        val fieldsMap = businessFieldsMap + userFieldsMap
-
-        val templateFields =
-            templateRepository.findTemplateFieldsById2(templateId)
-
-//        templateFields.forEach { tempField ->
-//            if (!fieldsMap.contains(tempField.sourceFieldName)) {
-//                emit(false)
-//                return@flow
-//            }
-//        }
-        emit(true)
-    }
-
-    override suspend fun getTemplateFillerData(
-        businessId: Long,
-        templateId: Long,
-        userId: Long
-    ): Flow<List<TemplateFillerItem>> = flow {
-
-        val businessFieldsMap = businessRepository.findFieldMapById(businessId, userId)
-
-        val userFieldsMap = userRepository.findFieldMapById(userId)
-
-        val fieldsMap = businessFieldsMap + userFieldsMap
-
-        val templateFields =
-            templateRepository.findTemplateFieldsById2(templateId)
-
-        val tempFillerList = mutableListOf<TemplateFillerItem>()
-
-//        templateFields.forEach { tempField ->
-//
-//            if (fieldsMap.contains(tempField.formFieldName)) {
-//                tempFillerList.add(
-//                    TemplateFillerItem(
-//                        tempField.formFieldName,
-//                        tempField.sourceFieldType,
-//                        fieldsMap[tempField.sourceFieldName]!!.fieldValue
-//                    )
-//                )
-//            } else {
-//                throw ExecuteError("必要的属性缺失，请完善相关信息")
-//            }
-//
-//        }
-        emit(tempFillerList)
     }
 
     override suspend fun getFieldsByTemplateId(id: Long): Flow<List<TplField>> {
@@ -111,7 +50,7 @@ class TemplateServiceImpl(
                     templateRepository.updateTemplateFieldById(
                         tempField.fieldName!!,
                         tempField.fieldType!!,
-                        tempField.alias!!,
+                        tempField.alias,
                         tempField.id
                     )
                 }
@@ -132,11 +71,5 @@ class TemplateServiceImpl(
     ): Flow<NoData> = flow {
         templateRepository.insertNewTemplate(templateName, path, fileType)
         emit(NoData)
-    }
-
-    override fun getFillFieldsByTplIdAndBizId(templateId: Long, businessId: Long ): Flow<NoData> = flow {
-//        val basicFieldConfigs = userRepository.findFieldConfigMapByTid(templateId,businessId).associate {  }
-//        val bizFieldConfigs = businessRepository.findFieldConfigMapByBidAndTid(businessId,templateId)
-
     }
 }

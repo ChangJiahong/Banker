@@ -1,7 +1,6 @@
 package cn.changjiahong.banker.app.business_handle
 
 import androidx.compose.runtime.Stable
-import cn.changjiahong.banker.BizField
 import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.model.Field
 import cn.changjiahong.banker.model.FieldVal
@@ -12,7 +11,6 @@ import cn.changjiahong.banker.mvi.UiState
 
 @Stable
 data class BhUiState(
-    val bizFields: List<BizField> = emptyList(),
 
     val fieldValues: Map<Long, String> = emptyMap(),
     val fieldErrorMsg: Map<String, String> = emptyMap(),

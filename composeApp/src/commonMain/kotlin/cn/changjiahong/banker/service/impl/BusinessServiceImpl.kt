@@ -2,14 +2,8 @@ package cn.changjiahong.banker.service.impl
 
 import cn.changjiahong.banker.BankerDb
 import cn.changjiahong.banker.Business
-import cn.changjiahong.banker.BizField
-import cn.changjiahong.banker.RelBizFieldTplField
-import cn.changjiahong.banker.model.FieldConf
-import cn.changjiahong.banker.model.FieldVal
 import cn.changjiahong.banker.model.NoData
-import cn.changjiahong.banker.model.RelFieldConfigTplField
 import cn.changjiahong.banker.repository.BusinessRepository
-import cn.changjiahong.banker.repository.UserRepository
 import cn.changjiahong.banker.service.BusinessService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -18,130 +12,11 @@ import org.koin.core.annotation.Factory
 @Factory
 class BusinessServiceImpl(
     val db: BankerDb,
-    val userRepository: UserRepository,
     val businessRepository: BusinessRepository
 ) : BusinessService {
 
     override suspend fun getBusinessList(): Flow<List<Business>> {
         return businessRepository.findBusinessTypes()
-    }
-
-    /**
-     * 获取该业务的所有属性信息
-     */
-    override suspend fun getFieldsByBusinessId(businessId: Long): Flow<List<BizField>> {
-        return businessRepository.findFieldsByBusinessId(businessId)
-    }
-
-    override suspend fun saveFields(
-        uId: Long?,
-        businessId: Long,
-        fieldValues: Map<Long, FieldVal>
-    ) = flow {
-
-        db.transaction {
-            var uid = uId
-            if (uId == null || uId < 0) {
-                uid = userRepository.newUser()
-            }
-            fieldValues.values.forEach { fieldValue ->
-                if (fieldValue.fieldId > 0) {
-                    if (fieldValue.fieldValueId > 0) {
-//                        if (fieldValue.isBasic) {
-//                            userRepository.updateFieldValue(
-//                                fieldValue.fieldValueId,
-//                                fieldValue.fieldValue
-//                            )
-//                        } else {
-//                            businessRepository.updateFieldValue(
-//                                fieldValue.fieldValueId,
-//                                fieldValue.fieldValue
-//                            )
-//                        }
-                    } else {
-//                        if (fieldValue.isBasic) {
-//                            userRepository.newFieldValue(
-//                                uid,
-//                                fieldValue.fieldId,
-//                                fieldValue.fieldValue
-//                            )
-//                        } else {
-//                            businessRepository.newFieldValue(
-//                                uid,
-//                                businessId,
-//                                fieldValue.fieldId,
-//                                fieldValue.fieldValue
-//                            )
-//                        }
-                    }
-                }
-            }
-        }
-
-        emit(NoData)
-    }
-
-    override suspend fun saveBizFieldConfigs(value: List<FieldConf>): Flow<NoData> = flow {
-        db.transaction {
-            value.forEachIndexed { index, field ->
-                if (field.fieldId < 0) {
-                    businessRepository.insertBizField(
-                        field.fieldName,
-                        field.bId,
-                        field.fieldType,
-                        field.alias,
-                        field.validationRule,
-                        false,
-                        ""
-                    )
-                } else {
-                    businessRepository.updateBizField(
-                        field.fieldId,
-                        field.fieldName,
-                        field.bId,
-                        field.fieldType,
-                        field.alias,
-                        field.validationRule,
-                        false,
-                        ""
-                    )
-                }
-            }
-        }
-        emit(NoData)
-    }
-
-    override fun saveRelTplFieldBizFieldConfig(data: List<RelFieldConfigTplField>): Flow<NoData> =
-        flow {
-            db.transaction {
-                data.forEach { tBField ->
-                    if (tBField.id < 0) {
-                        businessRepository.insertRelTplFieldBizField(
-                            tBField.fieldId,
-                            tBField.tFieldId!!,
-                            tBField.isFixed,
-                            tBField.fixedValue
-                        )
-                    } else {
-                        businessRepository.updateRelTplFieldBizField(
-                            tBField.id,
-                            tBField.fieldId,
-                            tBField.tFieldId!!,
-                            tBField.isFixed,
-                            tBField.fixedValue
-                        )
-                    }
-                }
-            }
-
-            emit(NoData)
-        }
-
-    override fun getFieldConfigMapByBidAndTid(
-        bId: Long,
-        tId: Long
-    ): Flow<List<RelBizFieldTplField>> {
-        return businessRepository.findFieldConfigMapByBidAndTid(bId, tId)
     }
 
     override fun addTemplate(
