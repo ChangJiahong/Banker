@@ -10,14 +10,3 @@ import androidx.compose.ui.unit.dp
 import cn.changjiahong.banker.pdfutils.PDFViewer
 
 
-@Composable
-fun CreditCardTempApp() {
-
-    Column(modifier = Modifier.background(Color.LightGray)) {
-
-        PDFViewer(
-            "/Volumes/Ti600/Users/changjiahong/Documents/李二庄/3《个人征信业务授权书》.pdf",
-            modifier = Modifier.width(300.dp)
-        )
-    }
-}

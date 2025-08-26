@@ -9,16 +9,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.path
 
 @Composable
 fun PDFViewer(
-    pdfFilePath: String, modifier: Modifier = Modifier,
+    pdfFile: PlatformFile, modifier: Modifier = Modifier,
 ) {
     val pageStates = remember { mutableStateListOf<PdfRenderEvent.Page?>() }
     var totalPages by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(pdfFilePath) {
-        PDFRenderer.renderFlow(pdfFilePath).collect { event ->
+    LaunchedEffect(pdfFile.path) {
+        PDFRenderer.renderFlow(pdfFile).collect { event ->
             when (event) {
                 is PdfRenderEvent.Meta -> {
                     totalPages = event.pageCount

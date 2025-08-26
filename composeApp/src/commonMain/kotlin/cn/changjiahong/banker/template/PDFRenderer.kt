@@ -1,10 +1,11 @@
 package cn.changjiahong.banker.pdfutils
 
 import androidx.compose.ui.graphics.ImageBitmap
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.Flow
 
 expect object PDFRenderer {
-    fun renderFlow(pdfPath: String): Flow<PdfRenderEvent>
+    fun renderFlow(pdfFile: PlatformFile): Flow<PdfRenderEvent>
 }
 
 sealed interface PdfRenderEvent {

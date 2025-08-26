@@ -67,9 +67,9 @@ fun PDFTemplateView(
 //    Text(tempPath)
 
     if (tempPath.isNotEmpty()) {
-        PDFViewer(
-            tempPath,
-            modifier = Modifier.width(300.dp)
-        )
+//        PDFViewer(
+//            tempPath,
+//            modifier = Modifier.width(300.dp)
+//        )
     }
 }

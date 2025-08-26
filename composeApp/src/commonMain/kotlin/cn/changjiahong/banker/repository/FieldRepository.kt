@@ -3,6 +3,8 @@ package cn.changjiahong.banker.repository
 import cn.changjiahong.banker.FieldConfig
 import cn.changjiahong.banker.RelFieldTplField
 import cn.changjiahong.banker.model.Field
+import cn.changjiahong.banker.model.FormField
+import cn.changjiahong.banker.model.FormFieldValue
 import org.koin.core.scope.ScopeID
 
 interface FieldRepository {
@@ -74,6 +76,11 @@ interface FieldRepository {
      * 获取uid在bid业务项下的属性名称和值集合
      */
     fun findFieldsByUidAndBid(uid: Long,bId: Long): List<Field>
+
+    /**
+     * 获取uid 模版属性，bid业务项下的-值的映射
+     */
+    fun findTplFieldVals(uid: Long,bId: Long,tid: Long): List<FormFieldValue>
 
     /**
      * 查找涉及bid业务的属性配置，包括全局属性

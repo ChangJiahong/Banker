@@ -4,6 +4,7 @@ import cn.changjiahong.banker.FieldConfig
 import cn.changjiahong.banker.RelFieldTplField
 import cn.changjiahong.banker.model.FieldConf
 import cn.changjiahong.banker.model.FieldVal
+import cn.changjiahong.banker.model.FormFieldValue
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.model.RelFieldConfigTplField
 import kotlinx.coroutines.flow.Flow
@@ -64,4 +65,5 @@ interface FieldService {
     fun saveFieldValues(uid: Long?, bId: Long, fieldVals: List<FieldVal>): Flow<NoData>
 
 
+    fun getTplFieldVals(uid: Long,bId: Long,tid: Long): Flow<List<FormFieldValue>>
 }

@@ -1,6 +1,7 @@
 package cn.changjiahong.banker.pdfutils
 
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.yield
@@ -11,8 +12,8 @@ import java.io.File
 
 actual object PDFRenderer {
 
-    actual fun renderFlow(pdfPath: String): Flow<PdfRenderEvent> = flow {
-        val doc = Loader.loadPDF(File(pdfPath))
+    actual fun renderFlow(pdfFile: PlatformFile): Flow<PdfRenderEvent> = flow {
+        val doc = Loader.loadPDF(pdfFile.file)
         val renderer = PDFRenderer(doc)
         val total = doc.numberOfPages
 

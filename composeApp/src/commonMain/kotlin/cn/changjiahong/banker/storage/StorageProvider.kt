@@ -3,6 +3,7 @@ package cn.changjiahong.banker.storage
 import cn.changjiahong.banker.storage.StorageProvider.homeDir
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.cacheDir
 import io.github.vinceglb.filekit.createDirectories
 import io.github.vinceglb.filekit.databasesDir
 import io.github.vinceglb.filekit.exists
@@ -41,6 +42,15 @@ object Storage {
 
     fun getTemplatesFile(fileName: String): PlatformFile {
         return PlatformFile(templatesDir, fileName)
+    }
+
+    fun getCacheFile(uid: Long, bId: Long, fileName: String): PlatformFile {
+        val dir = PlatformFile(FileKit.cacheDir, "/$uid/$bId").apply {
+            if (!exists()){
+                createDirectories()
+            }
+        }
+        return PlatformFile(dir, fileName)
     }
 }
 

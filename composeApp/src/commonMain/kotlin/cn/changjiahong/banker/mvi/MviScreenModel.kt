@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 
 abstract class MviScreenModel : ScreenModel, KoinComponent {
@@ -67,13 +68,17 @@ abstract class MviScreenModel : ScreenModel, KoinComponent {
 
     fun sendEvent(intent: UiEvent) {
         screenModelScope.launch {
-            _uiEvent.emit(intent)
+            withContext(Dispatchers.Main) {
+                _uiEvent.emit(intent)
+            }
         }
     }
 
     fun sendEffect(intent: UiEffect) {
         screenModelScope.launch {
-            _uiEffect.emit(intent)
+            withContext(Dispatchers.Main) {
+                _uiEffect.emit(intent)
+            }
         }
     }
 

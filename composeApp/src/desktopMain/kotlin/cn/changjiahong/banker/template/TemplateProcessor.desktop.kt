@@ -1,7 +1,11 @@
 package cn.changjiahong.banker.template
 
 import cn.changjiahong.banker.model.FormField
+import cn.changjiahong.banker.model.FormFieldValue
+import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.storage.Storage
+import cn.changjiahong.banker.utils.okFlow
+import cn.changjiahong.banker.utils.returnFlow
 import com.itextpdf.forms.PdfAcroForm
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfReader
@@ -29,5 +33,25 @@ actual object PDFTempProcessor : TemplateProcessor {
             formFields += FormField(name, type)
         }
         emit(formFields)
+    }
+
+    actual override fun fillTemplateForm(
+        formData: List<FormFieldValue>,
+        templateFile: PlatformFile,
+        toTempFile: PlatformFile
+    ): Flow<NoData> = okFlow {
+        val pdfReader =
+            PdfReader(templateFile.file)
+        val writer = PdfWriter(toTempFile.file)
+        val pdfDoc = PdfDocument(pdfReader, writer)
+        val form = PdfAcroForm.getAcroForm(pdfDoc, false)
+
+        formData.forEach {
+            form.getField(it.tFieldName)?.setValue(it.fieldValue)
+        }
+
+        form.flattenFields()
+        pdfDoc.close()
+
     }
 }

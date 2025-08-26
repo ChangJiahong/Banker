@@ -6,6 +6,7 @@ import cn.changjiahong.banker.RelFieldTplField
 import cn.changjiahong.banker.SelectFieldsByUidAndBid
 import cn.changjiahong.banker.ck
 import cn.changjiahong.banker.model.Field
+import cn.changjiahong.banker.model.FormFieldValue
 import cn.changjiahong.banker.repository.FieldRepository
 import cn.changjiahong.banker.utils.getSnowId
 import org.koin.core.annotation.Factory
@@ -116,6 +117,26 @@ class FieldRepositoryImpl(db: BankerDb) : FieldRepository {
                 validationRule = "",
                 fieldValue = f.fieldValue,
                 isBasic = f.global > 0
+            )
+        }
+    }
+
+    override fun findTplFieldVals(
+        uid: Long,
+        bId: Long,
+        tid: Long
+    ): List<FormFieldValue> {
+
+        return fieldValueQueries.selectTplFieldVals(bId, uid, tid).executeAsList().map {
+            FormFieldValue(
+                it.fieldId!!,
+                it.tFieldId!!,
+                it.fieldValueId,
+                it.fieldName!!,
+                it.formFieldName!!,
+                it.fieldType!!,
+                it.formFieldType!!,
+                it.fieldValue
             )
         }
     }
