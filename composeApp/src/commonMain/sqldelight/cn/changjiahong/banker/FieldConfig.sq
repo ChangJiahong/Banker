@@ -12,7 +12,8 @@ CREATE TABLE FieldConfig (
 
 --查找涉及bid业务的属性配置，包括全局属性
 selectFieldConfigInvolveTplFieldRel:
-SELECT fc.*
+SELECT DISTINCT fc.fieldId, fc.fieldName, fc.bId, fc.fieldType, fc.alias,
+              fc.validationRule, fc.forced,fc.created
 FROM FieldConfig fc
 LEFT JOIN RelFieldTplField rf ON rf.fieldId = fc.fieldId
 WHERE (rf.bId = ? AND rf.isFixed = 0) OR (forced = 1 AND fc.bId=-1);

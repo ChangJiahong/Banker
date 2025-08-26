@@ -6,8 +6,8 @@ import io.github.vinceglb.filekit.PlatformFile
 import java.awt.Desktop
 import java.io.File
 
-@Composable
-actual fun SystemOpen(file: PlatformFile) {
+
+actual fun systemOpen(file: PlatformFile) {
     if (Desktop.isDesktopSupported()) {
         val desktop = Desktop.getDesktop()
         if (desktop.isSupported(Desktop.Action.OPEN)) {

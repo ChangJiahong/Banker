@@ -142,7 +142,13 @@ class FieldRepositoryImpl(db: BankerDb) : FieldRepository {
     }
 
     override fun findFieldConfigInvolveTplFieldRel(bId: Long): List<FieldConfig> {
-        return fieldConfigQueries.selectFieldConfigInvolveTplFieldRel(bId).executeAsList()
+        return fieldConfigQueries.selectFieldConfigInvolveTplFieldRel(bId).executeAsList().map {
+            FieldConfig(
+                it.fieldId, it.bId, it.fieldName,
+                it.fieldType, it.alias, it.validationRule,
+                it.forced, it.created
+            )
+        }
     }
 
     override fun newFieldValue(
