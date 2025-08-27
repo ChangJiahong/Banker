@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -43,6 +44,7 @@ import cn.changjiahong.banker.ClienteleItem
 import cn.changjiahong.banker.FoldersButton
 import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.app.DirScreen
+import cn.changjiahong.banker.composable.AlertDialogState
 import cn.changjiahong.banker.composable.DialogState
 import cn.changjiahong.banker.model.FieldVal
 import org.jetbrains.compose.resources.painterResource
@@ -65,19 +67,13 @@ fun BusinessHandlerScreen.BusinessHandlerView(
     )
 ) {
     val openAlertDialog = businessHandlerScreenModel.clienteleDialog
+    val openOtherSoftwareDialog = businessHandlerScreenModel.openOtherSoftwareDialog
 
     val uiState by businessHandlerScreenModel.uiState.collectAsState()
 
     businessHandlerScreenModel.handleEffect { effect ->
         when (effect) {
-            is BhEffect.CloseDialog -> {
-//                openAlertDialog.value = false
-                true
-            }
 
-            is BhEffect.OpenDialog -> {
-//                openAlertDialog.value = true
-            }
         }
         false
     }
@@ -123,7 +119,7 @@ fun BusinessHandlerScreen.BusinessHandlerView(
             ) {
                 itemsIndexed(templates) { index, it ->
                     FoldersButton(it.templateName, fileType = it.fileType) {
-                        BhUIEvent.ClickTplItem( it)
+                        BhUIEvent.ClickTplItem(it)
                             .sendTo(businessHandlerScreenModel)
                     }
                 }
@@ -133,6 +129,32 @@ fun BusinessHandlerScreen.BusinessHandlerView(
     }
 
     ClienteleDialog(businessHandlerScreenModel, openAlertDialog)
+    OpenOtherSoftwareDialog(businessHandlerScreenModel,openOtherSoftwareDialog)
+
+}
+
+@Composable
+fun OpenOtherSoftwareDialog(
+    businessHandlerScreenModel: BusinessHandlerScreenModel,dialogState: AlertDialogState) {
+    val visible by dialogState.visible.collectAsState()
+    if (!visible) {
+        return
+    }
+    AlertDialog(
+        onDismissRequest = { },
+        confirmButton = {
+            Button(onClick = {
+                dialogState.ok()
+            }) { Text("确定") }
+        },
+        dismissButton = {
+            Button(onClick = {
+                dialogState.dismiss()
+            }) { Text("取消") }
+        },
+        title = { Text("提示") },
+        text = { Text("暂不支持该类型文件预览，是否跳转系统默认软件打开") })
+
 
 }
 

@@ -22,6 +22,8 @@ sealed interface BhUIEvent : UiEvent {
     object EditClientele : BhUIEvent
     object SaveBhDetail : BhUIEvent
 
+    object SystemOpenFile : BhUIEvent
+
     data class UpdateFieldValue(val fieldId: Long, val fieldValue: FieldVal): BhUIEvent
 
     data class SelectedClientele(val user: UserInfo) : BhUIEvent
@@ -30,7 +32,3 @@ sealed interface BhUIEvent : UiEvent {
 
 }
 
-sealed interface BhEffect : UiEffect {
-    object CloseDialog : BhEffect
-    object OpenDialog : BhEffect
-}

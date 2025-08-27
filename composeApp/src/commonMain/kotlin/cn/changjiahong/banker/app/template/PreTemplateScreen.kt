@@ -17,9 +17,10 @@ import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.GlobalNavigator
 import cn.changjiahong.banker.storage.platformFile
 import cn.changjiahong.banker.tplview.FilePreView
+import io.github.vinceglb.filekit.PlatformFile
 import org.jetbrains.compose.resources.painterResource
 
-class PreTemplateScreen(val template: Template): Screen {
+class PreTemplateScreen(val file: PlatformFile): Screen {
     private val PDF = "PDF"
     private val DOC = "DOC"
     @OptIn(ExperimentalMaterial3Api::class)
@@ -45,14 +46,7 @@ class PreTemplateScreen(val template: Template): Screen {
         ) { paddingValues ->
 
             Box(Modifier.padding(paddingValues)) {
-                FilePreView(template.filePath.platformFile)
-//                when (template.fileType) {
-//                    PDF -> PDFTemplateView(template)
-//                    DOC -> DOCTemplateView(template)
-//                    else -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                        Text("未知的文件类型，尚不受支持。请联系管理员！！！")
-//                    }
-//                }
+                FilePreView(file)
             }
         }
     }

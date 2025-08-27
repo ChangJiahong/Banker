@@ -10,6 +10,7 @@ import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.service.TemplateService
 import cn.changjiahong.banker.storage.Storage
 import cn.changjiahong.banker.storage.containsFile
+import cn.changjiahong.banker.storage.platformFile
 import cn.changjiahong.banker.uieffect.GoEffect
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.copyTo
@@ -46,7 +47,7 @@ class TemplateSettingScreenModel(val templateService: TemplateService) : MviScre
 
     override fun handleEvent(event: UiEvent) {
         when (event) {
-            is TempSettingUiEvent.GoPreTemplateScreen -> GoEffect(RR.PRE_TEMPLATE(event.template)).trigger()
+            is TempSettingUiEvent.GoPreTemplateScreen -> GoEffect(RR.PRE_TEMPLATE(event.template.filePath.platformFile)).trigger()
             is TempSettingUiEvent.GoTempFiledSettingScreen -> GoEffect(RR.TEMP_FIELD_SETTING(event.template)).trigger()
 
             is TempSettingUiEvent.AddDocTemplate -> addDocTemplate(event.file)

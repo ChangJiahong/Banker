@@ -34,24 +34,6 @@ fun FilePreView(file: PlatformFile) {
                 modifier = Modifier.width(300.dp)
             )
         }
-
-        DOC, DOCX, XLS, XLSX -> {
-            val navigator = LocalNavigator.current
-            AlertDialog(
-                onDismissRequest = {  },
-                confirmButton = { Button(onClick = {
-                    systemOpen(file)
-                    navigator?.pop()
-                }) { Text("确定") } },
-                dismissButton = { Button(onClick = {
-                    navigator?.pop()
-                }) { Text("取消") } },
-                title = { Text("提示") },
-                text = { Text("暂不支持该类型文件预览，是否跳转系统默认软件打开") })
-
-
-
-        }
         else -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("未知的文件类型，尚不受支持。请联系管理员！！！")
         }

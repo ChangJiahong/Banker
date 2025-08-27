@@ -1,23 +1,31 @@
 package cn.changjiahong.banker.app.business_handle
 
+import androidx.compose.material3.AlertDialog
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.FieldConfig
 import cn.changjiahong.banker.app.RR
+import cn.changjiahong.banker.composable.AlertDialogState
 import cn.changjiahong.banker.composable.DialogState
-import cn.changjiahong.banker.model.Field
 import cn.changjiahong.banker.model.FieldVal
-import cn.changjiahong.banker.model.TemplateFillerItem
 import cn.changjiahong.banker.model.UserInfo
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.mvi.replace
-import cn.changjiahong.banker.service.BusinessService
+import cn.changjiahong.banker.platform.systemOpen
 import cn.changjiahong.banker.service.FieldService
 import cn.changjiahong.banker.service.TemplateService
 import cn.changjiahong.banker.service.UserService
+import cn.changjiahong.banker.storage.FileType
+import cn.changjiahong.banker.storage.FileType.DOC
+import cn.changjiahong.banker.storage.FileType.DOCX
+import cn.changjiahong.banker.storage.FileType.PDF
+import cn.changjiahong.banker.storage.FileType.XLS
+import cn.changjiahong.banker.storage.FileType.XLSX
 import cn.changjiahong.banker.uieffect.GoDIREffect
+import cn.changjiahong.banker.uieffect.GoDIREvent
+import cn.changjiahong.banker.uieffect.GoEffect
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -28,7 +36,6 @@ class BusinessHandlerScreenModel(
     val business: Business,
     val userService: UserService,
     val fieldService: FieldService,
-    val businessService: BusinessService,
     val templateService: TemplateService
 ) : MviScreenModel() {
     private val _clientelesData = MutableStateFlow<List<UserInfo>>(listOf())
@@ -60,7 +67,7 @@ class BusinessHandlerScreenModel(
     val uiState = _uiState.asStateFlow()
 
     val clienteleDialog = DialogState()
-
+    val openOtherSoftwareDialog = AlertDialogState()
 
     override fun handleEvent(event: UiEvent) {
         when (event) {
@@ -189,35 +196,17 @@ class BusinessHandlerScreenModel(
 
         screenModelScope.launch {
 
-            fieldService.getFieldConfigsForTemplate(business.id, template.id)
-                .catchAndCollect { data ->
-                    val fields = user.fields.values
-
-
-
-                    data.forEach { f ->
-                        if (user.fields.values.none { it.fieldId == f.fieldId && it.fieldValue.isNotBlank() }) {
-                            tip("信息不完善")
-                            return@catchAndCollect
+            templateService.fillFromToTemplate(user.uid, business.id, template).catchAndCollect {
+                when (FileType.getFileType(template.fileType)) {
+                    PDF -> GoDIREffect(RR.DIR_PRE_TEMPLATE(it)).trigger()
+                    DOC, DOCX, XLS, XLSX -> {
+                        openOtherSoftwareDialog.show(){
+                            systemOpen(it)
+                            openOtherSoftwareDialog.dismiss()
                         }
                     }
-
-                    val fillData = data.map { f ->
-                        fields.first { it.fieldId == f.fieldId && it.fieldValue.isNotBlank() }
-                    }
-                    //信息完善
-
-                    GoDIREffect(
-                        RR.TEMPLATE(
-                            user.uid,
-                            business.id,
-                            template,
-                            fillData
-                        )
-                    ).trigger()
-
-
                 }
+            }
         }
 
     }
