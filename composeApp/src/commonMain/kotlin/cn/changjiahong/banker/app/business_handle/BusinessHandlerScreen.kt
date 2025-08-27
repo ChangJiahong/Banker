@@ -47,6 +47,8 @@ import cn.changjiahong.banker.app.DirScreen
 import cn.changjiahong.banker.composable.AlertDialogState
 import cn.changjiahong.banker.composable.DialogState
 import cn.changjiahong.banker.model.FieldVal
+import cn.changjiahong.banker.platform.RightClickMenu
+import cn.changjiahong.banker.platform.SimpleMenu
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parameterArrayOf
 
@@ -118,9 +120,22 @@ fun BusinessHandlerScreen.BusinessHandlerView(
                 verticalArrangement = Arrangement.Center,
             ) {
                 itemsIndexed(templates) { index, it ->
-                    FoldersButton(it.templateName, fileType = it.fileType) {
-                        BhUIEvent.ClickTplItem(it)
-                            .sendTo(businessHandlerScreenModel)
+                    RightClickMenu(
+                        listOf(
+                            SimpleMenu("第三方软件打开") {
+
+                                BhUIEvent.OtherOpenTplItem(it)
+                                    .sendTo(businessHandlerScreenModel)
+                            },
+                            SimpleMenu("打印") {
+                                BhUIEvent.PrintTplItem(it)
+                                    .sendTo(businessHandlerScreenModel)
+                            })
+                    ) {
+                        FoldersButton(it.templateName, fileType = it.fileType) {
+                            BhUIEvent.ClickTplItem(it)
+                                .sendTo(businessHandlerScreenModel)
+                        }
                     }
                 }
             }
@@ -129,13 +144,14 @@ fun BusinessHandlerScreen.BusinessHandlerView(
     }
 
     ClienteleDialog(businessHandlerScreenModel, openAlertDialog)
-    OpenOtherSoftwareDialog(businessHandlerScreenModel,openOtherSoftwareDialog)
+    OpenOtherSoftwareDialog(businessHandlerScreenModel, openOtherSoftwareDialog)
 
 }
 
 @Composable
 fun OpenOtherSoftwareDialog(
-    businessHandlerScreenModel: BusinessHandlerScreenModel,dialogState: AlertDialogState) {
+    businessHandlerScreenModel: BusinessHandlerScreenModel, dialogState: AlertDialogState
+) {
     val visible by dialogState.visible.collectAsState()
     if (!visible) {
         return

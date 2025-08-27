@@ -24,11 +24,15 @@ sealed interface BhUIEvent : UiEvent {
 
     object SystemOpenFile : BhUIEvent
 
-    data class UpdateFieldValue(val fieldId: Long, val fieldValue: FieldVal): BhUIEvent
+    data class UpdateFieldValue(val fieldId: Long, val fieldValue: FieldVal) : BhUIEvent
 
     data class SelectedClientele(val user: UserInfo) : BhUIEvent
 
     data class ClickTplItem(val template: Template) : BhUIEvent
+
+    data class PrintTplItem(val template: Template) : BhUIEvent
+
+    data class OtherOpenTplItem(val template: Template) : BhUIEvent
 
 }
 

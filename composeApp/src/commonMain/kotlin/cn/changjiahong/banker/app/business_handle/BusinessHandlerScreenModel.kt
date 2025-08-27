@@ -13,6 +13,7 @@ import cn.changjiahong.banker.model.UserInfo
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.mvi.replace
+import cn.changjiahong.banker.platform.SystemPrinter
 import cn.changjiahong.banker.platform.systemOpen
 import cn.changjiahong.banker.service.FieldService
 import cn.changjiahong.banker.service.TemplateService
@@ -91,6 +92,39 @@ class BusinessHandlerScreenModel(
 
                 clickTplItem(event.template)
 
+            }
+
+            is BhUIEvent.PrintTplItem -> {
+                if (currentlySelected.value == null || currentlySelected.value!!.uid < 0) {
+                    tip("请先勾选一个客户")
+                    return
+                }
+                val user = currentlySelected.value!!
+
+                screenModelScope.launch {
+
+                    templateService.fillFromToTemplate(user.uid, business.id, event.template)
+                        .catchAndCollect {
+                            SystemPrinter.print(it).catchAndCollect { toast("ok") }
+                        }
+                }
+
+            }
+
+            is BhUIEvent.OtherOpenTplItem->{
+                if (currentlySelected.value == null || currentlySelected.value!!.uid < 0) {
+                    tip("请先勾选一个客户")
+                    return
+                }
+                val user = currentlySelected.value!!
+
+                screenModelScope.launch {
+
+                    templateService.fillFromToTemplate(user.uid, business.id, event.template)
+                        .catchAndCollect {
+                            systemOpen(it)
+                        }
+                }
             }
         }
     }
@@ -200,7 +234,7 @@ class BusinessHandlerScreenModel(
                 when (FileType.getFileType(template.fileType)) {
                     PDF -> GoDIREffect(RR.DIR_PRE_TEMPLATE(it)).trigger()
                     DOC, DOCX, XLS, XLSX -> {
-                        openOtherSoftwareDialog.show(){
+                        openOtherSoftwareDialog.show() {
                             systemOpen(it)
                             openOtherSoftwareDialog.dismiss()
                         }
