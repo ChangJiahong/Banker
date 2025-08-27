@@ -7,7 +7,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.app.DirScreen
 import cn.changjiahong.banker.model.Field
-import cn.changjiahong.banker.template.FilePreView
+import cn.changjiahong.banker.tplview.FilePreView
 import org.koin.core.parameter.parametersOf
 
 class TemplateScreen(

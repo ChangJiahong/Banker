@@ -1,4 +1,4 @@
-package cn.changjiahong.banker.template
+package cn.changjiahong.banker.tplview
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cn.changjiahong.banker.pdfutils.PDFViewer
 import cn.changjiahong.banker.platform.systemOpen
 import cn.changjiahong.banker.storage.FileType
 import cn.changjiahong.banker.storage.FileType.DOC

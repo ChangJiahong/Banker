@@ -1,4 +1,4 @@
-package cn.changjiahong.banker.pdfutils
+package cn.changjiahong.banker.tplview
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

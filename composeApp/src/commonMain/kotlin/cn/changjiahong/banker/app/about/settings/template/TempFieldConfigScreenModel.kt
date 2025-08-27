@@ -11,7 +11,7 @@ import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.mvi.replace
 import cn.changjiahong.banker.service.TemplateService
 import cn.changjiahong.banker.storage.platformFile
-import cn.changjiahong.banker.template.TemplateKit
+import cn.changjiahong.banker.tplview.TemplateKit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

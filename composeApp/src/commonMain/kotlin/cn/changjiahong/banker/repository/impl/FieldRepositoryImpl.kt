@@ -3,6 +3,7 @@ package cn.changjiahong.banker.repository.impl
 import cn.changjiahong.banker.BankerDb
 import cn.changjiahong.banker.FieldConfig
 import cn.changjiahong.banker.RelFieldTplField
+import cn.changjiahong.banker.SelectFieldConfigsForTpl
 import cn.changjiahong.banker.SelectFieldsByUidAndBid
 import cn.changjiahong.banker.ck
 import cn.changjiahong.banker.model.Field
@@ -127,16 +128,12 @@ class FieldRepositoryImpl(db: BankerDb) : FieldRepository {
         tid: Long
     ): List<FormFieldValue> {
 
-        return fieldValueQueries.selectTplFieldVals(bId, uid, tid).executeAsList().map {
+        return fieldValueQueries.selectTplFieldVals(bId,  tid,uid).executeAsList().map {
             FormFieldValue(
-                it.fieldId!!,
                 it.tFieldId!!,
-                it.fieldValueId,
-                it.fieldName!!,
                 it.formFieldName!!,
-                it.fieldType!!,
                 it.formFieldType!!,
-                it.fieldValue
+                it.fieldValue?:""
             )
         }
     }
@@ -169,7 +166,7 @@ class FieldRepositoryImpl(db: BankerDb) : FieldRepository {
     override suspend fun findFieldConfigsForTpl(
         bId: Long,
         tid: Long
-    ): List<FieldConfig> {
+    ): List<SelectFieldConfigsForTpl> {
         return fieldConfigQueries.selectFieldConfigsForTpl(bId, tid).executeAsList()
     }
 }

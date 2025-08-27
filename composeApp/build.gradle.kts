@@ -96,6 +96,8 @@ kotlin {
             implementation("org.apache.poi:poi-ooxml:5.2.5")
             implementation("com.deepoove:poi-tl:1.12.0")
 
+            implementation("com.alibaba:easyexcel:4.0.3")
+
 
             implementation("app.cash.sqldelight:sqlite-driver:2.1.0")
         }

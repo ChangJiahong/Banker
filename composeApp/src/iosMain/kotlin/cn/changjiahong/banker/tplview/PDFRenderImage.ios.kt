@@ -1,5 +1,6 @@
 package cn.changjiahong.banker.pdfutils
 
+import cn.changjiahong.banker.tplview.PdfRenderEvent
 import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.Flow
 

@@ -2,6 +2,7 @@ package cn.changjiahong.banker.repository
 
 import cn.changjiahong.banker.FieldConfig
 import cn.changjiahong.banker.RelFieldTplField
+import cn.changjiahong.banker.SelectFieldConfigsForTpl
 import cn.changjiahong.banker.model.Field
 import cn.changjiahong.banker.model.FormField
 import cn.changjiahong.banker.model.FormFieldValue
@@ -94,5 +95,5 @@ interface FieldRepository {
     /**
      * 获取业务项下的某个模版的属性配置
      */
-    suspend fun findFieldConfigsForTpl(bId: Long, tid: Long): List<FieldConfig>
+    suspend fun findFieldConfigsForTpl(bId: Long, tid: Long): List<SelectFieldConfigsForTpl>
 }

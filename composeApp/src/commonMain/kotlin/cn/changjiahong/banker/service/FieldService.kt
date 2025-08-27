@@ -2,6 +2,7 @@ package cn.changjiahong.banker.service
 
 import cn.changjiahong.banker.FieldConfig
 import cn.changjiahong.banker.RelFieldTplField
+import cn.changjiahong.banker.SelectFieldConfigsForTpl
 import cn.changjiahong.banker.model.FieldConf
 import cn.changjiahong.banker.model.FieldVal
 import cn.changjiahong.banker.model.FormFieldValue
@@ -34,7 +35,7 @@ interface FieldService {
     /**
      * 获取业务项下的某个模版的属性配置
      */
-    fun getFieldConfigsForTemplate(bId: Long, tid: Long): Flow<List<FieldConfig>>
+    fun getFieldConfigsForTemplate(bId: Long, tid: Long): Flow<List<SelectFieldConfigsForTpl>>
 
     /**
      * 保存业务项下的属性配置

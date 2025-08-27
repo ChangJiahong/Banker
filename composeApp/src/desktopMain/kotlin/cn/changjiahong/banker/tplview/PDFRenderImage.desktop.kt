@@ -1,4 +1,4 @@
-package cn.changjiahong.banker.pdfutils
+package cn.changjiahong.banker.tplview
 
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import io.github.vinceglb.filekit.PlatformFile
@@ -8,7 +8,6 @@ import kotlinx.coroutines.yield
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.rendering.ImageType
 import org.apache.pdfbox.rendering.PDFRenderer
-import java.io.File
 
 actual object PDFRenderer {
 

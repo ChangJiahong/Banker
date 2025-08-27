@@ -16,13 +16,13 @@ LEFT JOIN FieldConfig fc ON fc.fieldId = fv.fieldId
 WHERE (fc.bId = ? OR fc.bId =-1) AND fv.uid = ?;
 
 selectTplFieldVals:
-SELECT fc.fieldId ,tf.id tFieldId,fv.fieldValueId ,fc.fieldName fieldName,tf.formFieldName,
-CASE WHEN rf.isFixed = 0 THEN  fv.fieldValue ELSE rf.fixedValue END AS fieldValue ,fc.fieldType ,tf.formFieldType
-FROM FieldValue fv
-LEFT JOIN FieldConfig fc ON fc.fieldId = fv.fieldId
-LEFT JOIN RelFieldTplField rf ON rf.fieldId = fv.fieldId
+SELECT tf.id tFieldId,tf.formFieldName,
+CASE WHEN rf.isFixed = 0 THEN  fv.fieldValue ELSE rf.fixedValue END AS fieldValue ,tf.formFieldType
+FROM RelFieldTplField rf
 LEFT JOIN TplField tf ON tf.id = rf.tFieldId
-WHERE (fc.bId = ? OR fc.bId =-1) AND fv.uid = ? AND tf.templateId = ?;
+LEFT JOIN FieldValue fv ON rf.fieldId = fv.fieldId
+LEFT JOIN FieldConfig fc ON fc.fieldId  = rf.fieldId
+WHERE rf.bId = ? AND tf.templateId = ? AND (fv.uid =? OR rf.isFixed =1);
 
 
 insert:

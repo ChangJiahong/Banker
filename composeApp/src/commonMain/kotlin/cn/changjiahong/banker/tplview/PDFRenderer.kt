@@ -1,4 +1,4 @@
-package cn.changjiahong.banker.pdfutils
+package cn.changjiahong.banker.tplview
 
 import androidx.compose.ui.graphics.ImageBitmap
 import io.github.vinceglb.filekit.PlatformFile

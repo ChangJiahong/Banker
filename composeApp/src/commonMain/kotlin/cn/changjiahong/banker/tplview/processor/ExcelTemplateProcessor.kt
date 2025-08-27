@@ -1,14 +1,12 @@
-package cn.changjiahong.banker.template.processor
+package cn.changjiahong.banker.tplview.processor
 
 import cn.changjiahong.banker.model.FormField
 import cn.changjiahong.banker.model.FormFieldValue
 import cn.changjiahong.banker.model.NoData
-import cn.changjiahong.banker.template.TemplateProcessor
 import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.Flow
 
-expect object WordTemplateProcessor: TemplateProcessor {
-
+expect object ExcelTemplateProcessor : TemplateProcessor {
     override fun getFormFields(file: PlatformFile): Flow<List<FormField>>
 
     override fun fillTemplateForm(

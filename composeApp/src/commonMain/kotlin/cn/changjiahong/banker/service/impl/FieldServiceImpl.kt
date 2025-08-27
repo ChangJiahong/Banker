@@ -3,6 +3,7 @@ package cn.changjiahong.banker.service.impl
 import cn.changjiahong.banker.BankerDb
 import cn.changjiahong.banker.FieldConfig
 import cn.changjiahong.banker.RelFieldTplField
+import cn.changjiahong.banker.SelectFieldConfigsForTpl
 import cn.changjiahong.banker.model.FieldConf
 import cn.changjiahong.banker.model.FieldVal
 import cn.changjiahong.banker.model.FormFieldValue
@@ -66,7 +67,7 @@ class FieldServiceImpl(
     override fun getFieldConfigsForTemplate(
         bId: Long,
         tid: Long
-    ): Flow<List<FieldConfig>> = returnFlow {
+    ): Flow<List<SelectFieldConfigsForTpl>> = returnFlow {
         fieldRepository.findFieldConfigsForTpl(bId, tid)
     }
 

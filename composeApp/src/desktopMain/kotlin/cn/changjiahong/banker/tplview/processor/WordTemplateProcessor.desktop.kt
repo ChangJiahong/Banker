@@ -1,18 +1,14 @@
-package cn.changjiahong.banker.template.processor
+package cn.changjiahong.banker.tplview.processor
 
 import cn.changjiahong.banker.model.FormField
 import cn.changjiahong.banker.model.FormFieldValue
 import cn.changjiahong.banker.model.NoData
-import cn.changjiahong.banker.storage.Storage
-import cn.changjiahong.banker.template.TemplateProcessor
 import cn.changjiahong.banker.utils.okFlow
 import cn.changjiahong.banker.utils.returnFlow
 import com.deepoove.poi.XWPFTemplate
 import com.deepoove.poi.template.run.RunTemplate
 import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.Flow
-import org.koin.core.component.getScopeName
-import java.io.FileOutputStream
 
 
 actual object WordTemplateProcessor : TemplateProcessor {

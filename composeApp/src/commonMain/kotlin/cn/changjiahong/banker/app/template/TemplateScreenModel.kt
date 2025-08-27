@@ -8,18 +8,13 @@ import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.service.FieldService
 import cn.changjiahong.banker.service.TemplateService
 import cn.changjiahong.banker.storage.Storage
-import cn.changjiahong.banker.storage.StorageProvider
 import cn.changjiahong.banker.storage.platformFile
-import cn.changjiahong.banker.template.TemplateKit
+import cn.changjiahong.banker.tplview.TemplateKit
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.name
-import io.github.vinceglb.filekit.nameWithoutExtension
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Factory
 
 @Factory
@@ -57,7 +52,7 @@ class TemplateScreenModel(
                     fieldService.getFieldConfigsForTemplate(businessId, template.id)
                         .catchAndCollect { fieldConfigs ->
                             fieldConfigs.forEach { f ->
-                                if (formFieldValues.none { f.fieldId == it.fieldId && it.fieldValue.isNotBlank() }) {
+                                if (formFieldValues.none { f.tFieldId == it.tFieldId && it.fieldValue.isNotBlank() }) {
                                     tip("信息不完整")
                                     return@catchAndCollect
                                 }

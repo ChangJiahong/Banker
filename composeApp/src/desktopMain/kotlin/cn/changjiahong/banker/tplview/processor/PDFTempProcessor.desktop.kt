@@ -1,11 +1,9 @@
-package cn.changjiahong.banker.template
+package cn.changjiahong.banker.tplview.processor
 
 import cn.changjiahong.banker.model.FormField
 import cn.changjiahong.banker.model.FormFieldValue
 import cn.changjiahong.banker.model.NoData
-import cn.changjiahong.banker.storage.Storage
 import cn.changjiahong.banker.utils.okFlow
-import cn.changjiahong.banker.utils.returnFlow
 import com.itextpdf.forms.PdfAcroForm
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfReader
@@ -13,8 +11,6 @@ import com.itextpdf.kernel.pdf.PdfWriter
 import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.io.File
-import java.net.URI
 
 actual object PDFTempProcessor : TemplateProcessor {
     actual override fun getFormFields(file: PlatformFile): Flow<List<FormField>> = flow {
