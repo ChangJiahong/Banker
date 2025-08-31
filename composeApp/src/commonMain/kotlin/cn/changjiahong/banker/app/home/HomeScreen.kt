@@ -48,7 +48,7 @@ object HomeScreen : Tab {
 
     override val options: TabOptions
         @Composable
-        get() = TabHost(0u, Res.string.app_name, Res.drawable.home)
+        get() = TabHost(0u, Res.string.home, Res.drawable.home)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

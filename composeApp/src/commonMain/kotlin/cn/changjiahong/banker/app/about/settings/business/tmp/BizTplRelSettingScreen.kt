@@ -30,7 +30,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.add_box
+import banker.composeapp.generated.resources.add_diamond
+import banker.composeapp.generated.resources.forms_add
 import banker.composeapp.generated.resources.home
+import banker.composeapp.generated.resources.search
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.Business
@@ -52,7 +55,7 @@ class BusinessTmpDetailScreen(val business: Business) : Screen {
 
         ScaffoldWithTopBar(
             "模版配置",
-            iconPainter = painterResource(Res.drawable.home),
+            iconPainter = painterResource(Res.drawable.forms_add),
             iconOnClick = {
                 BusinessTmpDetailUiEvent.GoBusinessFieldConfigScreen(business)
                     .sendTo(businessTmpDetailScreenModel)
@@ -154,7 +157,7 @@ fun AddTemplateDialog(
                             .sendTo(businessTmpDetailScreenModel)
                     }) {
                         Icon(
-                            painterResource(Res.drawable.home),
+                            painterResource(Res.drawable.search),
                             contentDescription = "Search"
                         )
                     }

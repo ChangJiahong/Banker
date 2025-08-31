@@ -228,7 +228,6 @@ fun ClienteleDialog(
 
                         },
 //                        errorText = uiState.usernameError,
-                        leadingIcon = painterResource(Res.drawable.home)
                     )
 
                 }
@@ -268,7 +267,6 @@ fun ClienteleDialog(
 
                         },
                         errorText = uiState.fieldErrorMsg[field.fieldName] ?: "",
-                        leadingIcon = painterResource(Res.drawable.home)
                     )
                 }
             }

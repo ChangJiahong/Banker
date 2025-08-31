@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.sp
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.app_name
 import banker.composeapp.generated.resources.home
+import banker.composeapp.generated.resources.setting
+import banker.composeapp.generated.resources.settings
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
@@ -31,7 +33,7 @@ import org.jetbrains.compose.resources.painterResource
 object AboutScreen : Tab {
     override val options: TabOptions
         @Composable
-        get() = TabHost(1u, Res.string.app_name, Res.drawable.home)
+        get() = TabHost(1u, Res.string.setting, Res.drawable.settings)
 
     @Composable
     override fun Content() = AboutView()

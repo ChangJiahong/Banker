@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import banker.composeapp.generated.resources.Res
+import banker.composeapp.generated.resources.add_diamond
 import banker.composeapp.generated.resources.home
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -61,7 +62,7 @@ class TempFieldSettingScreen(val template: Template) : Screen {
         }
         ScaffoldWithTopBar("表单设置", iconOnClick = {
             TFSUiEvent.AddNewFieldConfig.sendTo(tempFieldConfigScreenModel)
-        }, iconPainter = painterResource(Res.drawable.home)) { pd ->
+        }, iconPainter = painterResource(Res.drawable.add_diamond)) { pd ->
             TempFieldView(Modifier.padding(pd), tempFieldConfigScreenModel)
         }
     }

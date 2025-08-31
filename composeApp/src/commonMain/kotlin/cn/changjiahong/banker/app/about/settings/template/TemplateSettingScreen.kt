@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.add_box
 import banker.composeapp.generated.resources.home
+import banker.composeapp.generated.resources.search
+import banker.composeapp.generated.resources.unarchive
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.FoldersButton
@@ -140,7 +142,7 @@ fun AddDocTemplate(
                     IconButton({
                         launcher.launch()
                     }) {
-                        Icon(painterResource(Res.drawable.home), contentDescription = "")
+                        Icon(painterResource(Res.drawable.unarchive), contentDescription = "")
                     }
                 })
 

@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import banker.composeapp.generated.resources.Res
+import banker.composeapp.generated.resources.add_diamond
 import banker.composeapp.generated.resources.home
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -98,7 +99,7 @@ fun FieldConfigScreen.FieldConfigView(modifier: Modifier) {
             IconButton({
                 FieldConfigScreenUiEvent.AddFieldConfig.sendTo(fieldConfigScreenModel)
             }) {
-                Icon(painter = painterResource(Res.drawable.home), contentDescription = "")
+                Icon(painter = painterResource(Res.drawable.add_diamond), contentDescription = "")
             }
         }
         HorizontalDivider()

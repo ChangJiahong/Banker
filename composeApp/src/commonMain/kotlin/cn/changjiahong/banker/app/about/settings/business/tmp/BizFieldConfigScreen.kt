@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import banker.composeapp.generated.resources.Res
+import banker.composeapp.generated.resources.add_diamond
 import banker.composeapp.generated.resources.home
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -74,7 +75,7 @@ fun BusinessFieldConfigScreen.FieldConfigView(modifier: Modifier) {
             IconButton({
                 BFieldConfigScreenUiEvent.AddFieldConfig.sendTo(fieldConfigScreenModel)
             }) {
-                Icon(painter = painterResource(Res.drawable.home), contentDescription = "")
+                Icon(painter = painterResource(Res.drawable.add_diamond), contentDescription = "")
             }
         }
         HorizontalDivider()
