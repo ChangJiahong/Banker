@@ -48,6 +48,8 @@ interface FieldRepository {
         fieldId: Long
     )
 
+    fun deleteFieldConfigById(fieldId: Long)
+
     /**
      * 获取业务项（全局）属性和模版的属性映射关系
      */

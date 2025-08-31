@@ -1,13 +1,22 @@
-package cn.changjiahong.banker.app.about.settings.user
+package cn.changjiahong.banker.app.about.settings.global
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -24,11 +33,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import banker.composeapp.generated.resources.Res
+import banker.composeapp.generated.resources.add_diamond
 import banker.composeapp.generated.resources.home
+import banker.composeapp.generated.resources.remove
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.GlobalNavigator
@@ -37,6 +50,7 @@ import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.app.about.settings.ConfigUiEffect
 import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.composable.BooleanFieldDropdown
+import cn.changjiahong.banker.composable.HoverDeleteBox
 import cn.changjiahong.banker.platform.HorizontalScrollbar
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
@@ -45,16 +59,24 @@ class GlobalFieldSettingScreen : Screen {
 
     @Composable
     override fun Content() {
+        val fieldConfigScreenModel = koinScreenModel<GlobalFieldSettingScreenModel>()
 
-        ScaffoldWithTopBar("全局字段信息") { pd ->
-            ExtendFieldSettingView(Modifier.padding(pd))
+        ScaffoldWithTopBar(
+            "全局字段信息",
+            iconPainter = painterResource(Res.drawable.add_diamond),
+            iconOnClick = {
+                ConfigUiEvent.Add.sendTo(fieldConfigScreenModel)
+            }) { pd ->
+            ExtendFieldSettingView(Modifier.padding(pd), fieldConfigScreenModel)
         }
     }
 }
 
 @Composable
-private fun GlobalFieldSettingScreen.ExtendFieldSettingView(modifier: Modifier) {
-    val fieldConfigScreenModel = koinScreenModel<GlobalFieldSettingScreenModel>()
+private fun GlobalFieldSettingScreen.ExtendFieldSettingView(
+    modifier: Modifier,
+    fieldConfigScreenModel: GlobalFieldSettingScreenModel
+) {
 
     val global = GlobalNavigator.current
     fieldConfigScreenModel.handleEffect {
@@ -67,19 +89,25 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(modifier: Modifier) 
             else -> false
         }
     }
-    Column(modifier) {
+    Column(modifier.padding { paddingHorizontal(30.dp) }) {
         val fields by fieldConfigScreenModel.filedConfigs.collectAsState()
         val filedErrors by fieldConfigScreenModel.filedErrors.collectAsState()
 
-        Row(Modifier.padding {
-            paddingVertical(5.dp)
-        }, verticalAlignment = Alignment.CenterVertically) {
-            Text("业务信息", fontSize = 24.sp)
-            IconButton({
-                ConfigUiEvent.Add.sendTo(fieldConfigScreenModel)
-            }) {
-                Icon(painter = painterResource(Res.drawable.home), contentDescription = "")
-            }
+//        Row(Modifier.padding {
+//            paddingVertical(5.dp)
+//        }, verticalAlignment = Alignment.CenterVertically) {
+//            Text("业务信息", fontSize = 24.sp)
+//            IconButton({
+//                ConfigUiEvent.Add.sendTo(fieldConfigScreenModel)
+//            }) {
+//                Icon(painter = painterResource(Res.drawable.home), contentDescription = "")
+//            }
+//        }
+
+        Button({
+            ConfigUiEvent.Save.sendTo(fieldConfigScreenModel)
+        }) {
+            Text("保存")
         }
         HorizontalDivider()
         val scrollState = rememberScrollState()
@@ -88,17 +116,31 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(modifier: Modifier) 
             paddingVertical(5.dp)
         }) {
             Column(
-                modifier = Modifier.padding(5.dp).heightIn(max = 300.dp)
+                modifier = Modifier.padding(5.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                Column(Modifier.fillMaxWidth().horizontalScroll(scrollState)) {
+                var ind = remember { 1 }
+                Column(Modifier.wrapContentWidth()) {
                     fields.forEachIndexed { index, uField ->
-                        Row {
+                        if (uField.isDelete) {
+                            return@forEachIndexed
+                        }
+                        Row(
+                            Modifier.wrapContentWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
 
                             val bfe = filedErrors[index]
 
                             var item by remember(uField) { mutableStateOf(uField) }
                             var error by remember(bfe) { mutableStateOf(bfe) }
+
+                            HoverDeleteBox((ind++).toString(), Modifier.padding {
+                                paddingHorizontal(3.dp)
+                                paddingTop(5.dp)
+                            }) {
+                                ConfigUiEvent.Delete(index).sendTo(fieldConfigScreenModel)
+                            }
 
                             InputView(
                                 value = item.fieldName,
@@ -140,7 +182,7 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(modifier: Modifier) 
                             )
                             InputView(
                                 value = item.width.toString(),
-                                onValueChange = {newValue->
+                                onValueChange = { newValue ->
                                     val digitsOnly = newValue.filter { it.isDigit() }
                                     // 更新状态
                                     val newWidth = digitsOnly.toIntOrNull() ?: 0
@@ -172,17 +214,9 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(modifier: Modifier) 
                         }
                     }
 
-
                 }
-
-                HorizontalScrollbar(scrollState)
             }
         }
 
-        Button({
-            ConfigUiEvent.Save.sendTo(fieldConfigScreenModel)
-        }) {
-            Text("保存")
-        }
     }
 }

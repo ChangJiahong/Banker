@@ -71,7 +71,11 @@ class FieldRepositoryImpl(db: BankerDb) : FieldRepository {
             validationRule,
             if (forced) 1 else 0,
             fieldId
-        )
+        ).ck()
+    }
+
+    override fun deleteFieldConfigById(fieldId: Long) {
+        fieldConfigQueries.delete(fieldId).ck()
     }
 
     override suspend fun findFieldConfigAndTplFieldMap(

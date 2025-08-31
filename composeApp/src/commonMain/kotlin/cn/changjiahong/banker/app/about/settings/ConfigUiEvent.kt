@@ -5,7 +5,7 @@ import cn.changjiahong.banker.mvi.UiEvent
 
 sealed interface ConfigUiEvent : UiEvent {
     object Add : ConfigUiEvent
-    object Delete : ConfigUiEvent
+    class Delete(val index: Int) : ConfigUiEvent
     object Save : ConfigUiEvent
 }
 

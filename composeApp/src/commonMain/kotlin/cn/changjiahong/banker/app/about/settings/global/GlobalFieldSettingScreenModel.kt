@@ -1,4 +1,4 @@
-package cn.changjiahong.banker.app.about.settings.user
+package cn.changjiahong.banker.app.about.settings.global
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.app.about.settings.ConfigUiEffect
@@ -41,6 +41,17 @@ class GlobalFieldSettingScreenModel(
                 }
                 _filedErrors.update {
                     it + FieldConfError()
+                }
+            }
+
+            is ConfigUiEvent.Delete -> {
+                val field = _filedConfigs.value[event.index]
+                if (field.fieldId < 0) {
+                    _filedConfigs.update { it.toMutableList().apply { removeAt(event.index) } }
+                } else {
+                    _filedConfigs.replace(
+                        event.index
+                    ) { field.copy(isDelete = true) }
                 }
             }
 

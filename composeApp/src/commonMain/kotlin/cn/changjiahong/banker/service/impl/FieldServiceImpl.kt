@@ -32,7 +32,7 @@ class FieldServiceImpl(
     override fun saveGlobalFieldConfigs(fieldConfigs: List<FieldConf>) = okFlow {
         db.transaction {
             fieldConfigs.forEach { fieldConfig ->
-                if (fieldConfig.fieldId < 0) {
+                if (fieldConfig.fieldId < 0 && !fieldConfig.isDelete) {
                     fieldRepository.newFieldConfig(
                         -1,
                         fieldConfig.fieldName,
@@ -42,7 +42,7 @@ class FieldServiceImpl(
                         fieldConfig.validationRule,
                         fieldConfig.forced
                     )
-                } else {
+                } else if (!fieldConfig.isDelete) {
                     fieldRepository.updateFieldConfigById(
                         -1,
                         fieldConfig.fieldName,
@@ -53,6 +53,8 @@ class FieldServiceImpl(
                         fieldConfig.forced,
                         fieldConfig.fieldId
                     )
+                } else {
+                    fieldRepository.deleteFieldConfigById(fieldConfig.fieldId)
                 }
             }
         }

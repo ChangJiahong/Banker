@@ -52,3 +52,7 @@ update:
 UPDATE FieldConfig
 SET bId=?, fieldName=?, fieldType=?, alias=?, width=?,validationRule=?,forced=?
 WHERE fieldId=?;
+
+delete:
+DELETE FROM FieldConfig
+WHERE fieldId=?;

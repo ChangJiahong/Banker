@@ -433,7 +433,7 @@ fun InputView(
             label = { Text(label, style = MaterialTheme.typography.labelMedium) },
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
-            textStyle = TextStyle.Default.copy(fontSize = 20.sp),
+            textStyle = TextStyle.Default.copy(fontSize = 18.sp),
             visualTransformation = if (keyboardOptions.keyboardType == KeyboardType.Password)
                 PasswordVisualTransformation('*') else VisualTransformation.None,
             singleLine = true,
@@ -459,9 +459,8 @@ fun InputView(
 //                focusedLabelColor = Color.Black
 //            )
         )
-        Spacer(modifier = Modifier.height(8.dp))
-
         if (isError) {
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = errorText,
                 color = Color.Red,

@@ -15,8 +15,7 @@ import cn.changjiahong.banker.app.main.MainScreen
 import cn.changjiahong.banker.app.template.PreTemplateScreen
 import cn.changjiahong.banker.app.template.TemplateScreen
 import cn.changjiahong.banker.app.about.settings.template.TemplateSettingScreen
-import cn.changjiahong.banker.app.about.settings.user.GlobalFieldSettingScreen
-import cn.changjiahong.banker.model.Field
+import cn.changjiahong.banker.app.about.settings.global.GlobalFieldSettingScreen
 import io.github.vinceglb.filekit.PlatformFile
 
 object RR {

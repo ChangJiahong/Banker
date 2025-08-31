@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.add_diamond
-import banker.composeapp.generated.resources.home
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.Business
@@ -37,7 +36,6 @@ import cn.changjiahong.banker.GlobalNavigator
 import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.app.about.settings.ConfigUiEffect
-import cn.changjiahong.banker.app.about.settings.user.GlobalConfigUiEvent
 import cn.changjiahong.banker.composable.TextFieldDropdown
 import cn.changjiahong.banker.platform.HorizontalScrollbar
 import cn.changjiahong.banker.utils.padding
