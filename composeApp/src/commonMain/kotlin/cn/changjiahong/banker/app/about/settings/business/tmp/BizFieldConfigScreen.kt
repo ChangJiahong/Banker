@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -36,6 +37,8 @@ import cn.changjiahong.banker.GlobalNavigator
 import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.app.about.settings.ConfigUiEffect
+import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
+import cn.changjiahong.banker.composable.HoverDeleteBox
 import cn.changjiahong.banker.composable.TextFieldDropdown
 import cn.changjiahong.banker.platform.HorizontalScrollbar
 import cn.changjiahong.banker.utils.padding
@@ -45,39 +48,58 @@ import org.koin.core.parameter.parametersOf
 class BusinessFieldConfigScreen(val business: Business) : Screen {
     @Composable
     override fun Content() {
-        ScaffoldWithTopBar("业务属性") { pd ->
-            FieldConfigView(Modifier.padding(pd))
+        val fieldConfigScreenModel =
+            koinScreenModel<BusinessFieldConfigScreenModel> { parametersOf(business) }
+
+        ScaffoldWithTopBar(
+            "业务属性",
+            iconPainter = painterResource(Res.drawable.add_diamond),
+            iconOnClick = {
+                ConfigUiEvent.Add
+                    .sendTo(fieldConfigScreenModel)
+            }) { pd ->
+            FieldConfigView(Modifier.padding(pd), fieldConfigScreenModel)
         }
     }
 }
 
 
 @Composable
-fun BusinessFieldConfigScreen.FieldConfigView(modifier: Modifier) {
-    val fieldConfigScreenModel = koinScreenModel<BusinessFieldConfigScreenModel> { parametersOf(business) }
+fun BusinessFieldConfigScreen.FieldConfigView(
+    modifier: Modifier,
+    fieldConfigScreenModel: BusinessFieldConfigScreenModel
+) {
     val global = GlobalNavigator.current
     fieldConfigScreenModel.handleEffect {
-        when{
+        when {
             it is ConfigUiEffect.SaveSuccess -> {
                 global.pop()
                 true
             }
+
             else -> false
         }
     }
-    Column(modifier.padding { paddingHorizontal(10.dp) }) {
+    Column(modifier.padding { paddingHorizontal(30.dp) }) {
         val businessFields by fieldConfigScreenModel.businessFiledConfigs.collectAsState()
         val businessFiledErrors by fieldConfigScreenModel.businessFiledErrors.collectAsState()
 
-        Row(Modifier.padding {
-            paddingVertical(5.dp)
-        }, verticalAlignment = Alignment.CenterVertically) {
-            Text("业务信息", fontSize = 24.sp)
-            IconButton({
-                BFieldConfigScreenUiEvent.AddFieldConfig.sendTo(fieldConfigScreenModel)
-            }) {
-                Icon(painter = painterResource(Res.drawable.add_diamond), contentDescription = "")
-            }
+//        Row(Modifier.padding {
+//            paddingVertical(5.dp)
+//        }, verticalAlignment = Alignment.CenterVertically) {
+//            Text("业务信息", fontSize = 24.sp)
+//            IconButton({
+//                BFieldConfigScreenUiEvent.AddFieldConfig.sendTo(fieldConfigScreenModel)
+//            }) {
+//                Icon(painter = painterResource(Res.drawable.add_diamond), contentDescription = "")
+//            }
+//        }
+
+
+        Button({
+            BFieldConfigScreenUiEvent.SaveFiledConfig.sendTo(fieldConfigScreenModel)
+        }) {
+            Text("保存")
         }
         HorizontalDivider()
         val scrollState = rememberScrollState()
@@ -86,53 +108,64 @@ fun BusinessFieldConfigScreen.FieldConfigView(modifier: Modifier) {
             paddingVertical(5.dp)
         }) {
             Column(
-                modifier = Modifier.padding(5.dp).heightIn(max = 300.dp)
+                modifier = Modifier.padding(5.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                Column(Modifier.fillMaxWidth().horizontalScroll(scrollState)) {
-                        businessFields.forEachIndexed { index, bField ->
+                var ind = remember { 1 }
+                businessFields.forEachIndexed { index, bField ->
+                    if (bField.isDelete) {
+                        return@forEachIndexed
+                    }
+                    Row(
+                        Modifier.wrapContentWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val bfe = businessFiledErrors[index]
 
-                            Row {
-                               val bfe = businessFiledErrors[index]
+                        var item by remember(bField) { mutableStateOf(bField) }
+                        var error by remember(bfe) { mutableStateOf(bfe) }
 
-                                var item by remember(bField) { mutableStateOf(bField) }
-                                var error by remember(bfe){mutableStateOf(bfe) }
+                        val englishRegex = Regex("^$|^(?=.*[a-zA-Z])[a-zA-Z0-9]*$")
 
-                                val englishRegex = Regex("^$|^(?=.*[a-zA-Z])[a-zA-Z0-9]*$")
+                        HoverDeleteBox((ind++).toString(), Modifier.padding {
+                            paddingHorizontal(3.dp)
+                            paddingTop(5.dp)
+                        }) {
+                            ConfigUiEvent.Delete(index).sendTo(fieldConfigScreenModel)
+                        }
 
-
-                                InputView(
-                                    value = item.fieldName,
-                                    onValueChange = {
-                                        item = item.copy(fieldName = it)
-                                        BFieldConfigScreenUiEvent.UpdateBusinessFiled(
-                                            index,
-                                            item
-                                        )
-                                            .sendTo(fieldConfigScreenModel)
-                                    },
-                                    label = "字段名",
-                                    errorText = error.fieldName,
-                                    readOnly = false,
-                                    modifier = Modifier.width(150.dp)
-                                        .padding { paddingHorizontal(2.dp) }
+                        InputView(
+                            value = item.fieldName,
+                            onValueChange = {
+                                item = item.copy(fieldName = it)
+                                BFieldConfigScreenUiEvent.UpdateBusinessFiled(
+                                    index,
+                                    item
                                 )
-                                TextFieldDropdown(
-                                    listOf("TEXT", "IMAGE"),
-                                    item.fieldType,
-                                    onValueChange = {
-                                        item = item.copy(fieldType = it)
-                                        BFieldConfigScreenUiEvent.UpdateBusinessFiled(
-                                            index,
-                                            item
-                                        )
-                                            .sendTo(fieldConfigScreenModel)
-                                    },
-                                    enableEdit = false,
-                                    label = "字段类型",
-                                    modifier = Modifier.width(140.dp)
-                                        .padding { paddingHorizontal(2.dp) }
+                                    .sendTo(fieldConfigScreenModel)
+                            },
+                            label = "字段名",
+                            errorText = error.fieldName,
+                            readOnly = false,
+                            modifier = Modifier.width(150.dp)
+                                .padding { paddingHorizontal(2.dp) }
+                        )
+                        TextFieldDropdown(
+                            listOf("TEXT", "IMAGE"),
+                            item.fieldType,
+                            onValueChange = {
+                                item = item.copy(fieldType = it)
+                                BFieldConfigScreenUiEvent.UpdateBusinessFiled(
+                                    index,
+                                    item
                                 )
+                                    .sendTo(fieldConfigScreenModel)
+                            },
+                            enableEdit = false,
+                            label = "字段类型",
+                            modifier = Modifier.width(140.dp)
+                                .padding { paddingHorizontal(2.dp) }
+                        )
 //                                InputView(
 //                                    value = item.alias,
 //                                    onValueChange = {
@@ -148,54 +181,46 @@ fun BusinessFieldConfigScreen.FieldConfigView(modifier: Modifier) {
 //                                    modifier = Modifier.width(150.dp)
 //                                        .padding { paddingHorizontal(2.dp) }
 //                                )
-                                InputView(
-                                    value = item.width.toString(),
-                                    onValueChange = {newValue->
-                                        val digitsOnly = newValue.filter { it.isDigit() }
-                                        // 更新状态
-                                        val newWidth = digitsOnly.toIntOrNull() ?: 0
-                                        item = item.copy(width = newWidth)
+                        InputView(
+                            value = item.width.toString(),
+                            onValueChange = { newValue ->
+                                val digitsOnly = newValue.filter { it.isDigit() }
+                                // 更新状态
+                                val newWidth = digitsOnly.toIntOrNull() ?: 0
+                                item = item.copy(width = newWidth)
 
-                                        BFieldConfigScreenUiEvent.UpdateBusinessFiled(
-                                            index,
-                                            item
-                                        ).sendTo(fieldConfigScreenModel)
+                                BFieldConfigScreenUiEvent.UpdateBusinessFiled(
+                                    index,
+                                    item
+                                ).sendTo(fieldConfigScreenModel)
 
-                                    },
-                                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                                    label = "长度",
-                                    errorText = error.width,
-                                    modifier = Modifier.width(80.dp)
-                                        .padding { paddingHorizontal(2.dp) }
+                            },
+                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                            label = "长度",
+                            errorText = error.width,
+                            modifier = Modifier.width(80.dp)
+                                .padding { paddingHorizontal(2.dp) }
+                        )
+                        InputView(
+                            value = item.validationRule,
+                            onValueChange = {
+                                item = item.copy(validationRule = it)
+                                BFieldConfigScreenUiEvent.UpdateBusinessFiled(
+                                    index,
+                                    item
                                 )
-                                InputView(
-                                    value = item.validationRule,
-                                    onValueChange = {
-                                        item = item.copy(validationRule = it)
-                                        BFieldConfigScreenUiEvent.UpdateBusinessFiled(
-                                            index,
-                                            item
-                                        )
-                                            .sendTo(fieldConfigScreenModel)
-                                    },
-                                    label = "校验规则",
-                                    errorText = error.validationRule,
-                                    modifier = Modifier.width(160.dp)
-                                        .padding { paddingHorizontal(2.dp) }
-                                )
-                            }
-
-
+                                    .sendTo(fieldConfigScreenModel)
+                            },
+                            label = "校验规则",
+                            errorText = error.validationRule,
+                            modifier = Modifier.width(160.dp)
+                                .padding { paddingHorizontal(2.dp) }
+                        )
                     }
-                }
-                HorizontalScrollbar(scrollState)
-            }
-        }
 
-        Button({
-            BFieldConfigScreenUiEvent.SaveFiledConfig.sendTo(fieldConfigScreenModel)
-        }) {
-            Text("保存")
+
+                }
+            }
         }
     }
 }

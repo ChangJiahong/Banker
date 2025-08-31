@@ -78,7 +78,7 @@ class FieldServiceImpl(
     override fun saveBizFieldConfigs(fieldConfigs: List<FieldConf>) = okFlow {
         db.transaction {
             fieldConfigs.forEach { fieldConfig ->
-                if (fieldConfig.fieldId < 0) {
+                if (fieldConfig.fieldId < 0 && !fieldConfig.isDelete) {
                     fieldRepository.newFieldConfig(
                         fieldConfig.bId,
                         fieldConfig.fieldName,
@@ -88,7 +88,7 @@ class FieldServiceImpl(
                         fieldConfig.validationRule,
                         false
                     )
-                } else {
+                } else if (!fieldConfig.isDelete) {
                     fieldRepository.updateFieldConfigById(
                         fieldConfig.bId,
                         fieldConfig.fieldName,
@@ -99,6 +99,8 @@ class FieldServiceImpl(
                         false,
                         fieldConfig.fieldId
                     )
+                } else {
+                    fieldRepository.deleteFieldConfigById(fieldConfig.fieldId)
                 }
             }
         }

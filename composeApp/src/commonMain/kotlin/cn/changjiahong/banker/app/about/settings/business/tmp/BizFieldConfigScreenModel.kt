@@ -3,6 +3,7 @@ package cn.changjiahong.banker.app.about.settings.business.tmp
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.app.about.settings.ConfigUiEffect
+import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.model.FieldConf
 import cn.changjiahong.banker.model.FieldConfError
 import cn.changjiahong.banker.mvi.MviScreenModel
@@ -39,12 +40,25 @@ class BusinessFieldConfigScreenModel(
 
     override fun handleEvent(event: UiEvent) {
         when (event) {
-            is BFieldConfigScreenUiEvent.AddFieldConfig -> {
+            is ConfigUiEvent.Add -> {
                 _businessFiledConfigs.update {
                     it + FieldConf(bId = business.id)
                 }
                 _businessFiledErrors.update {
                     it + FieldConfError()
+                }
+            }
+
+            is ConfigUiEvent.Delete -> {
+                val field = _businessFiledConfigs.value[event.index]
+                if (field.fieldId < 0) {
+                    _businessFiledConfigs.update {
+                        it.toMutableList().apply { removeAt(event.index) }
+                    }
+                } else {
+                    _businessFiledConfigs.replace(
+                        event.index
+                    ) { field.copy(isDelete = true) }
                 }
             }
 
@@ -101,7 +115,7 @@ class BusinessFieldConfigScreenModel(
                         FieldConf(
                             fieldId, bId, fieldName,
                             fieldType,
-                            alias, width.toInt(),validationRule, field.forced>0
+                            alias, width.toInt(), validationRule, field.forced > 0
                         )
                     }
                 }
