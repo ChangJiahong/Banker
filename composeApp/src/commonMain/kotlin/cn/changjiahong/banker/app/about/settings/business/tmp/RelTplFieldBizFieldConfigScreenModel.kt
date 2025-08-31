@@ -141,7 +141,7 @@ class FieldConfigScreenModel(
     private fun loadFieldConfigs() {
         screenModelScope.launch {
             fieldService.getFieldConfigs(business.id).catchAndCollect { data ->
-                _fieldOptions.value = data.map { Option(it.alias, it.fieldId) }
+                _fieldOptions.value = data.map { Option(it.fieldName, it.fieldId) }
             }
         }
     }
@@ -149,7 +149,7 @@ class FieldConfigScreenModel(
     private fun loadTemplateFields() {
         screenModelScope.launch {
             templateService.getFieldsByTemplateId(template.id).collect { data ->
-                _tplFieldOptions.value = data.map { Option(it.formFieldName, it.id) }
+                _tplFieldOptions.value = data.map { Option(it.alias, it.id) }
             }
         }
     }

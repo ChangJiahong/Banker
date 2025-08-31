@@ -56,11 +56,12 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(modifier: Modifier) 
 
     val global = GlobalNavigator.current
     fieldConfigScreenModel.handleEffect {
-        when{
+        when {
             it is ConfigUiEffect.SaveSuccess -> {
                 global.pop()
                 true
             }
+
             else -> false
         }
     }
@@ -110,17 +111,29 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(modifier: Modifier) 
                                 modifier = Modifier.width(150.dp)
                                     .padding { paddingHorizontal(2.dp) }
                             )
-                            InputView(
-                                value = item.alias,
+//                            InputView(
+//                                value = item.alias,
+//                                onValueChange = {
+//                                    item = item.copy(alias = it)
+//                                    GlobalConfigUiEvent.Update(index, item)
+//                                        .sendTo(fieldConfigScreenModel)
+//
+//                                },
+//                                label = "描述",
+//                                errorText = error.alias,
+//                                modifier = Modifier.width(150.dp)
+//                                    .padding { paddingHorizontal(2.dp) }
+//                            )
+
+                            BooleanFieldDropdown(
+                                value = item.forced,
                                 onValueChange = {
-                                    item = item.copy(alias = it)
+                                    item = item.copy(forced = it)
                                     GlobalConfigUiEvent.Update(index, item)
                                         .sendTo(fieldConfigScreenModel)
-
                                 },
-                                label = "描述",
-                                errorText = error.alias,
-                                modifier = Modifier.width(150.dp)
+                                label = "是否必输项",
+                                modifier = Modifier.width(160.dp)
                                     .padding { paddingHorizontal(2.dp) }
                             )
                             InputView(
@@ -133,18 +146,6 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(modifier: Modifier) 
                                 },
                                 label = "校验规则",
                                 errorText = error.validationRule,
-                                modifier = Modifier.width(160.dp)
-                                    .padding { paddingHorizontal(2.dp) }
-                            )
-
-                            BooleanFieldDropdown(
-                                value = item.forced,
-                                onValueChange = {
-                                    item = item.copy(forced = it)
-                                    GlobalConfigUiEvent.Update(index, item)
-                                        .sendTo(fieldConfigScreenModel)
-                                },
-                                label = "是否必输项",
                                 modifier = Modifier.width(160.dp)
                                     .padding { paddingHorizontal(2.dp) }
                             )

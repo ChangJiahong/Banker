@@ -103,7 +103,7 @@ fun ClienteleItem(userDO: UserInfo, onClick: () -> Unit, selected: Boolean = fal
         ) {
             Column(Modifier.padding(10.dp)) {
                 Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                    val name = userDO.fields["name"]?.fieldValue
+                    val name = userDO.fields["姓名"]?.fieldValue
                     Text(name?:"未知", modifier = Modifier.weight(1f))
 //                    Text(
 //                        formatInstantToYMD(userDO.created),
@@ -111,7 +111,7 @@ fun ClienteleItem(userDO: UserInfo, onClick: () -> Unit, selected: Boolean = fal
 //                        textAlign = TextAlign.End
 //                    )
                 }
-                val idNum = userDO.fields["idNum"]?.fieldValue
+                val idNum = userDO.fields["证件号码"]?.fieldValue
 
                 Text(idNum?:"null")
 

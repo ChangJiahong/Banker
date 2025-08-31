@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -185,7 +187,7 @@ fun ClienteleDialog(
         popupDialogState = dialogState,
         modifier = Modifier.width(850.dp).fillMaxHeight().padding(30.dp)
     ) {
-        Column {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 
             val uiState by businessHandlerScreenModel.uiState.collectAsState()
 

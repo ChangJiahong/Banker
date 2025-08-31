@@ -131,21 +131,21 @@ fun BusinessFieldConfigScreen.FieldConfigView(modifier: Modifier) {
                                     modifier = Modifier.width(140.dp)
                                         .padding { paddingHorizontal(2.dp) }
                                 )
-                                InputView(
-                                    value = item.alias,
-                                    onValueChange = {
-                                        item = item.copy(alias = it)
-                                        BFieldConfigScreenUiEvent.UpdateBusinessFiled(
-                                            index,
-                                            item
-                                        )
-                                            .sendTo(fieldConfigScreenModel)
-                                    },
-                                    label = "描述",
-                                    errorText = error.alias,
-                                    modifier = Modifier.width(150.dp)
-                                        .padding { paddingHorizontal(2.dp) }
-                                )
+//                                InputView(
+//                                    value = item.alias,
+//                                    onValueChange = {
+//                                        item = item.copy(alias = it)
+//                                        BFieldConfigScreenUiEvent.UpdateBusinessFiled(
+//                                            index,
+//                                            item
+//                                        )
+//                                            .sendTo(fieldConfigScreenModel)
+//                                    },
+//                                    label = "描述",
+//                                    errorText = error.alias,
+//                                    modifier = Modifier.width(150.dp)
+//                                        .padding { paddingHorizontal(2.dp) }
+//                                )
                                 InputView(
                                     value = item.validationRule,
                                     onValueChange = {
