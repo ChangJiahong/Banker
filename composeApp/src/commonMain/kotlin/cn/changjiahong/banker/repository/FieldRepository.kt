@@ -29,6 +29,7 @@ interface FieldRepository {
         fieldName: String,
         fieldType: String,
         alias: String,
+        width: Int,
         validationRule: String,
         forced: Boolean
     ): Long
@@ -41,6 +42,7 @@ interface FieldRepository {
         fieldName: String,
         fieldType: String,
         alias: String,
+        width: Int,
         validationRule: String,
         forced: Boolean,
         fieldId: Long

@@ -104,7 +104,7 @@ fun ClienteleItem(userDO: UserInfo, onClick: () -> Unit, selected: Boolean = fal
             Column(Modifier.padding(10.dp)) {
                 Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                     val name = userDO.fields["姓名"]?.fieldValue
-                    Text(name?:"未知", modifier = Modifier.weight(1f))
+                    Text(name ?: "未知", modifier = Modifier.weight(1f))
 //                    Text(
 //                        formatInstantToYMD(userDO.created),
 //                        modifier = Modifier.weight(1f),
@@ -113,7 +113,7 @@ fun ClienteleItem(userDO: UserInfo, onClick: () -> Unit, selected: Boolean = fal
                 }
                 val idNum = userDO.fields["证件号码"]?.fieldValue
 
-                Text(idNum?:"null")
+                Text(idNum ?: "null")
 
             }
         }
@@ -261,9 +261,6 @@ fun ScaffoldWithTopBar(
         content(paddingValues)
     }
 }
-
-
-
 
 
 @Composable
@@ -445,15 +442,16 @@ fun InputView(
             } else null,
             modifier = modifier,
             isError = isError,
-            trailingIcon = {
+            trailingIcon =
                 if (isError) {
-                    Icon(
-                        painter = painterResource(Res.drawable.home),
-                        contentDescription = "error",
-                        tint = Color.Red
-                    )
-                }
-            },
+                    {
+                        Icon(
+                            painter = painterResource(Res.drawable.home),
+                            contentDescription = "error",
+                            tint = Color.Red
+                        )
+                    }
+                } else null,
             shape = RoundedCornerShape(15.dp),
 //            colors = OutlinedTextFieldDefaults.colors(
 //                focusedBorderColor = Color.Black,

@@ -4,6 +4,7 @@ CREATE TABLE FieldConfig (
  fieldName       TEXT     NOT NULL ,
  fieldType       TEXT     NOT NULL ,
  alias           TEXT     NOT NULL , -- 别名
+ width           INTEGER  NOT NULL DEFAULT 1,
  validationRule  TEXT   NOT NULL DEFAULT "",
  forced          INTEGER NOT NULL DEFAULT 0, --是否必须，bId=-1 才有效，针对全局属性是否必输
  created         INTEGER  NOT NULL DEFAULT (strftime('%s', 'now'))
@@ -12,7 +13,7 @@ CREATE TABLE FieldConfig (
 
 --查找涉及bid业务的属性配置，包括全局属性
 selectFieldConfigInvolveTplFieldRel:
-SELECT DISTINCT fc.fieldId, fc.fieldName, fc.bId, fc.fieldType, fc.alias,
+SELECT DISTINCT fc.fieldId, fc.fieldName, fc.bId, fc.fieldType, fc.alias,fc.width,
               fc.validationRule, fc.forced,fc.created
 FROM FieldConfig fc
 LEFT JOIN RelFieldTplField rf ON rf.fieldId = fc.fieldId
@@ -43,11 +44,11 @@ WHERE rftf.bId = ? AND tf.templateId = ?;
 
 
 insert:
-INSERT INTO FieldConfig(fieldId,bId,fieldName,fieldType,alias,
+INSERT INTO FieldConfig(fieldId,bId,fieldName,fieldType,alias,width,
 validationRule,forced)
-VALUES (?,?,?,?,?,?,?) ;
+VALUES (?,?,?,?,?,?,?,?) ;
 
 update:
 UPDATE FieldConfig
-SET bId=?, fieldName=?, fieldType=?, alias=?, validationRule=?,forced=?
+SET bId=?, fieldName=?, fieldType=?, alias=?, width=?,validationRule=?,forced=?
 WHERE fieldId=?;

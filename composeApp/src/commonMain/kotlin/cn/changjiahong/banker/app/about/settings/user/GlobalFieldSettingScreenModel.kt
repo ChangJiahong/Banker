@@ -95,7 +95,14 @@ class GlobalFieldSettingScreenModel(
                 _filedConfigs.value = it.map { field ->
                     field.run {
                         FieldConf(
-                            fieldId, -1,fieldName, fieldType,alias, validationRule, forced == 1L
+                            fieldId,
+                            -1,
+                            fieldName,
+                            fieldType,
+                            alias,
+                            width.toInt(),
+                            validationRule,
+                            forced == 1L
                         )
                     }
                 }

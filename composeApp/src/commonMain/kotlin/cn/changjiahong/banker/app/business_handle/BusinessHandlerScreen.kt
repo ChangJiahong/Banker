@@ -218,7 +218,8 @@ fun ClienteleDialog(
                     InputView(
                         label = field.alias,
                         value = fieldVal.fieldValue,
-                        modifier = Modifier.width(200.dp).padding(10.dp, 0.dp),
+                        modifier = Modifier.width((field.width.toInt() * 10).dp)
+                            .padding(10.dp, 0.dp),
                         onValueChange = { newValue ->
                             fieldVal = fieldVal.copy(fieldValue = newValue)
                             BhUIEvent.UpdateFieldValue(
@@ -256,7 +257,8 @@ fun ClienteleDialog(
                     }
                     InputView(
                         label = field.alias,
-                        modifier = Modifier.width(250.dp).padding(10.dp, 0.dp),
+                        modifier = Modifier.width((field.width.toInt() * 10).dp)
+                            .padding(10.dp, 0.dp),
                         value = fieldVal.fieldValue,
                         onValueChange = {
                             fieldVal = fieldVal.copy(fieldValue = it)

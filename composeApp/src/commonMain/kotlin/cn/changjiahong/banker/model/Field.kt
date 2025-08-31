@@ -32,6 +32,7 @@ data class FieldConf(
     val fieldName: String = "",
     val fieldType: String = "TEXT",
     val alias: String = "",
+    val width: Int = 20,
     val validationRule: String = "",
     val forced: Boolean = false
 )
@@ -40,6 +41,7 @@ data class FieldConfError(
     val fieldName: String = "",
     val fieldType: String = "",
     val alias: String = "",
+    val width: String = "",
     val validationRule: String = "",
 )
 

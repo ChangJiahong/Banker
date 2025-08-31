@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -23,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import banker.composeapp.generated.resources.Res
@@ -133,7 +135,25 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(modifier: Modifier) 
                                         .sendTo(fieldConfigScreenModel)
                                 },
                                 label = "是否必输项",
-                                modifier = Modifier.width(160.dp)
+                                modifier = Modifier.width(100.dp)
+                                    .padding { paddingHorizontal(2.dp) }
+                            )
+                            InputView(
+                                value = item.width.toString(),
+                                onValueChange = {newValue->
+                                    val digitsOnly = newValue.filter { it.isDigit() }
+                                    // 更新状态
+                                    val newWidth = digitsOnly.toIntOrNull() ?: 0
+                                    item = item.copy(width = newWidth)
+
+                                    GlobalConfigUiEvent.Update(index, item)
+                                        .sendTo(fieldConfigScreenModel)
+
+                                },
+                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                                label = "长度",
+                                errorText = error.width,
+                                modifier = Modifier.width(80.dp)
                                     .padding { paddingHorizontal(2.dp) }
                             )
                             InputView(

@@ -38,6 +38,7 @@ class FieldServiceImpl(
                         fieldConfig.fieldName,
                         fieldConfig.fieldType,
                         fieldConfig.alias,
+                        fieldConfig.width,
                         fieldConfig.validationRule,
                         fieldConfig.forced
                     )
@@ -47,6 +48,7 @@ class FieldServiceImpl(
                         fieldConfig.fieldName,
                         fieldConfig.fieldType,
                         fieldConfig.alias,
+                        fieldConfig.width,
                         fieldConfig.validationRule,
                         fieldConfig.forced,
                         fieldConfig.fieldId
@@ -80,6 +82,7 @@ class FieldServiceImpl(
                         fieldConfig.fieldName,
                         fieldConfig.fieldType,
                         fieldConfig.alias,
+                        fieldConfig.width,
                         fieldConfig.validationRule,
                         false
                     )
@@ -89,6 +92,7 @@ class FieldServiceImpl(
                         fieldConfig.fieldName,
                         fieldConfig.fieldType,
                         fieldConfig.alias,
+                        fieldConfig.width,
                         fieldConfig.validationRule,
                         false,
                         fieldConfig.fieldId
