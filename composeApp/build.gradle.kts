@@ -165,6 +165,9 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Deb)
             packageName = "cn.changjiahong.banker"
             packageVersion = "1.0.0"
+
+            includeAllModules=true
+            jvmArgs += listOf("-Xmx512m")
         }
     }
 }
