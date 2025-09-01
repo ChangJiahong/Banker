@@ -47,4 +47,11 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         return id
     }
 
+    override suspend fun updateBusinessById(name: String, bid: Long) {
+        val re = businessQueries.selectByName(name).executeAsOneOrNull()
+        if (re != null) {
+            throw ExecuteError("已有该业务名称")
+        }
+        businessQueries.update(name,bid).ck()
+    }
 }

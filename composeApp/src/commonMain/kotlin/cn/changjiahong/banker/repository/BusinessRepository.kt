@@ -11,6 +11,7 @@ interface BusinessRepository {
     suspend fun deleteTemplateFromBusiness(bId: Long, tid: Long)
 
     suspend fun insertBusiness(name: String): Long
+    suspend fun updateBusinessById(name: String, bid: Long)
 
 
 }

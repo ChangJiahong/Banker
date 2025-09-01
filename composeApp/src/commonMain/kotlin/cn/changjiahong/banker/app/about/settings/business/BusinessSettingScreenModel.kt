@@ -3,6 +3,8 @@ package cn.changjiahong.banker.app.about.settings.business
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.app.RR
+import cn.changjiahong.banker.composable.DialogState
+import cn.changjiahong.banker.model.Biz
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEffect
 import cn.changjiahong.banker.mvi.UiEvent
@@ -10,6 +12,7 @@ import cn.changjiahong.banker.service.BusinessService
 import cn.changjiahong.banker.uieffect.GoEffect
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.Factory
 
@@ -18,13 +21,11 @@ sealed interface BusinessSettingsUiEvent : UiEvent {
 
     class GoBusinessTmpDetails(val business: Business) : BusinessSettingsUiEvent
 
-    class AddBusiness(val name: String) : BusinessSettingsUiEvent
-}
+    object SaveBusiness : BusinessSettingsUiEvent
+    class UpdateBusiness(val biz: Biz) : BusinessSettingsUiEvent
 
-sealed interface BusinessSettingUiEffect : UiEffect {
-
-    object AddBusinessSuccess : BusinessSettingUiEffect
-
+    class ShowUpdateDialog(val biz: Biz): BusinessSettingsUiEvent
+    object ShowAddDialog: BusinessSettingsUiEvent
 }
 
 @Factory
@@ -34,24 +35,48 @@ class BusinessSettingScreenModel(val businessService: BusinessService) : MviScre
 
     val businessList = _businessList.asStateFlow()
 
+    private val _dialogBiz = MutableStateFlow(Biz())
+    val dialogBiz = _dialogBiz.asStateFlow()
+
+    val popupDialogState = DialogState()
 
     override fun handleEvent(event: UiEvent) {
         when (event) {
             is BusinessSettingsUiEvent.GoBusinessTmpDetails -> GoEffect(RR.BUSINESS_TMP_DETAIL(event.business)).trigger()
 
-            is BusinessSettingsUiEvent.AddBusiness -> addBusiness(event.name)
+            is BusinessSettingsUiEvent.SaveBusiness -> saveBusiness()
+
+            is BusinessSettingsUiEvent.ShowUpdateDialog ->{
+                _dialogBiz.update {
+                    event.biz
+                }
+                popupDialogState.show()
+            }
+
+            is BusinessSettingsUiEvent.ShowAddDialog->{
+                _dialogBiz.update {
+                    Biz()
+                }
+                popupDialogState.show()
+            }
+            is BusinessSettingsUiEvent.UpdateBusiness -> {
+                _dialogBiz.update {
+                    event.biz
+                }
+            }
         }
     }
 
-    private fun addBusiness(name: String) {
-        if (name.isBlank()){
+    private fun saveBusiness() {
+        if (_dialogBiz.value.name.isBlank()) {
             toast("不能为空")
             return
         }
         screenModelScope.launch {
-            businessService.addBusiness(name)
+            businessService.saveBusiness(_dialogBiz.value)
                 .catchAndCollect {
-                    BusinessSettingUiEffect.AddBusinessSuccess.trigger()
+                    popupDialogState.dismiss()
+                    toast("保存成功")
                 }
         }
     }

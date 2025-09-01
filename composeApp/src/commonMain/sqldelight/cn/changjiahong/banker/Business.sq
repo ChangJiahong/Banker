@@ -16,5 +16,10 @@ insert:
 INSERT INTO Business(id,businessName)
 VALUES (?,?);
 
+update:
+UPDATE Business
+SET businessName = ?
+WHERE id = ?;
+
 
 

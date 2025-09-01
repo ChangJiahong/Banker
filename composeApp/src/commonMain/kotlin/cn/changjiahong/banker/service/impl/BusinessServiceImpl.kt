@@ -2,6 +2,7 @@ package cn.changjiahong.banker.service.impl
 
 import cn.changjiahong.banker.BankerDb
 import cn.changjiahong.banker.Business
+import cn.changjiahong.banker.model.Biz
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.repository.BusinessRepository
 import cn.changjiahong.banker.service.BusinessService
@@ -35,8 +36,11 @@ class BusinessServiceImpl(
         businessRepository.deleteTemplateFromBusiness(bId, tid)
     }
 
-    override fun addBusiness(name: String): Flow<NoData> = flow {
-        businessRepository.insertBusiness(name)
-        emit(NoData)
+    override fun saveBusiness(biz: Biz): Flow<NoData> = okFlow {
+        if (biz.id < 0) {
+            businessRepository.insertBusiness(biz.name)
+        } else {
+            businessRepository.updateBusinessById(biz.name, biz.id)
+        }
     }
 }

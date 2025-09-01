@@ -24,8 +24,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -66,7 +64,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,8 +78,6 @@ import banker.composeapp.generated.resources.home
 import banker.composeapp.generated.resources.pdf
 import banker.composeapp.generated.resources.unknown_file
 import banker.composeapp.generated.resources.word
-import cn.changjiahong.banker.app.about.settings.business.BusinessGridView
-import cn.changjiahong.banker.model.UserDO
 import cn.changjiahong.banker.model.UserInfo
 import cn.changjiahong.banker.storage.FileType
 import cn.changjiahong.banker.utils.padding

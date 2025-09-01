@@ -32,6 +32,7 @@ import cn.changjiahong.banker.composable.PopupDialog
 import cn.changjiahong.banker.composable.DialogState
 import cn.changjiahong.banker.composable.RoundedInputField
 import cn.changjiahong.banker.composable.rememberDialogState
+import cn.changjiahong.banker.model.Biz
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
 
@@ -58,6 +59,7 @@ fun BusinessGridView(
     val popupDialogState = rememberDialogState()
 
     val businessList by businessSettingScreenModel.businessList.collectAsState()
+
     LazyVerticalGrid(
         GridCells.FixedSize(100.dp), contentPadding = PaddingValues(5.dp),
         modifier = modifier,
@@ -66,14 +68,10 @@ fun BusinessGridView(
         itemsIndexed(businessList) { index, item ->
             RightClickMenu(menu = {
                 DropdownMenuItem(text = {
-                    Text("预览")
+                    Text("修改")
                 }, onClick = {
-                    it()
-                })
-                DropdownMenuItem(text = {
-                    Text("查看表单")
-                }, onClick = {
-                    println("菜单项2点击")
+                    BusinessSettingsUiEvent.ShowUpdateDialog(Biz(item.id, item.businessName))
+                        .sendTo(businessSettingScreenModel)
                     it()
                 })
             }) {
@@ -86,7 +84,8 @@ fun BusinessGridView(
 
         item {
             FoldersButton(icon = painterResource(Res.drawable.add_box)) {
-                popupDialogState.show()
+                BusinessSettingsUiEvent.ShowAddDialog
+                    .sendTo(businessSettingScreenModel)
             }
         }
     }
@@ -99,20 +98,17 @@ fun AddBusinessDialog(
     popupDialogState: DialogState,
     businessSettingScreenModel: BusinessSettingScreenModel
 ) {
-    businessSettingScreenModel.handleEffect {
-        when (it) {
-            is BusinessSettingUiEffect.AddBusinessSuccess -> {
-                popupDialogState.dismiss()
-                true
-            }
+    val popupDialogState = businessSettingScreenModel.popupDialogState
 
-            else -> false
-        }
-    }
+    val dialogBiz by businessSettingScreenModel.dialogBiz.collectAsState()
 
-    PopupDialog(popupDialogState, title = "添加模版", Modifier.fillMaxWidth(0.6f)) {
+    PopupDialog(
+        popupDialogState,
+        title = "${if (dialogBiz.id < 0) "添加" else "修改"}模版",
+        Modifier.fillMaxWidth(0.6f)
+    ) {
 
-        var queryS by remember { mutableStateOf("") }
+        var queryS by remember(dialogBiz) { mutableStateOf(dialogBiz.name) }
 
         Column(
             Modifier.fillMaxWidth().padding(10.dp).wrapContentHeight(),
@@ -121,16 +117,20 @@ fun AddBusinessDialog(
 
             RoundedInputField(
                 queryS,
-                { queryS = it },
+                {
+                    queryS = it
+                    BusinessSettingsUiEvent.UpdateBusiness(dialogBiz.copy(name = it))
+                        .sendTo(businessSettingScreenModel)
+                },
                 onGo = {
-                    BusinessSettingsUiEvent.AddBusiness(queryS).sendTo(businessSettingScreenModel)
+                    BusinessSettingsUiEvent.SaveBusiness.sendTo(businessSettingScreenModel)
                 },
                 autoFocus = true,
                 modifier = Modifier.fillMaxWidth(0.6f)
             )
 
             Button({
-                BusinessSettingsUiEvent.AddBusiness(queryS).sendTo(businessSettingScreenModel)
+                BusinessSettingsUiEvent.SaveBusiness.sendTo(businessSettingScreenModel)
             }, modifier = Modifier.fillMaxWidth(0.2f).padding { paddingVertical(5.dp) }) {
                 Text("确定")
             }
