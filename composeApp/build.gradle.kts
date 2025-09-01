@@ -163,11 +163,15 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Deb)
-            packageName = "cn.changjiahong.banker"
+            packageName = "Banker"
             packageVersion = "1.0.0"
 
             includeAllModules=true
             jvmArgs += listOf("-Xmx512m")
+
+//            windows{
+//                iconFile = project.file("src/commonMain/composeResources/drawable/icon.ico")
+//            }
         }
     }
 }

@@ -11,7 +11,7 @@ actual object SystemPrinter {
     actual fun print(file: PlatformFile): Flow<NoData> = okFlow{
         if (Desktop.isDesktopSupported()) {
             val desktop = Desktop.getDesktop()
-            if (desktop.isSupported(Desktop.Action.APP_PRINT_FILE)) {
+            if (desktop.isSupported(Desktop.Action.PRINT)) {
                 desktop.print(file.file)
             } else {
                 throw BError.Fail("打印操作不支持")

@@ -7,7 +7,10 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import banker.composeapp.generated.resources.Res
+import banker.composeapp.generated.resources.coffee
 import io.github.vinceglb.filekit.FileKit
+import org.jetbrains.compose.resources.painterResource
 import org.koin.core.context.startKoin
 import java.awt.Toolkit
 
@@ -38,7 +41,10 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "Banker",
-        state = windowState
+        state = windowState,
+        icon = painterResource(
+            Res.drawable.coffee
+        )
     ) {
         App()
     }
