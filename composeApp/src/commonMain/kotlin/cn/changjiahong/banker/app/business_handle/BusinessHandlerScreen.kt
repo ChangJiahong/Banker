@@ -216,7 +216,7 @@ fun ClienteleDialog(
                     }
 
                     InputView(
-                        label = field.alias,
+                        label = field.fieldName,
                         value = fieldVal.fieldValue,
                         modifier = Modifier.width((field.width.toInt() * 10).dp)
                             .padding(10.dp, 0.dp),
@@ -256,7 +256,7 @@ fun ClienteleDialog(
                         )
                     }
                     InputView(
-                        label = field.alias,
+                        label = field.fieldName,
                         modifier = Modifier.width((field.width.toInt() * 10).dp)
                             .padding(10.dp, 0.dp),
                         value = fieldVal.fieldValue,
