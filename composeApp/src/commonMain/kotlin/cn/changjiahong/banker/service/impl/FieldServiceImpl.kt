@@ -119,7 +119,7 @@ class FieldServiceImpl(
     ): Flow<NoData> = okFlow {
         db.transaction {
             value.forEach { f ->
-                if (f.id < 0) {
+                if (f.id < 0 && !f.isDelete) {
                     fieldRepository.newRelFieldTplField(
                         bId,
                         f.tFieldId!!,
@@ -127,7 +127,7 @@ class FieldServiceImpl(
                         f.isFixed,
                         f.fixedValue
                     )
-                } else {
+                } else if (!f.isDelete) {
                     fieldRepository.updateRelFieldTplField(
                         f.tFieldId!!,
                         f.fieldId,
@@ -135,6 +135,8 @@ class FieldServiceImpl(
                         f.fixedValue,
                         f.id
                     )
+                } else {
+                    fieldRepository.deleteRelFieldTplField(f.id)
                 }
             }
         }

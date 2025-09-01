@@ -52,6 +52,7 @@ data class RelFieldConfigTplField(
     val fieldId: Long? = null,
     val isFixed: Boolean = false,
     val fixedValue: String = "",
+    val isDelete: Boolean = false
 )
 
 data class RelFieldConfigTplFieldError(

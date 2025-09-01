@@ -113,6 +113,9 @@ class FieldRepositoryImpl(db: BankerDb) : FieldRepository {
         ).ck()
     }
 
+    override fun deleteRelFieldTplField(id: Long) {
+        relFieldTplFieldQueries.delete(id).ck()
+    }
 
     override fun findFieldsByUidAndBid(uid: Long, bId: Long): List<Field> {
         return fieldValueQueries.selectFieldsByUidAndBid(bId, uid).executeAsList().map { f ->

@@ -77,6 +77,9 @@ interface FieldRepository {
         id: Long
     )
 
+    fun deleteRelFieldTplField(id: Long)
+
+
     /**
      * 获取uid在bid业务项下的属性名称和值集合
      */

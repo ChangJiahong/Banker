@@ -3,6 +3,7 @@ package cn.changjiahong.banker.app.about.settings.business.tmp
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.Template
+import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.composable.Option
 import cn.changjiahong.banker.model.RelFieldConfigTplField
 import cn.changjiahong.banker.model.RelFieldConfigTplFieldError
@@ -67,6 +68,16 @@ class FieldConfigScreenModel(
             is FieldConfigScreenUiEvent.AddFieldConfig -> {
                 _fieldConfigs.update { it + RelFieldConfigTplField() }
                 _fieldConfigsError.update { it + RelFieldConfigTplFieldError() }
+            }
+            is ConfigUiEvent.Delete ->{
+                val field = _fieldConfigs.value[event.index]
+                if (field.id < 0) {
+                    _fieldConfigs.update { it.toMutableList().apply { removeAt(event.index) } }
+                } else {
+                    _fieldConfigs.replace(
+                        event.index
+                    ) { field.copy(isDelete = true) }
+                }
             }
 
             is FieldConfigScreenUiEvent.UpdateFiledConfig ->

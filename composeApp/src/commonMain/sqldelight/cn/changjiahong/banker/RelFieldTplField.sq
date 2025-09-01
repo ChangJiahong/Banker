@@ -25,3 +25,7 @@ update:
 UPDATE RelFieldTplField
 SET fieldId=?,tFieldId=?,isFixed=?,fixedValue=?
 WHERE id = ?;
+
+delete:
+DELETE FROM RelFieldTplField
+WHERE id = ?;

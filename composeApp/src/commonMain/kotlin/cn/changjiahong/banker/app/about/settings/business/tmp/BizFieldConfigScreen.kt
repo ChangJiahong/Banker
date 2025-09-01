@@ -84,18 +84,6 @@ fun BusinessFieldConfigScreen.FieldConfigView(
         val businessFields by fieldConfigScreenModel.businessFiledConfigs.collectAsState()
         val businessFiledErrors by fieldConfigScreenModel.businessFiledErrors.collectAsState()
 
-//        Row(Modifier.padding {
-//            paddingVertical(5.dp)
-//        }, verticalAlignment = Alignment.CenterVertically) {
-//            Text("业务信息", fontSize = 24.sp)
-//            IconButton({
-//                BFieldConfigScreenUiEvent.AddFieldConfig.sendTo(fieldConfigScreenModel)
-//            }) {
-//                Icon(painter = painterResource(Res.drawable.add_diamond), contentDescription = "")
-//            }
-//        }
-
-
         Button({
             BFieldConfigScreenUiEvent.SaveFiledConfig.sendTo(fieldConfigScreenModel)
         }) {

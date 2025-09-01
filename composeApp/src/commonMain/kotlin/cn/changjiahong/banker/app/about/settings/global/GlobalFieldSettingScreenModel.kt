@@ -26,17 +26,17 @@ class GlobalFieldSettingScreenModel(
     val fieldService: FieldService
 ) : MviScreenModel() {
 
-    private val _filedConfigs = MutableStateFlow<List<FieldConf>>(emptyList())
+    private val _fieldConfigs = MutableStateFlow<List<FieldConf>>(emptyList())
 
     private val _filedErrors = MutableStateFlow<List<FieldConfError>>(emptyList())
 
-    val filedConfigs = _filedConfigs.asStateFlow()
+    val filedConfigs = _fieldConfigs.asStateFlow()
     val filedErrors = _filedErrors.asStateFlow()
 
     override fun handleEvent(event: UiEvent) {
         when (event) {
             is ConfigUiEvent.Add -> {
-                _filedConfigs.update {
+                _fieldConfigs.update {
                     it + FieldConf(bId = -1)
                 }
                 _filedErrors.update {
@@ -45,11 +45,11 @@ class GlobalFieldSettingScreenModel(
             }
 
             is ConfigUiEvent.Delete -> {
-                val field = _filedConfigs.value[event.index]
+                val field = _fieldConfigs.value[event.index]
                 if (field.fieldId < 0) {
-                    _filedConfigs.update { it.toMutableList().apply { removeAt(event.index) } }
+                    _fieldConfigs.update { it.toMutableList().apply { removeAt(event.index) } }
                 } else {
-                    _filedConfigs.replace(
+                    _fieldConfigs.replace(
                         event.index
                     ) { field.copy(isDelete = true) }
                 }
@@ -57,7 +57,7 @@ class GlobalFieldSettingScreenModel(
 
             is ConfigUiEvent.Save -> saveConfig()
 
-            is GlobalConfigUiEvent.Update -> _filedConfigs.replace(
+            is GlobalConfigUiEvent.Update -> _fieldConfigs.replace(
                 event.index
             ) { event.item }
         }
@@ -85,7 +85,7 @@ class GlobalFieldSettingScreenModel(
                 return@launch
             }
 
-            fieldService.saveGlobalFieldConfigs(_filedConfigs.value).catchAndCollect {
+            fieldService.saveGlobalFieldConfigs(_fieldConfigs.value).catchAndCollect {
                 ConfigUiEffect.SaveSuccess.trigger()
             }
         }
@@ -103,7 +103,7 @@ class GlobalFieldSettingScreenModel(
                         FieldConfError()
                     }
 
-                _filedConfigs.value = it.map { field ->
+                _fieldConfigs.value = it.map { field ->
                     field.run {
                         FieldConf(
                             fieldId,

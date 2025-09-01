@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -45,7 +46,9 @@ import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.GlobalNavigator
 import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.ScaffoldWithTopBar
+import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.composable.BooleanFieldDropdown
+import cn.changjiahong.banker.composable.HoverDeleteBox
 import cn.changjiahong.banker.composable.TextFieldDropdown
 import cn.changjiahong.banker.composable.rememberDropdownScope
 import cn.changjiahong.banker.platform.HorizontalScrollbar
@@ -56,16 +59,25 @@ import org.koin.core.parameter.parametersOf
 class FieldConfigScreen(val business: Business, val template: Template) : Screen {
     @Composable
     override fun Content() {
-        ScaffoldWithTopBar("字段配置") { pd ->
-            FieldConfigView(Modifier.padding(pd))
+        val fieldConfigScreenModel =
+            koinScreenModel<FieldConfigScreenModel> { parametersOf(business, template) }
+
+        ScaffoldWithTopBar(
+            "字段配置", iconPainter = painterResource(Res.drawable.add_diamond),
+            iconOnClick = {
+                FieldConfigScreenUiEvent.AddFieldConfig.sendTo(fieldConfigScreenModel)
+            }
+        ) { pd ->
+            FieldConfigView(Modifier.padding(pd), fieldConfigScreenModel)
         }
     }
 }
 
 @Composable
-fun FieldConfigScreen.FieldConfigView(modifier: Modifier) {
-    val fieldConfigScreenModel =
-        koinScreenModel<FieldConfigScreenModel> { parametersOf(business, template) }
+fun FieldConfigScreen.FieldConfigView(
+    modifier: Modifier,
+    fieldConfigScreenModel: FieldConfigScreenModel
+) {
     val globalNavigator = GlobalNavigator.current
 
     fieldConfigScreenModel.handleEffect {
@@ -79,7 +91,7 @@ fun FieldConfigScreen.FieldConfigView(modifier: Modifier) {
         }
     }
 
-    Column(modifier.padding { paddingHorizontal(10.dp) }) {
+    Column(modifier.padding { paddingHorizontal(30.dp) }) {
 
         val tplFieldOptions by fieldConfigScreenModel.tplFieldOptions.collectAsState()
         val fieldOptions by fieldConfigScreenModel.fieldOptions.collectAsState()
@@ -92,16 +104,12 @@ fun FieldConfigScreen.FieldConfigView(modifier: Modifier) {
         val fieldConfigOptions =
             rememberDropdownScope(fieldOptions)
 
-        Row(Modifier.padding {
-            paddingVertical(5.dp)
-        }, verticalAlignment = Alignment.CenterVertically) {
-            Text("业务信息", fontSize = 24.sp)
-            IconButton({
-                FieldConfigScreenUiEvent.AddFieldConfig.sendTo(fieldConfigScreenModel)
-            }) {
-                Icon(painter = painterResource(Res.drawable.add_diamond), contentDescription = "")
-            }
+        Button({
+            FieldConfigScreenUiEvent.SaveConfig.sendTo(fieldConfigScreenModel)
+        }) {
+            Text("保存")
         }
+
         HorizontalDivider()
         val scrollState = rememberScrollState()
 
@@ -109,106 +117,112 @@ fun FieldConfigScreen.FieldConfigView(modifier: Modifier) {
             paddingVertical(5.dp)
         }) {
             Column(
-                modifier = Modifier.padding(5.dp).heightIn(max = 300.dp)
+                modifier = Modifier.padding(5.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                Column(Modifier.fillMaxWidth().horizontalScroll(scrollState)) {
+                var ind = remember { 1 }
 
-                    fieldConfigs.forEachIndexed { index, btField ->
+                fieldConfigs.forEachIndexed { index, btField ->
+                    if (btField.isDelete) {
+                        return@forEachIndexed
+                    }
+                    Row(
+                        Modifier.wrapContentWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
 
-                        Row {
+                        var item by remember(btField) { mutableStateOf(btField) }
+                        var itemError by remember(fieldConfigsError[index]) {
+                            mutableStateOf(
+                                fieldConfigsError[index]
+                            )
+                        }
 
-                            var item by remember(btField) { mutableStateOf(btField) }
-                            var itemError by remember(fieldConfigsError[index]) {
-                                mutableStateOf(
-                                    fieldConfigsError[index]
-                                )
-                            }
+                        val englishRegex = Regex("^$|^(?=.*[a-zA-Z])[a-zA-Z0-9]*$")
 
-                            val englishRegex = Regex("^$|^(?=.*[a-zA-Z])[a-zA-Z0-9]*$")
+                        HoverDeleteBox((ind++).toString(), Modifier.padding {
+                            paddingHorizontal(3.dp)
+                            paddingTop(5.dp)
+                        }) {
+                            ConfigUiEvent.Delete(index).sendTo(fieldConfigScreenModel)
+                        }
+
+                        TextFieldDropdown(
+                            tempFieldOptions,
+                            item.tFieldId,
+                            onValueSelected = {
+                                item = item.copy(tFieldId = it)
+                                FieldConfigScreenUiEvent.UpdateFiledConfig(
+                                    index,
+                                    item
+                                ).sendTo(fieldConfigScreenModel)
+                            },
+                            "表单名",
+                            enableEdit = false,
+                            enableCancel = true,
+                            errorText = itemError.tempFieldId,
+                            modifier = Modifier.width(200.dp)
+                                .padding { paddingHorizontal(2.dp) }
+                        )
+
+
+                        BooleanFieldDropdown(
+                            item.isFixed,
+                            onValueChange = {
+                                item = item.copy(isFixed = it)
+                                FieldConfigScreenUiEvent.UpdateFiledConfig(
+                                    index,
+                                    item
+                                ).sendTo(fieldConfigScreenModel)
+                            },
+                            "是否固定",
+                            modifier = Modifier.width(90.dp)
+                                .padding { paddingHorizontal(2.dp) }
+                        )
+
+
+
+
+                        if (item.isFixed) {
+                            InputView(
+                                value = item.fixedValue ?: "",
+                                onValueChange = {
+                                    item = item.copy(fixedValue = it)
+                                    FieldConfigScreenUiEvent.UpdateFiledConfig(
+                                        index,
+                                        item
+                                    ).sendTo(fieldConfigScreenModel)
+                                },
+                                label = "固定值",
+                                errorText = itemError.fixedValue,
+                                modifier = Modifier.width(200.dp)
+                                    .padding { paddingHorizontal(2.dp) }
+                            )
+                        } else {
 
                             TextFieldDropdown(
-                                tempFieldOptions,
-                                item.tFieldId,
+                                fieldConfigOptions,
+                                item.fieldId,
                                 onValueSelected = {
-                                    item = item.copy(tFieldId = it)
+                                    item = item.copy(fieldId = it)
                                     FieldConfigScreenUiEvent.UpdateFiledConfig(
                                         index,
                                         item
                                     ).sendTo(fieldConfigScreenModel)
                                 },
-                                "表单名",
-                                enableEdit = false,
-                                errorText = itemError.tempFieldId,
-                                modifier = Modifier.width(150.dp)
+                                label = "字段名",
+                                errorText = itemError.businessFieldId,
+                                modifier = Modifier.width(200.dp)
                                     .padding { paddingHorizontal(2.dp) }
                             )
-
-
-                            BooleanFieldDropdown(
-                                item.isFixed,
-                                onValueChange = {
-                                    item = item.copy(isFixed = it)
-                                    FieldConfigScreenUiEvent.UpdateFiledConfig(
-                                        index,
-                                        item
-                                    ).sendTo(fieldConfigScreenModel)
-                                },
-                                "是否固定值",
-                                modifier = Modifier.width(110.dp)
-                                    .padding { paddingHorizontal(2.dp) }
-                            )
-
-
-
-
-                            if (item.isFixed) {
-                                InputView(
-                                    value = item.fixedValue ?: "",
-                                    onValueChange = {
-                                        item = item.copy(fixedValue = it)
-                                        FieldConfigScreenUiEvent.UpdateFiledConfig(
-                                            index,
-                                            item
-                                        ).sendTo(fieldConfigScreenModel)
-                                    },
-                                    label = "固定值",
-                                    errorText = itemError.fixedValue,
-                                    modifier = Modifier.width(150.dp)
-                                        .padding { paddingHorizontal(2.dp) }
-                                )
-                            } else {
-
-                                TextFieldDropdown(
-                                    fieldConfigOptions,
-                                    item.fieldId,
-                                    onValueSelected = {
-                                        item = item.copy(fieldId = it)
-                                        FieldConfigScreenUiEvent.UpdateFiledConfig(
-                                            index,
-                                            item
-                                        ).sendTo(fieldConfigScreenModel)
-                                    },
-                                    label = "字段名",
-                                    errorText = itemError.businessFieldId,
-                                    modifier = Modifier.width(150.dp)
-                                        .padding { paddingHorizontal(2.dp) }
-                                )
-                            }
                         }
                     }
                 }
-                HorizontalScrollbar(scrollState)
             }
 
 
         }
 
-        Button({
-            FieldConfigScreenUiEvent.SaveConfig.sendTo(fieldConfigScreenModel)
-        }) {
-            Text("保存")
-        }
 
     }
 
