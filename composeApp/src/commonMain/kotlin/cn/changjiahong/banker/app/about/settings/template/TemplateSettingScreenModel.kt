@@ -14,6 +14,7 @@ import cn.changjiahong.banker.storage.platformFile
 import cn.changjiahong.banker.uieffect.GoEffect
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.copyTo
+import io.github.vinceglb.filekit.delete
 import io.github.vinceglb.filekit.exists
 import io.github.vinceglb.filekit.extension
 import io.github.vinceglb.filekit.isDirectory
@@ -31,6 +32,7 @@ sealed interface TempSettingUiEvent : UiEvent {
 
     class AddDocTemplate(val file: PlatformFile) : TempSettingUiEvent
 
+    class DeleteTemplate(val template: Template) : TempSettingUiEvent
 }
 
 sealed interface TempSettingUiEffect : UiEffect {
@@ -51,6 +53,18 @@ class TemplateSettingScreenModel(val templateService: TemplateService) : MviScre
             is TempSettingUiEvent.GoTempFiledSettingScreen -> GoEffect(RR.TEMP_FIELD_SETTING(event.template)).trigger()
 
             is TempSettingUiEvent.AddDocTemplate -> addDocTemplate(event.file)
+
+            is TempSettingUiEvent.DeleteTemplate -> deleteTemplate(event.template)
+        }
+    }
+
+    private fun deleteTemplate(template: Template) {
+        screenModelScope.launch {
+            templateService.deleteTemplate(template.id)
+                .catchAndCollect {
+                    template.filePath.platformFile.delete(false)
+                    toast("删除成功")
+                }
         }
     }
 

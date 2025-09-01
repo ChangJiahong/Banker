@@ -72,4 +72,8 @@ class TemplateRepositoryImpl(db: BankerDb) : TemplateRepository {
         docTemplateQueries.insert(id, templateName, path, fileType).ck()
         return id
     }
+
+    override suspend fun deleteTemplate(tid: Long) {
+        docTemplateQueries.delete(tid).ck()
+    }
 }

@@ -88,6 +88,12 @@ fun TempFileGridView(
                     TempSettingUiEvent.GoTempFiledSettingScreen(item).sendTo(tempSettingScreenModel)
                     it()
                 })
+                DropdownMenuItem(text = {
+                    Text("删除")
+                }, onClick = {
+                    TempSettingUiEvent.DeleteTemplate(item).sendTo(tempSettingScreenModel)
+                    it()
+                })
             }) {
                 FoldersButton(item.templateName, fileType = item.fileType) {
                     TempSettingUiEvent.GoPreTemplateScreen(item).sendTo(tempSettingScreenModel)

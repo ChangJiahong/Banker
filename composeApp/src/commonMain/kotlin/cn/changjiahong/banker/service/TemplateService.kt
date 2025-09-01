@@ -25,10 +25,16 @@ interface TemplateService {
 
     suspend fun addNewTemplate(path: String, templateName: String, fileType: String): Flow<NoData>
 
+    suspend fun deleteTemplate(tid: Long): Flow<NoData>
+
     /**
      * 填充表单数据到模版
      */
-    suspend fun fillFromToTemplate(userId: Long, businessId: Long, template: Template): Flow<PlatformFile>
+    suspend fun fillFromToTemplate(
+        userId: Long,
+        businessId: Long,
+        template: Template
+    ): Flow<PlatformFile>
 
 
 }

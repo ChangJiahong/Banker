@@ -16,6 +16,7 @@ import cn.changjiahong.banker.service.TemplateService
 import cn.changjiahong.banker.storage.Storage
 import cn.changjiahong.banker.storage.platformFile
 import cn.changjiahong.banker.tplview.TemplateKit
+import cn.changjiahong.banker.utils.okFlow
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.name
 import kotlinx.coroutines.flow.Flow
@@ -81,6 +82,11 @@ class TemplateServiceImpl(
     ): Flow<NoData> = flow {
         templateRepository.insertNewTemplate(templateName, path, fileType)
         emit(NoData)
+    }
+
+    override suspend fun deleteTemplate(tid: Long): Flow<NoData> = okFlow {
+        templateRepository.deleteTemplate(tid)
+
     }
 
     override suspend fun fillFromToTemplate(

@@ -17,5 +17,6 @@ interface TemplateRepository {
 
     suspend fun findTemplatesByFuzzyName(tempName: String): Flow<List<Template>>
     suspend fun insertNewTemplate(templateName: String, path: String, fileType: String): Long
+    suspend fun deleteTemplate(tid: Long)
 
 }
