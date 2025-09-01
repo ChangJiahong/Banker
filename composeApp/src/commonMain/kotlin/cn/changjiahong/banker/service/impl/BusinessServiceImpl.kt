@@ -5,6 +5,7 @@ import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.model.NoData
 import cn.changjiahong.banker.repository.BusinessRepository
 import cn.changjiahong.banker.service.BusinessService
+import cn.changjiahong.banker.utils.okFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.koin.core.annotation.Factory
@@ -25,6 +26,13 @@ class BusinessServiceImpl(
     ): Flow<NoData> = flow {
         businessRepository.insertTemplateIntoBusiness(businessId, templateId)
         emit(NoData)
+    }
+
+    override fun removeTemplate(
+        bId: Long,
+        tid: Long
+    ): Flow<NoData> = okFlow {
+        businessRepository.deleteTemplateFromBusiness(bId, tid)
     }
 
     override fun addBusiness(name: String): Flow<NoData> = flow {

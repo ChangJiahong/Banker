@@ -2,6 +2,7 @@ package cn.changjiahong.banker
 
 import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
+import cn.changjiahong.banker.model.BError
 import org.koin.core.annotation.Single
 
 @Single
@@ -19,9 +20,9 @@ fun createDatabase(driverFactory: DriverFactory): BankerDb {
 
 fun QueryResult<Long>.ck() {
     if (value <= 0) {
-        throw ExecuteError()
+        throw BError.SqlExecuteError("sql 执行失败")
     }
 }
 
 
-class ExecuteError(msg: String="") : RuntimeException(msg)
+class ExecuteError(msg: String = "") : RuntimeException(msg)

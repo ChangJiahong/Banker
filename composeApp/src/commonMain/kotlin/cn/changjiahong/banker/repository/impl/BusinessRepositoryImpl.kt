@@ -33,6 +33,10 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         return id
     }
 
+    override suspend fun deleteTemplateFromBusiness(bId: Long, tid: Long) {
+        relBizTplQueries.deleteTemplateFromBusiness(bId,tid).ck()
+    }
+
     override suspend fun insertBusiness(name: String): Long {
         val re = businessQueries.selectByName(name).executeAsOneOrNull()
         if (re != null) {

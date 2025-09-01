@@ -8,6 +8,9 @@ interface BusinessRepository {
     suspend fun findBusinessTypes(): Flow<List<Business>>
 
     suspend fun insertTemplateIntoBusiness(businessId: Long, templateId: Long): Long
+    suspend fun deleteTemplateFromBusiness(bId: Long, tid: Long)
+
     suspend fun insertBusiness(name: String): Long
+
 
 }

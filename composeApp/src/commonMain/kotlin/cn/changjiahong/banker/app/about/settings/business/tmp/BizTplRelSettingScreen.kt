@@ -86,9 +86,10 @@ fun BusinessTmpDetailScreen.BusinessTmpDetailView(
                     it()
                 })
                 DropdownMenuItem(text = {
-                    Text("查看表单")
+                    Text("移除模版")
                 }, onClick = {
-                    println("菜单项2点击")
+                    BusinessTmpDetailUiEvent.RemoveTemplate(item)
+                        .sendTo(businessTmpDetailScreenModel)
                     it()
                 })
             }) {

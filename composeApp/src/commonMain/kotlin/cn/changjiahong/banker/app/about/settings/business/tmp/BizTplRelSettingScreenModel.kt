@@ -25,6 +25,8 @@ sealed interface BusinessTmpDetailUiEvent : UiEvent {
 
     class AddTemplate(val template: Template) : BusinessTmpDetailUiEvent
 
+    class RemoveTemplate(val template: Template): BusinessTmpDetailUiEvent
+
     class FuzzySearch(val name: String) : BusinessTmpDetailUiEvent
 }
 
@@ -65,7 +67,17 @@ class BusinessTmpDetailScreenModel(
 
             is BusinessTmpDetailUiEvent.AddTemplate -> addTemplate(event.template)
 
+            is BusinessTmpDetailUiEvent.RemoveTemplate -> removeTemplate(event.template)
+
             is BusinessTmpDetailUiEvent.FuzzySearch -> fuzzySearchByTempName(event.name)
+        }
+    }
+
+    private fun removeTemplate(template: Template) {
+        screenModelScope.launch {
+            businessService.removeTemplate(business.id,template.id).catchAndCollect {
+                toast("移除成功")
+            }
         }
     }
 

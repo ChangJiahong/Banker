@@ -11,6 +11,10 @@ SELECT *
 FROM RelBizTpl
 WHERE bId=? AND tId=?;
 
+deleteTemplateFromBusiness:
+DELETE FROM RelBizTpl
+WHERE bId = ? AND tId = ?;
+
 insert:
 INSERT INTO RelBizTpl(id,bId,tId)
 VALUES (?,?,?);

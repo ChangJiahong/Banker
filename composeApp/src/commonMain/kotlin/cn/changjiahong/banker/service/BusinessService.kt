@@ -10,4 +10,6 @@ interface BusinessService {
     fun addTemplate(businessId: Long, templateId: Long): Flow<NoData>
     fun addBusiness(name: String): Flow<NoData>
 
+    fun removeTemplate(bId: Long, tid: Long): Flow<NoData>
+
 }
