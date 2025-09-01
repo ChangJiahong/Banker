@@ -115,7 +115,7 @@ class BusinessFieldConfigScreenModel(
                         FieldConf(
                             fieldId, bId, fieldName,
                             fieldType,
-                            alias, width.toInt(), validationRule, field.forced > 0
+                            alias, width.toInt(), options?:"",validationRule, field.forced > 0
                         )
                     }
                 }

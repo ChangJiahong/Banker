@@ -55,6 +55,11 @@ class BusinessHandlerScreenModel(
     private val _fieldValues = MutableStateFlow<Map<Long, FieldVal>>(emptyMap())
     val fieldValues = _fieldValues.asStateFlow()
 
+    private val _optionsFields =
+        MutableStateFlow<Map<Long, List<Map<String, String>>>>(emptyMap())
+    val optionsFields = _optionsFields.asStateFlow()
+
+
     /**
      * 业务信息
      */
@@ -111,7 +116,7 @@ class BusinessHandlerScreenModel(
 
             }
 
-            is BhUIEvent.OtherOpenTplItem->{
+            is BhUIEvent.OtherOpenTplItem -> {
                 if (currentlySelected.value == null || currentlySelected.value!!.uid < 0) {
                     tip("请先勾选一个客户")
                     return
@@ -124,6 +129,26 @@ class BusinessHandlerScreenModel(
                         .catchAndCollect {
                             systemOpen(it)
                         }
+                }
+            }
+
+            is BhUIEvent.UpdateOptionV ->{
+                _optionsFields.replace(event.filedId){
+                    _optionsFields.value[event.filedId]!!.toMutableList().apply {
+                        this[event.index] = event.ov
+                    }
+                }
+            }
+
+            is BhUIEvent.AddOptionV->{
+                _optionsFields.replace(event.filedId){
+                    _optionsFields.value[event.filedId]!!.toMutableList().apply {
+                        add(buildMap {
+                            (event.options).split(",").forEach {k->
+                                put(k, "")
+                            }
+                        })
+                    }
                 }
             }
         }
@@ -162,6 +187,15 @@ class BusinessHandlerScreenModel(
             fieldService.getFieldConfigsForBiz(business.id).catchAndCollect { data ->
                 _basicFields.value = data.filter { f -> f.bId == -1L }
 
+                //TODO::
+                _optionsFields.value = data.filter {f->
+                    f.fieldType in "ROW_TABLE"
+                }.associate { it.fieldId to listOf(buildMap {
+                    (it.options?:"").split(",").forEach {k->
+                        put(k, "")
+                    }
+                }) }
+
                 _bizFields.value = data.filterNot { f -> f.bId == -1L }
             }
 
@@ -179,9 +213,15 @@ class BusinessHandlerScreenModel(
 
         screenModelScope.launch {
 
+            val fv = _fieldValues.value.toMutableMap()
+
+            _optionsFields.value.forEach { (fieldId,list) ->
+               fv[fieldId] = FieldVal(fieldId=fieldId,fieldValue = list.toString())
+            }
+
             fieldService.saveFieldValues(
                 currentlySelected.value?.uid,
-                business.id, _fieldValues.value.values.toList()
+                business.id, fv.values.toList()
             ).catchAndCollect {
                 toast("OK")
                 loadClientele()

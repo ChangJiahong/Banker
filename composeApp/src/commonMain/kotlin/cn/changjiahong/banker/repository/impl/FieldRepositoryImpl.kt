@@ -35,6 +35,7 @@ class FieldRepositoryImpl(db: BankerDb) : FieldRepository {
         fieldType: String,
         alias: String,
         width: Int,
+        options:String,
         validationRule: String,
         forced: Boolean
     ): Long {
@@ -46,6 +47,7 @@ class FieldRepositoryImpl(db: BankerDb) : FieldRepository {
             fieldType,
             alias,
             width.toLong(),
+            options,
             validationRule,
             if (forced) 1 else 0
         ).ck()
@@ -58,6 +60,7 @@ class FieldRepositoryImpl(db: BankerDb) : FieldRepository {
         fieldType: String,
         alias: String,
         width: Int,
+        options:String,
         validationRule: String,
         forced: Boolean,
         fieldId: Long
@@ -68,6 +71,7 @@ class FieldRepositoryImpl(db: BankerDb) : FieldRepository {
             fieldType,
             alias,
             width.toLong(),
+            options,
             validationRule,
             if (forced) 1 else 0,
             fieldId
@@ -153,7 +157,7 @@ class FieldRepositoryImpl(db: BankerDb) : FieldRepository {
         return fieldConfigQueries.selectFieldConfigInvolveTplFieldRel(bId).executeAsList().map {
             FieldConfig(
                 it.fieldId, it.bId, it.fieldName,
-                it.fieldType, it.alias, it.width, it.validationRule,
+                it.fieldType, it.alias, it.width, it.options,it.validationRule,
                 it.forced, it.created
             )
         }

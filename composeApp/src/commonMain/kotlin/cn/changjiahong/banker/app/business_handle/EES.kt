@@ -34,5 +34,9 @@ sealed interface BhUIEvent : UiEvent {
 
     data class OtherOpenTplItem(val template: Template) : BhUIEvent
 
+
+    data class UpdateOptionV(val filedId:Long,val index:Int,val ov: Map<String, String>): BhUIEvent
+    data class AddOptionV(val filedId:Long,val options: String): BhUIEvent
+
 }
 

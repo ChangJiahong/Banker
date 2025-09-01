@@ -1,10 +1,11 @@
 CREATE TABLE FieldConfig (
- fieldId              INTEGER  PRIMARY KEY NOT NULL ,
+ fieldId         INTEGER  PRIMARY KEY NOT NULL ,
  bId             INTEGER  NOT NULL DEFAULT -1, -- bId=-1表示全局属性
  fieldName       TEXT     NOT NULL ,
  fieldType       TEXT     NOT NULL ,
  alias           TEXT     NOT NULL , -- 别名
  width           INTEGER  NOT NULL DEFAULT 1,
+ options         TEXT , -- 选项列表，用于 CheckBox/Radio/Table等
  validationRule  TEXT   NOT NULL DEFAULT "",
  forced          INTEGER NOT NULL DEFAULT 0, --是否必须，bId=-1 才有效，针对全局属性是否必输
  created         INTEGER  NOT NULL DEFAULT (strftime('%s', 'now'))
@@ -13,7 +14,7 @@ CREATE TABLE FieldConfig (
 
 --查找涉及bid业务的属性配置，包括全局属性
 selectFieldConfigInvolveTplFieldRel:
-SELECT DISTINCT fc.fieldId, fc.fieldName, fc.bId, fc.fieldType, fc.alias,fc.width,
+SELECT DISTINCT fc.fieldId, fc.fieldName, fc.bId, fc.fieldType, fc.alias,fc.width,fc.options,
               fc.validationRule, fc.forced,fc.created
 FROM FieldConfig fc
 LEFT JOIN RelFieldTplField rf ON rf.fieldId = fc.fieldId
@@ -44,13 +45,13 @@ WHERE rftf.bId = ? AND tf.templateId = ?;
 
 
 insert:
-INSERT INTO FieldConfig(fieldId,bId,fieldName,fieldType,alias,width,
+INSERT INTO FieldConfig(fieldId,bId,fieldName,fieldType,alias,width,options,
 validationRule,forced)
-VALUES (?,?,?,?,?,?,?,?) ;
+VALUES (?,?,?,?,?,?,?,?,?) ;
 
 update:
 UPDATE FieldConfig
-SET bId=?, fieldName=?, fieldType=?, alias=?, width=?,validationRule=?,forced=?
+SET bId=?, fieldName=?, fieldType=?, alias=?, width=?,options=?,validationRule=?,forced=?
 WHERE fieldId=?;
 
 delete:

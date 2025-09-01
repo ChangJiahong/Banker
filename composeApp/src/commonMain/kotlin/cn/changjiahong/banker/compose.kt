@@ -64,7 +64,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -422,6 +424,7 @@ fun InputView(
     errorText: String = "",
     readOnly: Boolean = false,
     leadingIcon: Painter? = null,
+    fontSize: TextUnit = 18.sp,
     onValueChange: (String) -> Unit = {},
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -435,7 +438,7 @@ fun InputView(
             label = { Text(label, style = MaterialTheme.typography.labelMedium) },
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
-            textStyle = TextStyle.Default.copy(fontSize = 18.sp),
+            textStyle = TextStyle.Default.copy(fontSize = fontSize),
             visualTransformation = if (keyboardOptions.keyboardType == KeyboardType.Password)
                 PasswordVisualTransformation('*') else VisualTransformation.None,
             singleLine = true,

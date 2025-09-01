@@ -112,6 +112,7 @@ class GlobalFieldSettingScreenModel(
                             fieldType,
                             alias,
                             width.toInt(),
+                            options?:"",
                             validationRule,
                             forced == 1L
                         )
