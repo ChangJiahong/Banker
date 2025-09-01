@@ -85,7 +85,8 @@ data class TplFieldConfig(
     val id: Long = -1,
     val fieldName: String = "",
     val alias: String = "",
-    val fieldType: String = ""
+    val fieldType: String = "",
+    val isDelete: Boolean = false
 )
 
 data class TplFieldConfigError(

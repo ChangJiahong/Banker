@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -32,12 +34,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -412,6 +418,7 @@ fun InputView(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputView(
     modifier: Modifier = Modifier,
@@ -445,28 +452,20 @@ fun InputView(
             trailingIcon =
                 if (isError) {
                     {
-                        Icon(
-                            painter = painterResource(Res.drawable.home),
-                            contentDescription = "error",
-                            tint = Color.Red
-                        )
+                        TooltipBox(
+                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                            tooltip = {
+                                PlainTooltip { Text(errorText) }
+                            },
+                            state = rememberTooltipState()
+                        ) {
+                            Icon(Icons.Default.Error, contentDescription = errorText)
+                        }
                     }
                 } else null,
             shape = RoundedCornerShape(15.dp),
-//            colors = OutlinedTextFieldDefaults.colors(
-//                focusedBorderColor = Color.Black,
-//                unfocusedBorderColor = Color.Black,
-//                focusedLabelColor = Color.Black
-//            )
+
         )
-        if (isError) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = errorText,
-                color = Color.Red,
-                modifier = Modifier.padding(6.dp, 0.dp),
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
+
     }
 }

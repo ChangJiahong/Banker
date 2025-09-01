@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -115,9 +116,16 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(
         Card(modifier = Modifier.padding {
             paddingVertical(5.dp)
         }) {
+            val verticalScrollState = rememberScrollState()
+            LaunchedEffect(fields.size) {
+                // 滚动到底部
+                if (fields.isNotEmpty()) {
+                    verticalScrollState.animateScrollTo(verticalScrollState.maxValue)
+                }
+            }
             Column(
                 modifier = Modifier.padding(5.dp)
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(verticalScrollState)
             ) {
                 var ind = remember { 1 }
                 Column(Modifier.wrapContentWidth()) {

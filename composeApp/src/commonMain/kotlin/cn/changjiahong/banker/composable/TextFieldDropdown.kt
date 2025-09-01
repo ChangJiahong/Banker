@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -21,7 +22,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -134,7 +139,6 @@ inline fun <reified T> TextFieldDropdown(
                 suffix = if (enableCancel) {
                     @Composable {
                         HoverBox(Modifier.size(24.dp), hovered = {
-                            expanded
                             IconButton({
                                 expanded
                                 onValueSelected(null)
@@ -148,12 +152,25 @@ inline fun <reified T> TextFieldDropdown(
                     }
                 } else null,
                 prefix = {
-
-                    Icon(Icons.AutoMirrored.Filled.ArrowRight, null,
-                        Modifier.rotate(if (expanded) 90f else 0f))
-
-//                    ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-                         },
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowRight, null,
+                        Modifier.rotate(if (expanded) 90f else 0f)
+                    )
+                },
+                trailingIcon = if (errorText.isNotEmpty()) {
+                    @Composable {
+                        val s = rememberTooltipState()
+                        TooltipBox(
+                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                            tooltip = {
+                                PlainTooltip { Text(errorText) }
+                            },
+                            state = s
+                        ) {
+                            Icon(Icons.Default.Error, contentDescription = errorText)
+                        }
+                    }
+                } else null,
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true)
                     .onFocusChanged {
                         if (!it.isFocused && isFocused) {
@@ -170,14 +187,6 @@ inline fun <reified T> TextFieldDropdown(
                 isError = inputText.isNotEmpty() && validOption == null || errorText.isNotEmpty(),
                 singleLine = true
             )
-            if (errorText.isNotEmpty()) {
-                Text(
-                    text = errorText,
-                    color = Color.Red,
-                    modifier = Modifier.padding(6.dp, 0.dp),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
         }
         ExposedDropdownMenu(
             expanded = expanded,

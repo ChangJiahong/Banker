@@ -47,20 +47,22 @@ class TemplateServiceImpl(
     ): Flow<NoData> = flow {
         db.transaction {
             fieldConfigs.forEach { tempField ->
-                if (tempField.id < 0) {
+                if (tempField.id < 0 && !tempField.isDelete) {
                     templateRepository.insertNewTemplateField(
                         templateId,
-                        tempField.fieldName!!,
-                        tempField.alias!!,
-                        tempField.fieldType!!
+                        tempField.fieldName,
+                        tempField.alias,
+                        tempField.fieldType
                     )
-                } else {
+                } else if (!tempField.isDelete) {
                     templateRepository.updateTemplateFieldById(
-                        tempField.fieldName!!,
-                        tempField.fieldType!!,
+                        tempField.fieldName,
+                        tempField.fieldType,
                         tempField.alias,
                         tempField.id
                     )
+                } else {
+                    templateRepository.deleteTemplateFieldById(tempField.id)
                 }
             }
         }

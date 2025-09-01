@@ -22,3 +22,7 @@ update:
 UPDATE TplField SET formFieldName=?,formFieldType=?,alias=?
 WHERE id=?;
 
+delete:
+DELETE FROM TplField
+WHERE id=?;
+

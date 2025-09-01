@@ -55,6 +55,10 @@ class TemplateRepositoryImpl(db: BankerDb) : TemplateRepository {
         return res.value > 0
     }
 
+    override fun deleteTemplateFieldById(id: Long) {
+        templateFieldQueries.delete(id).ck()
+    }
+
     override suspend fun findTemplatesByFuzzyName(tempName: String): Flow<List<Template>> {
         return docTemplateQueries.selectTemplatesByFuzzyName(tempName).asFlow().list()
     }

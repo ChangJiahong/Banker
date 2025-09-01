@@ -2,6 +2,7 @@ package cn.changjiahong.banker.app.about.settings.template
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Template
+import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.model.FormField
 import cn.changjiahong.banker.model.TplFieldConfig
 import cn.changjiahong.banker.model.TplFieldConfigError
@@ -48,38 +49,48 @@ class TempFieldConfigScreenModel(val template: Template, val templateService: Te
 
         when (event) {
             is TFSUiEvent.AddNewFieldConfig -> {
-                var hasE = false
-                if (_tempFieldConfigs.value.isNotEmpty()) {
-                    val lastItem = _tempFieldConfigs.value.last()
-                    var fE = ""
-                    var tE = ""
-                    var aE = ""
-                    if (lastItem.fieldName.isEmpty()) {
-                        fE = "不能为空"
-                        hasE = true
-                    }
-                    if (lastItem.fieldType.isEmpty()) {
-                        tE = "不能为空"
-                        hasE = true
-                    }
-                    if (lastItem.alias.isEmpty()) {
-                        aE = "不能为空"
-                        hasE = true
-                    }
-                    _tempFieldConfigsError.replace(_tempFieldConfigsError.value.lastIndex) {
-                        TplFieldConfigError(
-                            fE,
-                            aE,
-                            tE
-                        )
-                    }
-                }
-                if (hasE) return
+//                var hasE = false
+//                if (_tempFieldConfigs.value.isNotEmpty()) {
+//                    val lastItem = _tempFieldConfigs.value.last()
+//                    var fE = ""
+//                    var tE = ""
+//                    var aE = ""
+//                    if (lastItem.fieldName.isEmpty()) {
+//                        fE = "不能为空"
+//                        hasE = true
+//                    }
+//                    if (lastItem.fieldType.isEmpty()) {
+//                        tE = "不能为空"
+//                        hasE = true
+//                    }
+//                    if (lastItem.alias.isEmpty()) {
+//                        aE = "不能为空"
+//                        hasE = true
+//                    }
+//                    _tempFieldConfigsError.replace(_tempFieldConfigsError.value.lastIndex) {
+//                        TplFieldConfigError(
+//                            fE,
+//                            aE,
+//                            tE
+//                        )
+//                    }
+//                }
+//                if (hasE) return
 
                 _tempFieldConfigs.update { it + TplFieldConfig() }
                 _tempFieldConfigsError.update { it + TplFieldConfigError() }
             }
 
+            is ConfigUiEvent.Delete ->{
+                val field = _tempFieldConfigs.value[event.index]
+                if (field.id < 0) {
+                    _tempFieldConfigs.update { it.toMutableList().apply { removeAt(event.index) } }
+                } else {
+                    _tempFieldConfigs.replace(
+                        event.index
+                    ) { field.copy(isDelete = true) }
+                }
+            }
             is TFSUiEvent.UpdateTempFieldConfig -> {
                 _tempFieldConfigs.replace(event.index) { event.tempField }
             }

@@ -12,6 +12,9 @@ interface TemplateRepository {
     suspend fun findAllDocTemps(): Flow<List<Template>>
     fun insertNewTemplateField(templateId: Long, fieldName: String, alias: String, fieldType: String): Long
     fun updateTemplateFieldById(fieldName: String, fieldType: String, alias: String, id: Long): Boolean
+
+    fun deleteTemplateFieldById(id: Long)
+
     suspend fun findTemplatesByFuzzyName(tempName: String): Flow<List<Template>>
     suspend fun insertNewTemplate(templateName: String, path: String, fileType: String): Long
 
