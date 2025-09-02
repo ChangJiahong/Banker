@@ -57,6 +57,7 @@ import cn.changjiahong.banker.composable.rememberDropdownScope
 import cn.changjiahong.banker.model.FormField
 import cn.changjiahong.banker.model.TplFieldConfigError
 import cn.changjiahong.banker.model.TplFieldConfig
+import cn.changjiahong.banker.model.fieldTypes
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parametersOf
@@ -207,7 +208,7 @@ private fun FieldConfigItem(
                 item = item.copy(fieldType = it)
                 updateTempField(item)
             },
-            options = listOf("TEXT", "CHECK", "IMAGE"),
+            options = fieldTypes(),
             enableEdit = false,
             label = "字段类型",
             errorText = error.fieldType,

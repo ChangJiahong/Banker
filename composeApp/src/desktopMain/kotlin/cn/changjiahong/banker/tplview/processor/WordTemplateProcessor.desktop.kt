@@ -1,17 +1,25 @@
 package cn.changjiahong.banker.tplview.processor
 
+import cn.changjiahong.banker.model.COL_TABLE
 import cn.changjiahong.banker.model.FormField
 import cn.changjiahong.banker.model.FormFieldValue
 import cn.changjiahong.banker.model.NoData
-import cn.changjiahong.banker.storage.platformFile
+import cn.changjiahong.banker.model.ROW_TABLE
+import cn.changjiahong.banker.model.isRowTableType
+import cn.changjiahong.banker.model.isTableType
+import cn.changjiahong.banker.model.isTextType
 import cn.changjiahong.banker.utils.okFlow
 import cn.changjiahong.banker.utils.returnFlow
 import com.deepoove.poi.XWPFTemplate
 import com.deepoove.poi.config.Configure
+import com.deepoove.poi.data.Tables
+import com.deepoove.poi.data.style.BorderStyle
+import com.deepoove.poi.plugin.table.LoopColumnTableRenderPolicy
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy
 import com.deepoove.poi.template.run.RunTemplate
 import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.json.Json
 
 
 actual object WordTemplateProcessor : TemplateProcessor {
@@ -32,42 +40,50 @@ actual object WordTemplateProcessor : TemplateProcessor {
         toTempFile: PlatformFile
     ): Flow<NoData> = okFlow {
 
-        val table: MutableList<Map<String, String>> = mutableListOf()
-        table.add(mapOf(
-            Pair("name","这是"),
-            Pair("age","12"),
-            Pair("clazz","八十")
-        ))
-        table.add(mapOf(
-            Pair("name","阿萨"),
-            Pair("age","22"),
-            Pair("clazz","爱上")
-        ))
-        table.add(mapOf(
-            Pair("name","但是"),
-            Pair("age","22"),
-            Pair("clazz","爱上")
-        ))
-        table.add(mapOf(
-            Pair("name","皮带"),
-            Pair("age","22"),
-            Pair("clazz","爱上")
-        ))
-
-
-
 
         // 填充数据
         val data: MutableMap<String, Any> = HashMap()
-        data.put("user", table)
-        val policy = LoopRowTableRenderPolicy()
-
         val config = Configure.builder()
-            .bind("user", policy).build()
 
-        val template = XWPFTemplate.compile("D:\\ChangJiahongs\\Documents\\模板.docx".platformFile.file,config).render(
-            data
-        )
+
+        formData.forEach { f ->
+            when {
+                f.formFiledType.isTextType() -> {
+                    data.put(f.tFieldName, f.fieldValue)
+                }
+
+                f.formFiledType.isTableType() -> {
+                    val table =
+                        Json.decodeFromString<List<Map<String, String>>>(f.fieldValue)
+
+                    when (f.formFiledType) {
+                        ROW_TABLE, COL_TABLE -> {
+                            config.bind(
+                                f.tFieldName,
+                                if (f.formFiledType.isRowTableType()) LoopRowTableRenderPolicy() else LoopColumnTableRenderPolicy()
+                            )
+                            data.put(f.tFieldName, table)
+                        }
+
+                        else -> {
+                            val tableArray = table.map { it.values.toTypedArray() }.toTypedArray()
+                            data.put(
+                                f.tFieldName,
+                                Tables.of(tableArray).border(BorderStyle.DEFAULT).create()
+                            )
+                        }
+                    }
+
+                }
+            }
+        }
+
+
+        val template = XWPFTemplate.compile(
+            templateFile.file,
+            config.build()
+        ).render(data)
+
         template.writeAndClose(toTempFile.file.outputStream())
     }
 }

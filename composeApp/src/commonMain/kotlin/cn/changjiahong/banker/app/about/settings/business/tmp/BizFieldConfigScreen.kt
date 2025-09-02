@@ -41,6 +41,7 @@ import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.app.about.settings.global.GlobalConfigUiEvent
 import cn.changjiahong.banker.composable.HoverDeleteBox
 import cn.changjiahong.banker.composable.TextFieldDropdown
+import cn.changjiahong.banker.model.fieldTypes
 import cn.changjiahong.banker.model.isTableType
 import cn.changjiahong.banker.platform.HorizontalScrollbar
 import cn.changjiahong.banker.utils.padding
@@ -141,7 +142,7 @@ fun BusinessFieldConfigScreen.FieldConfigView(
                                 .padding { paddingHorizontal(2.dp) }
                         )
                         TextFieldDropdown(
-                            listOf("TEXT", "IMAGE", "ROW_TABLE", "COL_TABLE", "TABLE"),
+                            fieldTypes(),
                             item.fieldType,
                             onValueChange = {
                                 item = item.copy(fieldType = it)

@@ -9,10 +9,6 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.collections.iterator
 
-fun String.isTableType(): Boolean {
-    return this in listOf("ROW_TABLE", "COL_TABLE", "TABLE")
-}
-
 class Table(
     val optionsKey: List<String> = emptyList(),
     val fieldIds: Long,

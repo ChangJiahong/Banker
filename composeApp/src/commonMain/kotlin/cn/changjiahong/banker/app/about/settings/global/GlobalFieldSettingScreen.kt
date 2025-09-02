@@ -54,6 +54,7 @@ import cn.changjiahong.banker.app.about.settings.business.tmp.BFieldConfigScreen
 import cn.changjiahong.banker.composable.BooleanFieldDropdown
 import cn.changjiahong.banker.composable.HoverDeleteBox
 import cn.changjiahong.banker.composable.TextFieldDropdown
+import cn.changjiahong.banker.model.fieldTypes
 import cn.changjiahong.banker.platform.HorizontalScrollbar
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
@@ -166,7 +167,7 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(
                                     .padding { paddingHorizontal(2.dp) }
                             )
                             TextFieldDropdown(
-                                listOf("TEXT", "IMAGE","ROW_TABLE","COL_TABLE","TABLE"),
+                                fieldTypes(),
                                 item.fieldType,
                                 onValueChange = {
                                     item = item.copy(fieldType = it)
@@ -223,7 +224,7 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(
                             )
 
 
-                            if (item.fieldType in listOf("ROW_TABLE","COL_TABLE","TABLE")){
+                            if (item.fieldType in listOf("ROW_TABLE", "COL_TABLE", "TABLE")) {
                                 InputView(
                                     value = item.options,
                                     onValueChange = {
