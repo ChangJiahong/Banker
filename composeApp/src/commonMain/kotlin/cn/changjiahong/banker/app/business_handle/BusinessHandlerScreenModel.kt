@@ -10,6 +10,7 @@ import cn.changjiahong.banker.composable.DialogState
 import cn.changjiahong.banker.model.FieldVal
 import cn.changjiahong.banker.model.Table
 import cn.changjiahong.banker.model.UserInfo
+import cn.changjiahong.banker.model.isTableType
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.mvi.replace
@@ -137,11 +138,7 @@ class BusinessHandlerScreenModel(
                 _optionsFields.replace(event.filedId) {
                     event.ov
                 }
-//                _optionsFields.replace(event.filedId) {
-//                    _optionsFields.value[event.filedId]!!.toMutableList().apply {
-//                        this[event.index] = event.ov
-//                    }
-//                }
+
             }
 
             is BhUIEvent.AddOptionV -> {
@@ -150,11 +147,7 @@ class BusinessHandlerScreenModel(
                         createRow()
                     }
                 }
-//                _optionsFields.replace(event.filedId) {
-//                    _optionsFields.value[event.filedId]!!.toMutableList().apply {
-//                        add(_optionsKey.value[event.filedId]!!.associate { it to "" })
-//                    }
-//                }
+
             }
         }
     }
@@ -193,7 +186,7 @@ class BusinessHandlerScreenModel(
                 _basicFields.value = data.filter { f -> f.bId == -1L }
 
                 val tableFields = data.filter { f ->
-                    f.fieldType in "ROW_TABLE"
+                    f.fieldType.isTableType()
                 }
 
                 _optionsKey.value =
@@ -218,20 +211,9 @@ class BusinessHandlerScreenModel(
 
             val fv = _fieldValues.value.toMutableMap()
 
-//            _optionsFields.value.forEach { (fieldId, list) ->
-//                list.forEach { map ->
-//                    map.forEach { (key, value) -> if (value.isBlank()) return@launch }
-//                }
-//                val field = fv[fieldId]
-//                fv[fieldId] = FieldVal(
-//                    fieldId = fieldId,
-//                    fieldValueId = field?.fieldValueId ?: -1,
-//                    fieldValue = list.toString()
-//                )
-//            }
 
             _optionsFields.value.forEach { (key, value) ->
-                fv[key] = FieldVal(value.fieldIds,-1,value.toFieldValue())
+                fv[key] = FieldVal(value.fieldIds, value.fieldValueId, value.toFieldValue())
             }
 
             fieldService.saveFieldValues(
@@ -253,11 +235,7 @@ class BusinessHandlerScreenModel(
         _fieldValues.value = emptyMap()
         _currentlySelected.value = null
 
-//        val vv = mutableMapOf<Long, List<Map<String, String>>>()
-//        _optionsKey.value.forEach { (key, value) ->
-//            vv[key] = listOf(value.associate { it to "" })
-//        }
-//        _optionsFields.value = vv
+        _optionsFields.value = emptyMap()
 
 
         clienteleDialog.show()
@@ -272,16 +250,15 @@ class BusinessHandlerScreenModel(
 
         val currentUser = currentlySelected.value!!
 
-//        val vv = mutableMapOf<Long, List<Map<String, String>>>()
-//        _optionsKey.value.forEach { (key, value) ->
-//            val v = currentUser.fields.values.find { f -> f.fieldId == key }?.fieldValue ?: ""
-//            vv[key] = listOf()
-//            if (vv[key]!!.isEmpty()) {
-//                vv[key] = listOf(value.associate { it to "" })
-//            }
-//        }
-//
-//        _optionsFields.value = vv
+        _optionsFields.value =
+            currentUser.fields.values.filter { it.fieldType.isTableType() }.associate {
+                it.fieldId to Table(
+                    optionsKey.value[it.fieldId]!!,
+                    it.fieldId,
+                    it.fieldValueId,
+                    it.fieldValue
+                )
+            }
 
         _fieldValues.value = currentUser.fields.values.associate {
             it.fieldId to FieldVal(

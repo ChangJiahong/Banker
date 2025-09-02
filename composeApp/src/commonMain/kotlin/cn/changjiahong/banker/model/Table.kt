@@ -9,6 +9,10 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.collections.iterator
 
+fun String.isTableType(): Boolean {
+    return this in arrayOf("ROW_TABLE")
+}
+
 class Table(
     val optionsKey: List<String> = emptyList(),
     val fieldIds: Long,
@@ -22,8 +26,14 @@ class Table(
     private val table: MutableList<Row> = mutableListOf()
 
     init {
-//        val ll = Json.decodeFromString<List<Row>>(fieldValue)
-//        table.addAll(ll)
+        if (fieldValue.isNotBlank()) {
+            try {
+                val ll = Json.decodeFromString<List<Map<String, String>>>(fieldValue)
+                this.table.addAll(ll.mapIndexed { ind, map -> Row(ind, map) })
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     private constructor(table: Table) : this(
@@ -31,8 +41,7 @@ class Table(
         table.fieldIds,
         table.fieldValueId,
         table.toFieldValue()
-    ){
-        this.table.addAll(table.table)
+    ) {
     }
 
 
@@ -47,12 +56,15 @@ class Table(
     }
 
 
-    @Serializable
     inner class Row(val index: Int) {
         private val map = optionsKey.associateWith { "" }.toMutableMap()
 
         private constructor(row: Row) : this(row.index) {
             map.putAll(row.map)
+        }
+
+        constructor(index: Int, map: Map<String, String>) : this(index) {
+            this.map.putAll(map)
         }
 
         fun set(key: String, value: String) {
@@ -72,6 +84,11 @@ class Table(
         override fun toString(): String {
             return map.toString()
         }
+
+        fun map(): Map<String, String> {
+            return map
+        }
+
     }
 
     /**
@@ -92,7 +109,7 @@ class Table(
         return Row(table.size)
     }
 
-    fun updateRow( row: Row) {
+    fun updateRow(row: Row) {
         table[row.index] = row
     }
 
@@ -103,7 +120,8 @@ class Table(
     }
 
     fun toFieldValue(): String {
-        return table.toString()
+        val mm = table.map { tableRow -> tableRow.map() }
+        return Json.encodeToString(mm)
     }
 
     operator fun iterator(): Iterator<Row> {
