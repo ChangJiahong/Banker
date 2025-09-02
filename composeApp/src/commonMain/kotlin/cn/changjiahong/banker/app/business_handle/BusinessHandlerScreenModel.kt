@@ -55,6 +55,9 @@ class BusinessHandlerScreenModel(
     private val _fieldValues = MutableStateFlow<Map<Long, FieldVal>>(emptyMap())
     val fieldValues = _fieldValues.asStateFlow()
 
+    private val _optionsKey = MutableStateFlow<Map<Long, List<String>>>(emptyMap())
+    val optionsKey = _optionsKey.asStateFlow()
+
     private val _optionsFields =
         MutableStateFlow<Map<Long, List<Map<String, String>>>>(emptyMap())
     val optionsFields = _optionsFields.asStateFlow()
@@ -132,22 +135,18 @@ class BusinessHandlerScreenModel(
                 }
             }
 
-            is BhUIEvent.UpdateOptionV ->{
-                _optionsFields.replace(event.filedId){
+            is BhUIEvent.UpdateOptionV -> {
+                _optionsFields.replace(event.filedId) {
                     _optionsFields.value[event.filedId]!!.toMutableList().apply {
                         this[event.index] = event.ov
                     }
                 }
             }
 
-            is BhUIEvent.AddOptionV->{
-                _optionsFields.replace(event.filedId){
+            is BhUIEvent.AddOptionV -> {
+                _optionsFields.replace(event.filedId) {
                     _optionsFields.value[event.filedId]!!.toMutableList().apply {
-                        add(buildMap {
-                            (event.options).split(",").forEach {k->
-                                put(k, "")
-                            }
-                        })
+                        add(_optionsKey.value[event.filedId]!!.associate { it to "" })
                     }
                 }
             }
@@ -187,14 +186,9 @@ class BusinessHandlerScreenModel(
             fieldService.getFieldConfigsForBiz(business.id).catchAndCollect { data ->
                 _basicFields.value = data.filter { f -> f.bId == -1L }
 
-                //TODO::
-                _optionsFields.value = data.filter {f->
+                _optionsKey.value = data.filter { f ->
                     f.fieldType in "ROW_TABLE"
-                }.associate { it.fieldId to listOf(buildMap {
-                    (it.options?:"").split(",").forEach {k->
-                        put(k, "")
-                    }
-                }) }
+                }.associate { it.fieldId to (it.options ?: "").split(",") }
 
                 _bizFields.value = data.filterNot { f -> f.bId == -1L }
             }
@@ -215,8 +209,16 @@ class BusinessHandlerScreenModel(
 
             val fv = _fieldValues.value.toMutableMap()
 
-            _optionsFields.value.forEach { (fieldId,list) ->
-               fv[fieldId] = FieldVal(fieldId=fieldId,fieldValue = list.toString())
+            _optionsFields.value.forEach { (fieldId, list) ->
+                list.forEach { map ->
+                    map.forEach { (key, value) -> if (value.isBlank()) return@launch }
+                }
+                val field = fv[fieldId]
+                fv[fieldId] = FieldVal(
+                    fieldId = fieldId,
+                    fieldValueId = field?.fieldValueId ?: -1,
+                    fieldValue = list.toString()
+                )
             }
 
             fieldService.saveFieldValues(
@@ -238,6 +240,13 @@ class BusinessHandlerScreenModel(
         _fieldValues.value = emptyMap()
         _currentlySelected.value = null
 
+        val vv = mutableMapOf<Long, List<Map<String, String>>>()
+        _optionsKey.value.forEach { (key, value) ->
+            vv[key] = listOf(value.associate { it to "" })
+        }
+        _optionsFields.value = vv
+
+
         clienteleDialog.show()
 
     }
@@ -249,6 +258,17 @@ class BusinessHandlerScreenModel(
         }
 
         val currentUser = currentlySelected.value!!
+
+        val vv = mutableMapOf<Long, List<Map<String, String>>>()
+        _optionsKey.value.forEach { (key, value) ->
+            val v = currentUser.fields.values.find { f -> f.fieldId == key }?.fieldValue ?: ""
+            vv[key] = listOf()
+            if (vv[key]!!.isEmpty()) {
+                vv[key] = listOf(value.associate { it to "" })
+            }
+        }
+
+        _optionsFields.value = vv
 
         _fieldValues.value = currentUser.fields.values.associate {
             it.fieldId to FieldVal(

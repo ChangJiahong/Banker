@@ -69,6 +69,7 @@ fun ClienteleDialog(
 
             val fieldValues by businessHandlerScreenModel.fieldValues.collectAsState()
             val optionsFields by businessHandlerScreenModel.optionsFields.collectAsState()
+            val optionsKey by businessHandlerScreenModel.optionsKey.collectAsState()
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("基本信息", modifier = Modifier.padding(10.dp, 0.dp), fontSize = 24.sp)
@@ -114,12 +115,12 @@ fun ClienteleDialog(
                         }
 
                         "ROW_TABLE" -> {
-                            if (field.options.isNullOrBlank()) {
+                            if (!optionsKey.containsKey(field.fieldId)) {
                                 return@forEachIndexed
                             }
                             Spacer(modifier = Modifier.fillMaxWidth())
                             Column(Modifier.padding { paddingTop(5.dp) }) {
-                                val options = field.options.split(",")
+                                val options = optionsKey[field.fieldId]!!
                                 Row(
                                     Modifier.height(IntrinsicSize.Min),
                                     verticalAlignment = Alignment.CenterVertically
@@ -136,7 +137,7 @@ fun ClienteleDialog(
                                         }
                                     }
                                     IconButton({
-                                        BhUIEvent.AddOptionV(field.fieldId,field.options).sendTo(businessHandlerScreenModel)
+                                        BhUIEvent.AddOptionV(field.fieldId,"").sendTo(businessHandlerScreenModel)
                                     }, Modifier.height(30.dp)) {
                                         Icon(Icons.Default.Add, "")
                                     }
