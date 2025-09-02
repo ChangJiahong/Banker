@@ -1,6 +1,5 @@
 package cn.changjiahong.banker.app.business_handle
 
-import androidx.compose.material3.AlertDialog
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.Template
@@ -9,6 +8,7 @@ import cn.changjiahong.banker.app.RR
 import cn.changjiahong.banker.composable.AlertDialogState
 import cn.changjiahong.banker.composable.DialogState
 import cn.changjiahong.banker.model.FieldVal
+import cn.changjiahong.banker.model.Table
 import cn.changjiahong.banker.model.UserInfo
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEvent
@@ -25,8 +25,6 @@ import cn.changjiahong.banker.storage.FileType.PDF
 import cn.changjiahong.banker.storage.FileType.XLS
 import cn.changjiahong.banker.storage.FileType.XLSX
 import cn.changjiahong.banker.uieffect.GoDIREffect
-import cn.changjiahong.banker.uieffect.GoDIREvent
-import cn.changjiahong.banker.uieffect.GoEffect
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -59,7 +57,7 @@ class BusinessHandlerScreenModel(
     val optionsKey = _optionsKey.asStateFlow()
 
     private val _optionsFields =
-        MutableStateFlow<Map<Long, List<Map<String, String>>>>(emptyMap())
+        MutableStateFlow<Map<Long, Table>>(emptyMap())
     val optionsFields = _optionsFields.asStateFlow()
 
 
@@ -137,18 +135,26 @@ class BusinessHandlerScreenModel(
 
             is BhUIEvent.UpdateOptionV -> {
                 _optionsFields.replace(event.filedId) {
-                    _optionsFields.value[event.filedId]!!.toMutableList().apply {
-                        this[event.index] = event.ov
-                    }
+                    event.ov
                 }
+//                _optionsFields.replace(event.filedId) {
+//                    _optionsFields.value[event.filedId]!!.toMutableList().apply {
+//                        this[event.index] = event.ov
+//                    }
+//                }
             }
 
             is BhUIEvent.AddOptionV -> {
                 _optionsFields.replace(event.filedId) {
-                    _optionsFields.value[event.filedId]!!.toMutableList().apply {
-                        add(_optionsKey.value[event.filedId]!!.associate { it to "" })
+                    _optionsFields.value[event.filedId]!!.copy {
+                        createRow()
                     }
                 }
+//                _optionsFields.replace(event.filedId) {
+//                    _optionsFields.value[event.filedId]!!.toMutableList().apply {
+//                        add(_optionsKey.value[event.filedId]!!.associate { it to "" })
+//                    }
+//                }
             }
         }
     }
@@ -186,9 +192,12 @@ class BusinessHandlerScreenModel(
             fieldService.getFieldConfigsForBiz(business.id).catchAndCollect { data ->
                 _basicFields.value = data.filter { f -> f.bId == -1L }
 
-                _optionsKey.value = data.filter { f ->
+                val tableFields = data.filter { f ->
                     f.fieldType in "ROW_TABLE"
-                }.associate { it.fieldId to (it.options ?: "").split(",") }
+                }
+
+                _optionsKey.value =
+                    tableFields.associate { it.fieldId to (it.options ?: "").split(",") }
 
                 _bizFields.value = data.filterNot { f -> f.bId == -1L }
             }
@@ -209,16 +218,20 @@ class BusinessHandlerScreenModel(
 
             val fv = _fieldValues.value.toMutableMap()
 
-            _optionsFields.value.forEach { (fieldId, list) ->
-                list.forEach { map ->
-                    map.forEach { (key, value) -> if (value.isBlank()) return@launch }
-                }
-                val field = fv[fieldId]
-                fv[fieldId] = FieldVal(
-                    fieldId = fieldId,
-                    fieldValueId = field?.fieldValueId ?: -1,
-                    fieldValue = list.toString()
-                )
+//            _optionsFields.value.forEach { (fieldId, list) ->
+//                list.forEach { map ->
+//                    map.forEach { (key, value) -> if (value.isBlank()) return@launch }
+//                }
+//                val field = fv[fieldId]
+//                fv[fieldId] = FieldVal(
+//                    fieldId = fieldId,
+//                    fieldValueId = field?.fieldValueId ?: -1,
+//                    fieldValue = list.toString()
+//                )
+//            }
+
+            _optionsFields.value.forEach { (key, value) ->
+                fv[key] = FieldVal(value.fieldIds,-1,value.toFieldValue())
             }
 
             fieldService.saveFieldValues(
@@ -240,11 +253,11 @@ class BusinessHandlerScreenModel(
         _fieldValues.value = emptyMap()
         _currentlySelected.value = null
 
-        val vv = mutableMapOf<Long, List<Map<String, String>>>()
-        _optionsKey.value.forEach { (key, value) ->
-            vv[key] = listOf(value.associate { it to "" })
-        }
-        _optionsFields.value = vv
+//        val vv = mutableMapOf<Long, List<Map<String, String>>>()
+//        _optionsKey.value.forEach { (key, value) ->
+//            vv[key] = listOf(value.associate { it to "" })
+//        }
+//        _optionsFields.value = vv
 
 
         clienteleDialog.show()
@@ -259,16 +272,16 @@ class BusinessHandlerScreenModel(
 
         val currentUser = currentlySelected.value!!
 
-        val vv = mutableMapOf<Long, List<Map<String, String>>>()
-        _optionsKey.value.forEach { (key, value) ->
-            val v = currentUser.fields.values.find { f -> f.fieldId == key }?.fieldValue ?: ""
-            vv[key] = listOf()
-            if (vv[key]!!.isEmpty()) {
-                vv[key] = listOf(value.associate { it to "" })
-            }
-        }
-
-        _optionsFields.value = vv
+//        val vv = mutableMapOf<Long, List<Map<String, String>>>()
+//        _optionsKey.value.forEach { (key, value) ->
+//            val v = currentUser.fields.values.find { f -> f.fieldId == key }?.fieldValue ?: ""
+//            vv[key] = listOf()
+//            if (vv[key]!!.isEmpty()) {
+//                vv[key] = listOf(value.associate { it to "" })
+//            }
+//        }
+//
+//        _optionsFields.value = vv
 
         _fieldValues.value = currentUser.fields.values.associate {
             it.fieldId to FieldVal(

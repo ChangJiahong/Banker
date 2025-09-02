@@ -43,6 +43,7 @@ import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.composable.DialogState
 import cn.changjiahong.banker.composable.PopupDialog
 import cn.changjiahong.banker.model.FieldVal
+import cn.changjiahong.banker.model.Table
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
 
@@ -121,6 +122,17 @@ fun ClienteleDialog(
                             Spacer(modifier = Modifier.fillMaxWidth())
                             Column(Modifier.padding { paddingTop(5.dp) }) {
                                 val options = optionsKey[field.fieldId]!!
+                                var table by remember(optionsFields) {
+                                    mutableStateOf(
+                                        optionsFields[field.fieldId] ?: Table(
+                                            options,
+                                            field.fieldId
+                                        )
+                                    )
+                                }
+                                /*
+                                表头
+                                 */
                                 Row(
                                     Modifier.height(IntrinsicSize.Min),
                                     verticalAlignment = Alignment.CenterVertically
@@ -137,23 +149,24 @@ fun ClienteleDialog(
                                         }
                                     }
                                     IconButton({
-                                        BhUIEvent.AddOptionV(field.fieldId,"").sendTo(businessHandlerScreenModel)
+                                        BhUIEvent.UpdateOptionV(field.fieldId, table.copy { createRow() })
+                                            .sendTo(businessHandlerScreenModel)
                                     }, Modifier.height(30.dp)) {
                                         Icon(Icons.Default.Add, "")
                                     }
                                 }
-                                var optionV by remember(optionsFields) {
-                                    mutableStateOf(
-                                        optionsFields[field.fieldId]
-                                    )
-                                }
 
-                                optionV?.forEachIndexed { index, map ->
+
+                                var rIndex = 0
+                                for (row in table.table()) {
+
                                     Row(
                                         Modifier.height(IntrinsicSize.Min),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        map.forEach { (key, value) ->
+
+                                        var cIndex = 0
+                                        for ((key, value) in row) {
                                             Box(
                                                 modifier = Modifier
                                                     .width(100.dp)
@@ -175,15 +188,18 @@ fun ClienteleDialog(
                                                         va = newValue
                                                         BhUIEvent.UpdateOptionV(
                                                             field.fieldId,
-                                                            index,
-                                                            map.toMutableMap()
-                                                                .apply { put(key, newValue) })
-                                                            .sendTo(businessHandlerScreenModel)
+                                                            table.copy {
+                                                                updateRow(row.copy(key, newValue))
+                                                            }).sendTo(businessHandlerScreenModel)
                                                     }
                                                 )
                                             }
+
+                                            cIndex++
                                         }
                                     }
+
+                                    rIndex++
                                 }
 
                             }
