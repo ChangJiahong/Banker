@@ -283,6 +283,7 @@ private fun TableHander(
                                     fontSize = 12.sp,
                                     textAlign = TextAlign.Center // 水平居中
                                 ),
+                                singleLine = true,
                                 onValueChange = { newValue ->
                                     va = newValue
                                     BhUIEvent.UpdateOptionV(
