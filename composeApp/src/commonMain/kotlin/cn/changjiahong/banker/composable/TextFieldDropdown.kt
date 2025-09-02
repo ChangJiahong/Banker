@@ -132,7 +132,7 @@ inline fun <reified T> TextFieldDropdown(
                     expanded = true
                 },
                 readOnly = !enableEdit,
-                textStyle = TextStyle.Default.copy(fontSize = 20.sp),
+                textStyle = TextStyle.Default.copy(fontSize = 16.sp),
                 label = { Text(label, style = MaterialTheme.typography.labelMedium) },
                 shape = RoundedCornerShape(15.dp),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),

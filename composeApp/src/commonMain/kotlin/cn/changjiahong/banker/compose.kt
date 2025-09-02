@@ -424,7 +424,7 @@ fun InputView(
     errorText: String = "",
     readOnly: Boolean = false,
     leadingIcon: Painter? = null,
-    fontSize: TextUnit = 18.sp,
+    fontSize: TextUnit = 16.sp,
     onValueChange: (String) -> Unit = {},
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
     keyboardActions: KeyboardActions = KeyboardActions.Default,

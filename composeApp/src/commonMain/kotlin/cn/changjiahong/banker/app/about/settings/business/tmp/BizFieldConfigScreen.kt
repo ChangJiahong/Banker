@@ -38,8 +38,10 @@ import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.app.about.settings.ConfigUiEffect
 import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
+import cn.changjiahong.banker.app.about.settings.global.GlobalConfigUiEvent
 import cn.changjiahong.banker.composable.HoverDeleteBox
 import cn.changjiahong.banker.composable.TextFieldDropdown
+import cn.changjiahong.banker.model.isTableType
 import cn.changjiahong.banker.platform.HorizontalScrollbar
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
@@ -139,7 +141,7 @@ fun BusinessFieldConfigScreen.FieldConfigView(
                                 .padding { paddingHorizontal(2.dp) }
                         )
                         TextFieldDropdown(
-                            listOf("TEXT", "IMAGE"),
+                            listOf("TEXT", "IMAGE", "ROW_TABLE", "COL_TABLE", "TABLE"),
                             item.fieldType,
                             onValueChange = {
                                 item = item.copy(fieldType = it)
@@ -151,7 +153,7 @@ fun BusinessFieldConfigScreen.FieldConfigView(
                             },
                             enableEdit = false,
                             label = "字段类型",
-                            modifier = Modifier.width(140.dp)
+                            modifier = Modifier.width(160.dp)
                                 .padding { paddingHorizontal(2.dp) }
                         )
 //                                InputView(
@@ -204,6 +206,23 @@ fun BusinessFieldConfigScreen.FieldConfigView(
                             modifier = Modifier.width(160.dp)
                                 .padding { paddingHorizontal(2.dp) }
                         )
+                        if (item.fieldType.isTableType()) {
+                            InputView(
+                                value = item.options,
+                                onValueChange = {
+                                    item = item.copy(options = it)
+                                    BFieldConfigScreenUiEvent.UpdateBusinessFiled(
+                                        index,
+                                        item
+                                    ).sendTo(fieldConfigScreenModel)
+                                },
+                                label = "选项列表",
+                                errorText = error.options,
+                                readOnly = false,
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding { paddingHorizontal(2.dp) }
+                            )
+                        }
                     }
 
 

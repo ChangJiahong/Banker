@@ -1,5 +1,7 @@
 package cn.changjiahong.banker.app.business_handle
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +21,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,11 +43,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.home
+import cn.changjiahong.banker.FieldConfig
 import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.composable.DialogState
 import cn.changjiahong.banker.composable.PopupDialog
 import cn.changjiahong.banker.model.FieldVal
 import cn.changjiahong.banker.model.Table
+import cn.changjiahong.banker.model.isTableType
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
 
@@ -69,8 +75,6 @@ fun ClienteleDialog(
             val uiState by businessHandlerScreenModel.uiState.collectAsState()
 
             val fieldValues by businessHandlerScreenModel.fieldValues.collectAsState()
-            val optionsFields by businessHandlerScreenModel.optionsFields.collectAsState()
-            val optionsKey by businessHandlerScreenModel.optionsKey.collectAsState()
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("基本信息", modifier = Modifier.padding(10.dp, 0.dp), fontSize = 24.sp)
@@ -95,9 +99,9 @@ fun ClienteleDialog(
                         )
                     }
 
-                    when (field.fieldType) {
+                    when {
 
-                        "TEXT" -> {
+                        field.fieldType == "TEXT" -> {
                             InputView(
                                 label = field.fieldName,
                                 value = fieldVal.fieldValue,
@@ -115,94 +119,8 @@ fun ClienteleDialog(
                             )
                         }
 
-                        "ROW_TABLE" -> {
-                            if (!optionsKey.containsKey(field.fieldId)) {
-                                return@forEachIndexed
-                            }
-                            Spacer(modifier = Modifier.fillMaxWidth())
-                            Column(Modifier.padding { paddingTop(5.dp) }) {
-                                val options = optionsKey[field.fieldId]!!
-                                var table by remember(optionsFields) {
-                                    mutableStateOf(
-                                        optionsFields[field.fieldId] ?: Table(
-                                            options,
-                                            field.fieldId
-                                        )
-                                    )
-                                }
-                                /*
-                                表头
-                                 */
-                                Row(
-                                    Modifier.height(IntrinsicSize.Min),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    options.forEach {
-                                        Box(
-                                            modifier = Modifier
-                                                .width(100.dp)
-                                                .height(30.dp)
-                                                .border(1.dp, Color.Gray),
-                                            contentAlignment = Alignment.Center // 水平 + 垂直居中
-                                        ) {
-                                            Text(it)
-                                        }
-                                    }
-                                    IconButton({
-                                        BhUIEvent.UpdateOptionV(field.fieldId, table.copy { createRow() })
-                                            .sendTo(businessHandlerScreenModel)
-                                    }, Modifier.height(30.dp)) {
-                                        Icon(Icons.Default.Add, "")
-                                    }
-                                }
-
-
-                                var rIndex = 0
-                                for (row in table.table()) {
-
-                                    Row(
-                                        Modifier.height(IntrinsicSize.Min),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-
-                                        var cIndex = 0
-                                        for ((key, value) in row) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .width(100.dp)
-                                                    .height(30.dp)
-                                                    .border(1.dp, Color.Gray),
-                                                contentAlignment = Alignment.Center // 水平 + 垂直居中
-                                            ) {
-                                                var va by remember(value) { mutableStateOf(value) }
-
-                                                BasicTextField(
-                                                    value = va,
-                                                    modifier = Modifier.fillMaxWidth()
-                                                        .padding(2.dp, 0.dp),
-                                                    textStyle = TextStyle.Default.copy(
-                                                        fontSize = 12.sp,
-                                                        textAlign = TextAlign.Center // 水平居中
-                                                    ),
-                                                    onValueChange = { newValue ->
-                                                        va = newValue
-                                                        BhUIEvent.UpdateOptionV(
-                                                            field.fieldId,
-                                                            table.copy {
-                                                                updateRow(row.copy(key, newValue))
-                                                            }).sendTo(businessHandlerScreenModel)
-                                                    }
-                                                )
-                                            }
-
-                                            cIndex++
-                                        }
-                                    }
-
-                                    rIndex++
-                                }
-
-                            }
+                        field.fieldType.isTableType() -> {
+                            TableHander(field, businessHandlerScreenModel)
                         }
 
                     }
@@ -231,21 +149,30 @@ fun ClienteleDialog(
                             fieldValues[field.fieldId] ?: FieldVal(field.fieldId)
                         )
                     }
-                    InputView(
-                        label = field.fieldName,
-                        modifier = Modifier.width((field.width.toInt() * 10).dp)
-                            .padding(10.dp, 0.dp),
-                        value = fieldVal.fieldValue,
-                        onValueChange = {
-                            fieldVal = fieldVal.copy(fieldValue = it)
-                            BhUIEvent.UpdateFieldValue(
-                                field.fieldId,
-                                fieldVal
-                            ).sendTo(businessHandlerScreenModel)
+                    when {
+                        field.fieldType == "TEXT" -> {
 
-                        },
-                        errorText = uiState.fieldErrorMsg[field.fieldName] ?: "",
-                    )
+                            InputView(
+                                label = field.fieldName,
+                                modifier = Modifier.width((field.width.toInt() * 10).dp)
+                                    .padding(10.dp, 0.dp),
+                                value = fieldVal.fieldValue,
+                                onValueChange = {
+                                    fieldVal = fieldVal.copy(fieldValue = it)
+                                    BhUIEvent.UpdateFieldValue(
+                                        field.fieldId,
+                                        fieldVal
+                                    ).sendTo(businessHandlerScreenModel)
+
+                                },
+                                errorText = uiState.fieldErrorMsg[field.fieldName] ?: "",
+                            )
+                        }
+
+                        field.fieldType.isTableType() -> {
+                            TableHander(field, businessHandlerScreenModel)
+                        }
+                    }
                 }
             }
 
@@ -260,6 +187,120 @@ fun ClienteleDialog(
                     Text("保存")
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+private fun TableHander(
+    field: FieldConfig,
+    businessHandlerScreenModel: BusinessHandlerScreenModel
+) {
+    val optionsFields by businessHandlerScreenModel.optionsFields.collectAsState()
+    val optionsKey by businessHandlerScreenModel.optionsKey.collectAsState()
+
+    if (!optionsKey.containsKey(field.fieldId)) {
+        return
+    }
+    Spacer(modifier = Modifier.fillMaxWidth())
+    Card(
+        Modifier.padding {
+            paddingHorizontal(10.dp)
+            paddingVertical(5.dp)
+        },
+        border = BorderStroke(1.dp, Color.Gray)
+    ) {
+        Column(Modifier.padding(5.dp)) {
+            val options = optionsKey[field.fieldId]!!
+            var table by remember(optionsFields) {
+                mutableStateOf(
+                    optionsFields[field.fieldId] ?: Table(
+                        options,
+                        field.fieldId
+                    )
+                )
+            }
+            Row {
+                Box(
+                    Modifier.height(30.dp)
+                        .padding { paddingHorizontal(10.dp) }, contentAlignment = Alignment.Center
+                ) {
+                    Text(field.fieldName)
+                }
+                IconButton({
+                    BhUIEvent.UpdateOptionV(field.fieldId, table.copy { createRow() })
+                        .sendTo(businessHandlerScreenModel)
+                }, Modifier.height(30.dp)) {
+                    Icon(Icons.Default.Add, "")
+                }
+            }
+            /*
+            表头
+             */
+            Row(
+                Modifier.height(IntrinsicSize.Min),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                options.forEach {
+                    Box(
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(30.dp)
+                            .border(1.dp, Color.Gray),
+                        contentAlignment = Alignment.Center // 水平 + 垂直居中
+                    ) {
+                        Text(it)
+                    }
+                }
+            }
+
+
+            var rIndex = 0
+            for (row in table.table()) {
+
+                Row(
+                    Modifier.height(IntrinsicSize.Min),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    var cIndex = 0
+                    for ((key, value) in row) {
+                        Box(
+                            modifier = Modifier
+                                .width(100.dp)
+                                .height(30.dp)
+                                .border(1.dp, Color.Gray),
+                            contentAlignment = Alignment.Center // 水平 + 垂直居中
+                        ) {
+                            var va by remember(value) { mutableStateOf(value) }
+
+                            BasicTextField(
+                                value = va,
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(2.dp, 0.dp),
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 12.sp,
+                                    textAlign = TextAlign.Center // 水平居中
+                                ),
+                                onValueChange = { newValue ->
+                                    va = newValue
+                                    BhUIEvent.UpdateOptionV(
+                                        field.fieldId,
+                                        table.copy {
+                                            updateRow(row.copy(key, newValue))
+                                        }).sendTo(businessHandlerScreenModel)
+                                }
+                            )
+                        }
+
+                        cIndex++
+                    }
+                }
+
+                rIndex++
+            }
+
         }
     }
 }

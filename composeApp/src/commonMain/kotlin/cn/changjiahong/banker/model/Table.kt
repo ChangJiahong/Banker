@@ -10,7 +10,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlin.collections.iterator
 
 fun String.isTableType(): Boolean {
-    return this in arrayOf("ROW_TABLE")
+    return this in listOf("ROW_TABLE", "COL_TABLE", "TABLE")
 }
 
 class Table(

@@ -175,7 +175,7 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(
                                 },
                                 enableEdit = false,
                                 label = "字段类型",
-                                modifier = Modifier.width(180.dp)
+                                modifier = Modifier.width(160.dp)
                                     .padding { paddingHorizontal(2.dp) }
                             )
 
