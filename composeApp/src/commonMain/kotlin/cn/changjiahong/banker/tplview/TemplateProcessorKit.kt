@@ -32,8 +32,8 @@ object TemplateKit : TemplateProcessor {
     private fun PlatformFile.getTempProcessor(): TemplateProcessor {
         return when (FileType.getFileType(extension)) {
             FileType.PDF -> PDFTempProcessor
-            FileType.DOC, FileType.DOCX -> WordTemplateProcessor
-            FileType.XLS, FileType.XLSX -> ExcelTemplateProcessor
+            FileType.DOCX -> WordTemplateProcessor
+            FileType.XLSX -> ExcelTemplateProcessor
             else -> throw Exception("不受支持的文件类型")
         }
     }

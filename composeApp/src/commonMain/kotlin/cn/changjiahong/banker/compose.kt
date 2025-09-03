@@ -342,8 +342,8 @@ fun FoldersButton(
                     when (FileType.getFileType(fileType)) {
                         FileType.PDF -> Res.drawable.pdf
                         FileType.DIR -> Res.drawable.dir
-                        FileType.DOC, FileType.DOCX -> Res.drawable.word
-                        FileType.XLS, FileType.XLSX -> Res.drawable.excel
+                        FileType.DOCX -> Res.drawable.word
+                        FileType.XLSX -> Res.drawable.excel
                         else -> Res.drawable.unknown_file
                     }
                 ),
@@ -463,7 +463,7 @@ fun InputView(
                 } else null,
             shape = RoundedCornerShape(15.dp),
 
-        )
+            )
 
     }
 }

@@ -1,5 +1,6 @@
 package cn.changjiahong.banker.app.business_handle
 
+import androidx.compose.runtime.mutableStateMapOf
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.Template
@@ -20,10 +21,8 @@ import cn.changjiahong.banker.service.FieldService
 import cn.changjiahong.banker.service.TemplateService
 import cn.changjiahong.banker.service.UserService
 import cn.changjiahong.banker.storage.FileType
-import cn.changjiahong.banker.storage.FileType.DOC
 import cn.changjiahong.banker.storage.FileType.DOCX
 import cn.changjiahong.banker.storage.FileType.PDF
-import cn.changjiahong.banker.storage.FileType.XLS
 import cn.changjiahong.banker.storage.FileType.XLSX
 import cn.changjiahong.banker.uieffect.GoDIREffect
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,6 +40,7 @@ class BusinessHandlerScreenModel(
     private val _clientelesData = MutableStateFlow<List<UserInfo>>(listOf())
     val clientelesData = _clientelesData.asStateFlow()
 
+    private var dataFields = listOf<FieldConfig>()
 
     /**
      * 基本信息
@@ -53,6 +53,9 @@ class BusinessHandlerScreenModel(
 
     private val _fieldValues = MutableStateFlow<Map<Long, FieldVal>>(emptyMap())
     val fieldValues = _fieldValues.asStateFlow()
+
+    val fieldErrorMsg = mutableStateMapOf<Long, String>()
+
 
     private val _optionsKey = MutableStateFlow<Map<Long, List<String>>>(emptyMap())
     val optionsKey = _optionsKey.asStateFlow()
@@ -79,6 +82,7 @@ class BusinessHandlerScreenModel(
 
     override fun handleEvent(event: UiEvent) {
         when (event) {
+            is BhUIEvent.Resume -> load()
             is BhUIEvent.NewClientele -> newClientele()
 
             is BhUIEvent.EditClientele -> editClientele()
@@ -154,6 +158,10 @@ class BusinessHandlerScreenModel(
 
 
     init {
+        load()
+    }
+
+    private fun load() {
         loadClientele()
         loadTemplates()
         loadFieldConfigs()
@@ -183,7 +191,9 @@ class BusinessHandlerScreenModel(
     fun loadFieldConfigs() {
         screenModelScope.launch {
             fieldService.getFieldConfigsForBiz(business.id).catchAndCollect { data ->
-                _basicFields.value = data.filter { f -> f.bId == -1L }
+                dataFields = data
+
+                _basicFields.value = data.filter { f -> f.bId == -1L }.sortedBy { it.weight }
 
                 val tableFields = data.filter { f ->
                     f.fieldType.isTableType()
@@ -192,7 +202,7 @@ class BusinessHandlerScreenModel(
                 _optionsKey.value =
                     tableFields.associate { it.fieldId to (it.options ?: "").split(",") }
 
-                _bizFields.value = data.filterNot { f -> f.bId == -1L }
+                _bizFields.value = data.filterNot { f -> f.bId == -1L }.sortedBy { it.weight }
             }
 
         }
@@ -204,17 +214,33 @@ class BusinessHandlerScreenModel(
 //        ) {
 //            return
 //        }
+        fieldErrorMsg.clear()
 
-        val state = uiState.value
+        _fieldValues.value.values.forEach { v ->
+            if (v.fieldValue.isNotBlank()) {
+                val config = dataFields.find { it.fieldId == v.fieldId }
+                if (config==null||config.validationRule.isBlank()){
+                    return@forEach
+                }
+                if (!v.fieldValue.matches(config.validationRule.toRegex())){
+                    fieldErrorMsg[v.fieldId] = "格式错误"
+                }
+            }
+        }
+
+        if (fieldErrorMsg.isNotEmpty()){
+            return
+        }
 
         screenModelScope.launch {
 
             val fv = _fieldValues.value.toMutableMap()
 
-
             _optionsFields.value.forEach { (key, value) ->
                 fv[key] = FieldVal(value.fieldIds, value.fieldValueId, value.toFieldValue())
             }
+
+
 
             fieldService.saveFieldValues(
                 currentlySelected.value?.uid,
@@ -283,7 +309,7 @@ class BusinessHandlerScreenModel(
             templateService.fillFromToTemplate(user.uid, business.id, template).catchAndCollect {
                 when (FileType.getFileType(template.fileType)) {
                     PDF -> GoDIREffect(RR.DIR_PRE_TEMPLATE(it)).trigger()
-                    DOC, DOCX, XLS, XLSX -> {
+                    DOCX, XLSX -> {
                         openOtherSoftwareDialog.show() {
                             systemOpen(it)
                             openOtherSoftwareDialog.dismiss()
