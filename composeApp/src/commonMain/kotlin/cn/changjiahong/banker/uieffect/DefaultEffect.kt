@@ -4,7 +4,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
-import cn.changjiahong.banker.composable.DialogState
 import cn.changjiahong.banker.composable.TipState
 import cn.changjiahong.banker.mvi.UiEffect
 import cn.changjiahong.banker.mvi.UiEvent

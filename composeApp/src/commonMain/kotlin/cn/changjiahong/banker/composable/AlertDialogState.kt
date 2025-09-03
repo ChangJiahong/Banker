@@ -1,6 +1,6 @@
 package cn.changjiahong.banker.composable
 
-class AlertDialogState : DialogState() {
+class AlertDialogState : VisibleState() {
     private var _ok: () -> Unit = {}
     val ok get() = _ok
 

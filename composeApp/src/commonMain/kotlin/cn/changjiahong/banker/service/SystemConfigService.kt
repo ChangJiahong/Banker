@@ -9,4 +9,8 @@ interface SystemConfigService {
 
     fun savePwd(pwd: String): Flow<NoData>
 
+    fun isFirstStart(): Flow<Boolean>
+
+    fun unFirstStart(): Flow<NoData>
+
 }

@@ -3,10 +3,9 @@ package cn.changjiahong.banker.app.about.settings.business
 import cafe.adriel.voyager.core.model.screenModelScope
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.app.RR
-import cn.changjiahong.banker.composable.DialogState
+import cn.changjiahong.banker.composable.VisibleState
 import cn.changjiahong.banker.model.Biz
 import cn.changjiahong.banker.mvi.MviScreenModel
-import cn.changjiahong.banker.mvi.UiEffect
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.service.BusinessService
 import cn.changjiahong.banker.uieffect.GoEffect
@@ -38,7 +37,7 @@ class BusinessSettingScreenModel(val businessService: BusinessService) : MviScre
     private val _dialogBiz = MutableStateFlow(Biz())
     val dialogBiz = _dialogBiz.asStateFlow()
 
-    val popupDialogState = DialogState()
+    val popupVisibleState = VisibleState()
 
     override fun handleEvent(event: UiEvent) {
         when (event) {
@@ -50,14 +49,14 @@ class BusinessSettingScreenModel(val businessService: BusinessService) : MviScre
                 _dialogBiz.update {
                     event.biz
                 }
-                popupDialogState.show()
+                popupVisibleState.show()
             }
 
             is BusinessSettingsUiEvent.ShowAddDialog->{
                 _dialogBiz.update {
                     Biz()
                 }
-                popupDialogState.show()
+                popupVisibleState.show()
             }
             is BusinessSettingsUiEvent.UpdateBusiness -> {
                 _dialogBiz.update {
@@ -75,7 +74,7 @@ class BusinessSettingScreenModel(val businessService: BusinessService) : MviScre
         screenModelScope.launch {
             businessService.saveBusiness(_dialogBiz.value)
                 .catchAndCollect {
-                    popupDialogState.dismiss()
+                    popupVisibleState.dismiss()
                     toast("保存成功")
                 }
         }

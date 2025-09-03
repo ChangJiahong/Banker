@@ -8,7 +8,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 
-class TipState() : DialogState() {
+class TipState() : VisibleState() {
     private var _tip: String = ""
     private var _title: String = ""
     val tip get() = _tip

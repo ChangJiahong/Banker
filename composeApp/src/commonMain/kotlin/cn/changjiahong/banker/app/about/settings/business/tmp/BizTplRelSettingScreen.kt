@@ -30,9 +30,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.add_box
-import banker.composeapp.generated.resources.add_diamond
 import banker.composeapp.generated.resources.forms_add
-import banker.composeapp.generated.resources.home
 import banker.composeapp.generated.resources.search
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -41,9 +39,9 @@ import cn.changjiahong.banker.FoldersButton
 import cn.changjiahong.banker.RightClickMenu
 import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.composable.PopupDialog
-import cn.changjiahong.banker.composable.DialogState
+import cn.changjiahong.banker.composable.VisibleState
 import cn.changjiahong.banker.composable.RoundedInputField
-import cn.changjiahong.banker.composable.rememberDialogState
+import cn.changjiahong.banker.composable.rememberVisibleState
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parameterArrayOf
 
@@ -70,7 +68,7 @@ fun BusinessTmpDetailScreen.BusinessTmpDetailView(
     modifier: Modifier,
     businessTmpDetailScreenModel: BusinessTmpDetailScreenModel
 ) {
-    val popupDialogState = rememberDialogState()
+    val popupDialogState = rememberVisibleState()
 
     val tmpDetails by businessTmpDetailScreenModel.tmpDetails.collectAsState()
     LazyVerticalGrid(
@@ -114,13 +112,13 @@ fun BusinessTmpDetailScreen.BusinessTmpDetailView(
 
 @Composable
 fun AddTemplateDialog(
-    popupDialogState: DialogState,
+    popupVisibleState: VisibleState,
     businessTmpDetailScreenModel: BusinessTmpDetailScreenModel
 ) {
     businessTmpDetailScreenModel.handleEffect {
         when (it) {
             is BusinessTmpDetailUiEffect.AddTempSuccess -> {
-                popupDialogState.dismiss()
+                popupVisibleState.dismiss()
                 true
             }
 
@@ -128,7 +126,7 @@ fun AddTemplateDialog(
         }
     }
 
-    PopupDialog(popupDialogState, title = "添加模版", Modifier.fillMaxSize(0.8f)) {
+    PopupDialog(popupVisibleState, title = "添加模版", Modifier.fillMaxSize(0.8f)) {
 
         var se by remember { mutableStateOf("") }
 

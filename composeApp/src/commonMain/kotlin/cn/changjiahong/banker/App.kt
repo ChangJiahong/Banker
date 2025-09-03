@@ -9,7 +9,6 @@ import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import cn.changjiahong.banker.app.RR
 import cn.changjiahong.banker.composable.TipDialog
-import cn.changjiahong.banker.composable.rememberDialogState
 import cn.changjiahong.banker.composable.rememberTipState
 import cn.changjiahong.banker.uieffect.NavigatorEffectRegister
 import cn.changjiahong.banker.uieffect.TipDialogRegister

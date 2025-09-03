@@ -3,6 +3,7 @@ package cn.changjiahong.banker.app
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.app.about.AboutScreen
+import cn.changjiahong.banker.app.about.settings.PwdSettingScreen
 import cn.changjiahong.banker.app.about.settings.business.BusinessSettingScreen
 import cn.changjiahong.banker.app.about.settings.business.tmp.BusinessFieldConfigScreen
 import cn.changjiahong.banker.app.about.settings.business.tmp.BusinessTmpDetailScreen
@@ -27,6 +28,8 @@ object RR {
 
     val HOME = HomeScreen
     val ABOUT = AboutScreen
+
+    val PWD_SETTING=  PwdSettingScreen
 
 
     val OPTIONS_DIR = OptionsDirScreen

@@ -6,7 +6,7 @@ import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.FieldConfig
 import cn.changjiahong.banker.app.RR
 import cn.changjiahong.banker.composable.AlertDialogState
-import cn.changjiahong.banker.composable.DialogState
+import cn.changjiahong.banker.composable.VisibleState
 import cn.changjiahong.banker.model.FieldVal
 import cn.changjiahong.banker.model.Table
 import cn.changjiahong.banker.model.UserInfo
@@ -74,7 +74,7 @@ class BusinessHandlerScreenModel(
     private val _uiState by lazy { MutableStateFlow(BhUiState()) }
     val uiState = _uiState.asStateFlow()
 
-    val clienteleDialog = DialogState()
+    val clienteleDialog = VisibleState()
     val openOtherSoftwareDialog = AlertDialogState()
 
     override fun handleEvent(event: UiEvent) {

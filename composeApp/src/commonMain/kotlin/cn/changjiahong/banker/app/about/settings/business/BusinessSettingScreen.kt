@@ -29,9 +29,9 @@ import cn.changjiahong.banker.FoldersButton
 import cn.changjiahong.banker.RightClickMenu
 import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.composable.PopupDialog
-import cn.changjiahong.banker.composable.DialogState
+import cn.changjiahong.banker.composable.VisibleState
 import cn.changjiahong.banker.composable.RoundedInputField
-import cn.changjiahong.banker.composable.rememberDialogState
+import cn.changjiahong.banker.composable.rememberVisibleState
 import cn.changjiahong.banker.model.Biz
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
@@ -56,7 +56,7 @@ fun BusinessGridView(
     modifier: Modifier = Modifier,
     businessSettingScreenModel: BusinessSettingScreenModel
 ) {
-    val popupDialogState = rememberDialogState()
+    val popupDialogState = rememberVisibleState()
 
     val businessList by businessSettingScreenModel.businessList.collectAsState()
 
@@ -95,10 +95,10 @@ fun BusinessGridView(
 
 @Composable
 fun AddBusinessDialog(
-    popupDialogState: DialogState,
+    popupVisibleState: VisibleState,
     businessSettingScreenModel: BusinessSettingScreenModel
 ) {
-    val popupDialogState = businessSettingScreenModel.popupDialogState
+    val popupDialogState = businessSettingScreenModel.popupVisibleState
 
     val dialogBiz by businessSettingScreenModel.dialogBiz.collectAsState()
 

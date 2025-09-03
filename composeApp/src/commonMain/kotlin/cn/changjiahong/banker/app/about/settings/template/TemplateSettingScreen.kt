@@ -25,8 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.add_box
-import banker.composeapp.generated.resources.home
-import banker.composeapp.generated.resources.search
 import banker.composeapp.generated.resources.unarchive
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -34,9 +32,9 @@ import cn.changjiahong.banker.FoldersButton
 import cn.changjiahong.banker.RightClickMenu
 import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.composable.PopupDialog
-import cn.changjiahong.banker.composable.DialogState
+import cn.changjiahong.banker.composable.VisibleState
 import cn.changjiahong.banker.composable.RoundedInputField
-import cn.changjiahong.banker.composable.rememberDialogState
+import cn.changjiahong.banker.composable.rememberVisibleState
 import cn.changjiahong.banker.storage.FileType
 import cn.changjiahong.banker.uieffect.Toast
 import cn.changjiahong.banker.utils.padding
@@ -66,7 +64,7 @@ fun TempFileGridView(
     tempSettingScreenModel: TemplateSettingScreenModel
 ) {
 
-    val popupDialogState = rememberDialogState()
+    val popupDialogState = rememberVisibleState()
 
     val tempFiles by tempSettingScreenModel.tempFiles.collectAsState()
     LazyVerticalGrid(
@@ -112,19 +110,19 @@ fun TempFileGridView(
 
 @Composable
 fun AddDocTemplate(
-    popupDialogState: DialogState,
+    popupVisibleState: VisibleState,
     tempSettingScreenModel: TemplateSettingScreenModel
 ) {
     tempSettingScreenModel.handleEffect {
         when(it){
             is TempSettingUiEffect.AddTempSuccess ->{
-                popupDialogState.dismiss()
+                popupVisibleState.dismiss()
                 true
             }
             else -> false
         }
     }
-    PopupDialog(popupDialogState, title = "添加模版文件", modifier = Modifier.fillMaxWidth(0.6f)) {
+    PopupDialog(popupVisibleState, title = "添加模版文件", modifier = Modifier.fillMaxWidth(0.6f)) {
         var filePath by remember { mutableStateOf("") }
         var selectFile by remember { mutableStateOf<PlatformFile?>(null) }
 

@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -21,27 +20,25 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.cancel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import org.jetbrains.compose.resources.painterResource
 
 
 @Composable
 fun PopupDialog(
-    popupDialogState: DialogState,
+    popupVisibleState: VisibleState,
     title: String = "",
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
 
-    val visible by popupDialogState.visible.collectAsState()
+    val visible by popupVisibleState.visible.collectAsState()
     if (!visible) {
         return
     }
 
     Popup(
         alignment = Alignment.Center,
-        onDismissRequest = { popupDialogState.dismiss() },
+        onDismissRequest = { popupVisibleState.dismiss() },
         properties = PopupProperties(focusable = true)
     ) {
 
@@ -66,7 +63,7 @@ fun PopupDialog(
                     // 右侧
                     Box(Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
 
-                        IconButton({ popupDialogState.dismiss() }, modifier = Modifier) {
+                        IconButton({ popupVisibleState.dismiss() }, modifier = Modifier) {
                             Icon(
                                 painter = painterResource(Res.drawable.cancel),
                                 contentDescription = ""
