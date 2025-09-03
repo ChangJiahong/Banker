@@ -16,8 +16,8 @@ sealed interface PwdSettingEvent : UiEvent {
     object Submit : PwdSettingEvent
 }
 
-sealed interface PwdSettingEffect: UiEffect{
-    object SaveSuccess: PwdSettingEffect
+sealed interface PwdSettingEffect : UiEffect {
+    object SaveSuccess : PwdSettingEffect
 }
 
 @Factory
@@ -38,7 +38,7 @@ class PwdSettingViewModel(val systemConfigService: SystemConfigService) : MviScr
     }
 
     private fun submit(oldPwd: String, newPwd: String, newPwd2: String) {
-        if (oldPwd.isBlank() || newPwd.isBlank() || newPwd2.isBlank()){
+        if (oldPwd.isBlank() || newPwd.isBlank() || newPwd2.isBlank()) {
             _error.update { "请输入密码" }
             return
         }
@@ -51,17 +51,31 @@ class PwdSettingViewModel(val systemConfigService: SystemConfigService) : MviScr
             return
         }
         screenModelScope.launch {
-            systemConfigService.getPwd().catchAndCollect {
-                if (newPwd != it) {
-                    _error.update { "原密码错误" }
+            systemConfigService.isFirstStart().catchAndCollect {
+                if (it) {
+                    if (oldPwd != "111111") {
+                        _error.update { "原密码错误" }
+                    } else {
+                        systemConfigService.savePwd(newPwd).catchAndCollect {
+                            systemConfigService.unFirstStart().catchAndCollect {
+                                PwdSettingEffect.SaveSuccess.trigger()
+                            }
+                        }
+                    }
                 } else {
-                    systemConfigService.savePwd(newPwd).catchAndCollect {
-                        systemConfigService.unFirstStart().catchAndCollect {
-                            PwdSettingEffect.SaveSuccess.trigger()
+                    systemConfigService.getPwd().catchAndCollect {
+                        if (oldPwd != it) {
+                            _error.update { "原密码错误" }
+                        } else {
+                            systemConfigService.savePwd(newPwd).catchAndCollect {
+                                PwdSettingEffect.SaveSuccess.trigger()
+                            }
                         }
                     }
                 }
             }
+
         }
+
     }
 }

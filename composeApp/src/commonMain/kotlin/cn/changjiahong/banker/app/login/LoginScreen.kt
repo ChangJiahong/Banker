@@ -56,9 +56,6 @@ fun LoginView(loginViewModel: LoginViewModel) {
         modifier = Modifier.padding { paddingBottom(180.dp) }) {
         val focusRequester = remember { FocusRequester() }
 
-        LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
-        }
         OutlinedTextField(
             label = {
                 Text(
@@ -96,5 +93,8 @@ fun LoginView(loginViewModel: LoginViewModel) {
             Text("确定", fontSize = 18.sp)
         }
 
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+        }
     }
 }

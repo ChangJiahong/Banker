@@ -51,5 +51,5 @@ object PwdConfigItem: MenusConfig{
     override val menuIcon: DrawableResource
         get() = Res.drawable.security
     override val screen: Screen?
-        get() = null
+        get() = RR.PWD_SETTING
 }

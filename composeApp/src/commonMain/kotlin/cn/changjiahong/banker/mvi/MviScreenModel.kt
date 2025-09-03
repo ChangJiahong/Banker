@@ -95,8 +95,12 @@ abstract class MviScreenModel : ScreenModel, KoinComponent {
         _handleEffect = { if (!handle(it)) oldHandler(it) }
     }
 
-    suspend fun <T> Flow<T>.catchAndCollect(collector: FlowCollector<T>) {
+    suspend fun <T> Flow<T>.catchAndCollect(
+        action: suspend FlowCollector<T>.(cause: Throwable) -> Unit = {},
+        collector: FlowCollector<T>
+    ) {
         catch {
+            action(it)
             it.printStackTrace()
             toast(it.message ?: it.stackTraceToString())
         }.collect(collector)

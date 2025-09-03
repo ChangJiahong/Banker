@@ -43,7 +43,7 @@ class LoginViewModel(val systemConfigService: SystemConfigService) : MviScreenMo
 
         screenModelScope.launch {
             loadingState.show()
-            systemConfigService.isFirstStart().catchAndCollect {
+            systemConfigService.isFirstStart().catchAndCollect({ loadingState.dismiss() }) {
                 if (it) {
                     loadingState.dismiss()
                     if (pwd == "111111") {
