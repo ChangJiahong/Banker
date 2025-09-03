@@ -1,0 +1,19 @@
+CREATE TABLE SystemConfig (
+key     TEXT PRIMARY KEY UNIQUE NOT NULL,
+value   TEXT NOT NULL,
+created         INTEGER  NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+select:
+SELECT *
+FROM SystemConfig
+WHERE key=?;
+
+insert:
+INSERT INTO SystemConfig(key,value)
+VALUES (?,?);
+
+update:
+UPDATE SystemConfig
+SET value = ?
+WHERE key = ?;

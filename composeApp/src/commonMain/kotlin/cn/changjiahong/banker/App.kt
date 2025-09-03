@@ -31,7 +31,7 @@ val appModules: List<Module>
 @Composable
 @Preview
 fun App() {
-    Navigator(RR.MAIN) { globalNavigator ->
+    Navigator(RR.LOGIN) { globalNavigator ->
         CompositionLocalProvider(GlobalNavigator providesDefault globalNavigator) {
 
             NavigatorEffectRegister(globalNavigator)
