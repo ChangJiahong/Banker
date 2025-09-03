@@ -85,7 +85,7 @@ object LoginScreen : Screen {
                         LoginEvent.Login.sendTo(loginViewModel)
                     }),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-//                    visualTransformation = PasswordVisualTransformation('*'),
+                    visualTransformation = PasswordVisualTransformation('*'),
                     singleLine = true,
                 )
 
