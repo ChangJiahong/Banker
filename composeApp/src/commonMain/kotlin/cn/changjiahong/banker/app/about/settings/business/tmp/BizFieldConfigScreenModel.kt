@@ -42,7 +42,7 @@ class BusinessFieldConfigScreenModel(
         when (event) {
             is ConfigUiEvent.Add -> {
                 _businessFiledConfigs.update {
-                    it + FieldConf(bId = business.id)
+                    it + FieldConf(bId = business.id, weight = it.size)
                 }
                 _businessFiledErrors.update {
                     it + FieldConfError()
@@ -74,18 +74,14 @@ class BusinessFieldConfigScreenModel(
             val be = mutableListOf<FieldConfError>()
             bf.forEachIndexed { index, field ->
                 var fE = ""
-                var dE = ""
                 if (field.fieldName.isEmpty()) {
                     fE = "字段名称不能为空"
                 }
-                if (field.alias.isEmpty()) {
-                    dE = "描述不能为空"
-                }
-                val error = FieldConfError(fE, dE, "")
+                val error = FieldConfError(fE, "")
                 be.add(error)
             }
 
-            if (be.any { b -> b.fieldName.isNotEmpty() || b.alias.isNotEmpty() || b.validationRule.isNotEmpty() }) {
+            if (be.any { b -> b.fieldName.isNotEmpty() }) {
                 _businessFiledErrors.value = be
                 return@launch
             }
@@ -113,12 +109,19 @@ class BusinessFieldConfigScreenModel(
                 _businessFiledConfigs.value = it.map { field ->
                     field.run {
                         FieldConf(
-                            fieldId, bId, fieldName,
+                            fieldId,
+                            bId,
+                            fieldName,
                             fieldType,
-                            alias, width.toInt(), options?:"",validationRule, field.forced > 0
+                            alias,
+                            width.toInt(),
+                            options ?: "",
+                            weight.toInt(),
+                            validationRule,
+                            field.forced > 0
                         )
                     }
-                }
+                }.sortedBy { it.weight }
             }
 
 

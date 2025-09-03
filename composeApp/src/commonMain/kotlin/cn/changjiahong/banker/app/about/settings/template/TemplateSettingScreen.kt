@@ -31,11 +31,14 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.FoldersButton
 import cn.changjiahong.banker.RightClickMenu
 import cn.changjiahong.banker.ScaffoldWithTopBar
+import cn.changjiahong.banker.app.business_handle.BhUIEvent
 import cn.changjiahong.banker.composable.PopupDialog
 import cn.changjiahong.banker.composable.VisibleState
 import cn.changjiahong.banker.composable.RoundedInputField
 import cn.changjiahong.banker.composable.rememberVisibleState
+import cn.changjiahong.banker.platform.systemOpen
 import cn.changjiahong.banker.storage.FileType
+import cn.changjiahong.banker.storage.platformFile
 import cn.changjiahong.banker.uieffect.Toast
 import cn.changjiahong.banker.utils.padding
 import io.github.vinceglb.filekit.PlatformFile
@@ -75,9 +78,9 @@ fun TempFileGridView(
         itemsIndexed(tempFiles) { index, item ->
             RightClickMenu(menu = {
                 DropdownMenuItem(text = {
-                    Text("预览")
+                    Text("第三方预览")
                 }, onClick = {
-                    TempSettingUiEvent.GoPreTemplateScreen(item).sendTo(tempSettingScreenModel)
+                    systemOpen(item.filePath.platformFile)
                     it()
                 })
                 DropdownMenuItem(text = {

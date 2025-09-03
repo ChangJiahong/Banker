@@ -23,6 +23,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -54,14 +56,6 @@ fun BusinessHandlerScreen.BusinessHandlerView(
     val openAlertDialog = businessHandlerScreenModel.clienteleDialog
     val openOtherSoftwareDialog = businessHandlerScreenModel.openOtherSoftwareDialog
 
-    val uiState by businessHandlerScreenModel.uiState.collectAsState()
-
-    businessHandlerScreenModel.handleEffect { effect ->
-        when (effect) {
-
-        }
-        false
-    }
 
     Row {
         Column(modifier = Modifier.width(400.dp)) {
@@ -77,6 +71,11 @@ fun BusinessHandlerScreen.BusinessHandlerView(
                     BhUIEvent.EditClientele.sendTo(businessHandlerScreenModel)
                 }) {
                     Text("编辑")
+                }
+                Button({
+                    BhUIEvent.Resume.sendTo(businessHandlerScreenModel)
+                }) {
+                    Text("刷新")
                 }
             }
 

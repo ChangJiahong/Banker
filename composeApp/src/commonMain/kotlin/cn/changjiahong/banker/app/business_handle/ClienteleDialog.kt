@@ -49,6 +49,7 @@ import cn.changjiahong.banker.model.Table
 import cn.changjiahong.banker.model.isTableType
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
+import kotlin.collections.getValue
 
 /**
  *
@@ -72,6 +73,7 @@ fun ClienteleDialog(
             val uiState by businessHandlerScreenModel.uiState.collectAsState()
 
             val fieldValues by businessHandlerScreenModel.fieldValues.collectAsState()
+            val fieldErrorMsg = businessHandlerScreenModel.fieldErrorMsg
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("基本信息", modifier = Modifier.padding(10.dp, 0.dp), fontSize = 24.sp)
@@ -85,7 +87,6 @@ fun ClienteleDialog(
                 modifier = Modifier.fillMaxWidth().padding(10.dp)
             ) {
                 val basicFields by businessHandlerScreenModel.basicFields.collectAsState()
-
                 basicFields.forEachIndexed { index, field ->
 
                     var fieldVal by remember {
@@ -112,7 +113,7 @@ fun ClienteleDialog(
                                     ).sendTo(businessHandlerScreenModel)
 
                                 },
-//                        errorText = uiState.usernameError,
+                                errorText = fieldErrorMsg[field.fieldId] ?: "",
                             )
                         }
 
@@ -162,7 +163,7 @@ fun ClienteleDialog(
                                     ).sendTo(businessHandlerScreenModel)
 
                                 },
-                                errorText = uiState.fieldErrorMsg[field.fieldName] ?: "",
+                                errorText = fieldErrorMsg[field.fieldId] ?: "",
                             )
                         }
 

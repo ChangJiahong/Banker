@@ -37,7 +37,7 @@ class GlobalFieldSettingScreenModel(
         when (event) {
             is ConfigUiEvent.Add -> {
                 _fieldConfigs.update {
-                    it + FieldConf(bId = -1)
+                    it + FieldConf(bId = -1, weight = it.size)
                 }
                 _filedErrors.update {
                     it + FieldConfError()
@@ -69,18 +69,14 @@ class GlobalFieldSettingScreenModel(
             val be = mutableListOf<FieldConfError>()
             bf.forEachIndexed { index, field ->
                 var fE = ""
-                var dE = ""
                 if (field.fieldName.isEmpty()) {
                     fE = "字段名称不能为空"
                 }
-                if (field.alias.isEmpty()) {
-                    dE = "描述不能为空"
-                }
-                val error = FieldConfError(fE, dE, "")
+                val error = FieldConfError(fE,  )
                 be.add(error)
             }
 
-            if (be.any { b -> b.fieldName.isNotEmpty() || b.alias.isNotEmpty() || b.validationRule.isNotEmpty() }) {
+            if (be.any { b -> b.fieldName.isNotEmpty()  }) {
                 _filedErrors.value = be
                 return@launch
             }
@@ -112,12 +108,13 @@ class GlobalFieldSettingScreenModel(
                             fieldType,
                             alias,
                             width.toInt(),
-                            options?:"",
+                            options ?: "",
+                            weight.toInt(),
                             validationRule,
                             forced == 1L
                         )
                     }
-                }
+                }.sortedBy { it.weight }
             }
         }
     }
