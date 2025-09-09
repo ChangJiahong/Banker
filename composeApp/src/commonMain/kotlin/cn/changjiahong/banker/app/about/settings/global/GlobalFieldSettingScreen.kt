@@ -24,6 +24,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,10 +54,14 @@ import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.app.about.settings.business.tmp.BFieldConfigScreenUiEvent
 import cn.changjiahong.banker.composable.BooleanFieldDropdown
 import cn.changjiahong.banker.composable.HoverDeleteBox
+import cn.changjiahong.banker.composable.SwitchButton
 import cn.changjiahong.banker.composable.TextFieldDropdown
 import cn.changjiahong.banker.model.fieldTypes
+import cn.changjiahong.banker.model.isTableType
 import cn.changjiahong.banker.platform.HorizontalScrollbar
 import cn.changjiahong.banker.utils.padding
+import com.alorma.compose.settings.ui.SettingsRadioButton
+import com.alorma.compose.settings.ui.SettingsSwitch
 import org.jetbrains.compose.resources.painterResource
 
 class GlobalFieldSettingScreen : Screen {
@@ -94,19 +99,8 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(
         }
     }
     Column(modifier.padding { paddingHorizontal(30.dp) }) {
-        val fields by fieldConfigScreenModel.filedConfigs.collectAsState()
-        val filedErrors by fieldConfigScreenModel.filedErrors.collectAsState()
-
-//        Row(Modifier.padding {
-//            paddingVertical(5.dp)
-//        }, verticalAlignment = Alignment.CenterVertically) {
-//            Text("业务信息", fontSize = 24.sp)
-//            IconButton({
-//                ConfigUiEvent.Add.sendTo(fieldConfigScreenModel)
-//            }) {
-//                Icon(painter = painterResource(Res.drawable.home), contentDescription = "")
-//            }
-//        }
+        val metaConfigs by fieldConfigScreenModel.metaConfigs.collectAsState()
+        val errors by fieldConfigScreenModel.errors.collectAsState()
 
         Button({
             ConfigUiEvent.Save.sendTo(fieldConfigScreenModel)
@@ -120,9 +114,9 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(
             paddingVertical(5.dp)
         }) {
             val verticalScrollState = rememberScrollState()
-            LaunchedEffect(fields.size) {
+            LaunchedEffect(metaConfigs.size) {
                 // 滚动到底部
-                if (fields.isNotEmpty()) {
+                if (metaConfigs.isNotEmpty()) {
                     verticalScrollState.animateScrollTo(verticalScrollState.maxValue)
                 }
             }
@@ -132,8 +126,8 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(
             ) {
                 var ind = remember { 1 }
                 Column(Modifier.wrapContentWidth()) {
-                    fields.forEachIndexed { index, uField ->
-                        if (uField.isDelete) {
+                    metaConfigs.forEachIndexed { index, uiMeta ->
+                        if (uiMeta.isDelete) {
                             return@forEachIndexed
                         }
                         Row(
@@ -141,9 +135,9 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
 
-                            val bfe = filedErrors[index]
+                            val bfe = errors[index]
 
-                            var item by remember(uField) { mutableStateOf(uField) }
+                            var item by remember(uiMeta) { mutableStateOf(uiMeta) }
                             var error by remember(bfe) { mutableStateOf(bfe) }
 
                             HoverDeleteBox((ind++).toString(), Modifier.padding {
@@ -154,23 +148,23 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(
                             }
 
                             InputView(
-                                value = item.fieldName,
+                                value = item.label,
                                 onValueChange = {
-                                    item = item.copy(fieldName = it)
+                                    item = item.copy(label = it)
                                     GlobalConfigUiEvent.Update(index, item)
                                         .sendTo(fieldConfigScreenModel)
                                 },
                                 label = "字段名",
-                                errorText = error.fieldName,
+                                errorText = error.label,
                                 readOnly = false,
                                 modifier = Modifier.width(150.dp)
                                     .padding { paddingHorizontal(2.dp) }
                             )
                             TextFieldDropdown(
                                 fieldTypes(),
-                                item.fieldType,
+                                item.metaType,
                                 onValueChange = {
-                                    item = item.copy(fieldType = it)
+                                    item = item.copy(metaType = it)
                                     GlobalConfigUiEvent.Update(index, item)
                                         .sendTo(fieldConfigScreenModel)
                                 },
@@ -180,17 +174,25 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(
                                     .padding { paddingHorizontal(2.dp) }
                             )
 
-                            BooleanFieldDropdown(
-                                value = item.forced,
-                                onValueChange = {
+                            SwitchButton(
+                                Modifier.padding { paddingHorizontal(2.dp) },
+                                checked = item.forced, label = "必输项", onCheckedChange = {
                                     item = item.copy(forced = it)
                                     GlobalConfigUiEvent.Update(index, item)
                                         .sendTo(fieldConfigScreenModel)
-                                },
-                                label = "是否必输项",
-                                modifier = Modifier.width(100.dp)
-                                    .padding { paddingHorizontal(2.dp) }
-                            )
+                                })
+
+                            SwitchButton(
+                                Modifier.padding { paddingHorizontal(2.dp) },
+                                checked = item.isGlobal,
+                                label = "全局共享",
+                                onCheckedChange = {
+                                    item = item.copy(isGlobal = it)
+                                    GlobalConfigUiEvent.Update(index, item)
+                                        .sendTo(fieldConfigScreenModel)
+                                })
+
+
                             InputView(
                                 value = item.width.toString(),
                                 onValueChange = { newValue ->
@@ -206,25 +208,25 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(
                                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                                 label = "长度",
                                 errorText = error.width,
-                                modifier = Modifier.width(80.dp)
+                                modifier = Modifier.width(90.dp)
                                     .padding { paddingHorizontal(2.dp) }
                             )
                             InputView(
-                                value = item.validationRule,
+                                value = item.validation,
                                 onValueChange = {
-                                    item = item.copy(validationRule = it)
+                                    item = item.copy(validation = it)
                                     GlobalConfigUiEvent.Update(index, item)
                                         .sendTo(fieldConfigScreenModel)
 
                                 },
                                 label = "校验规则",
-                                errorText = error.validationRule,
+                                errorText = error.validation,
                                 modifier = Modifier.width(160.dp)
                                     .padding { paddingHorizontal(2.dp) }
                             )
 
 
-                            if (item.fieldType in listOf("ROW_TABLE", "COL_TABLE", "TABLE")) {
+                            if (item.metaType.isTableType()) {
                                 InputView(
                                     value = item.options,
                                     onValueChange = {
@@ -235,7 +237,7 @@ private fun GlobalFieldSettingScreen.ExtendFieldSettingView(
                                     label = "选项列表",
                                     errorText = error.options,
                                     readOnly = false,
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.width(260.dp)
                                         .padding { paddingHorizontal(2.dp) }
                                 )
                             }

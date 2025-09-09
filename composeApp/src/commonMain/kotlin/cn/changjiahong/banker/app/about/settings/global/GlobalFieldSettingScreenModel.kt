@@ -5,10 +5,12 @@ import cn.changjiahong.banker.app.about.settings.ConfigUiEffect
 import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.model.FieldConf
 import cn.changjiahong.banker.model.FieldConfError
+import cn.changjiahong.banker.model.UIMetaConfig
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.mvi.replace
 import cn.changjiahong.banker.service.FieldService
+import cn.changjiahong.banker.service.UIMetaService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -17,39 +19,40 @@ import org.koin.core.annotation.Factory
 
 sealed interface GlobalConfigUiEvent : UiEvent {
 
-    class Update(val index: Int, val item: FieldConf) : GlobalConfigUiEvent
+    class Update(val index: Int, val item: UIMetaConfig) : GlobalConfigUiEvent
 
 }
 
 @Factory
 class GlobalFieldSettingScreenModel(
-    val fieldService: FieldService
+    val uiMetaService: UIMetaService
 ) : MviScreenModel() {
 
-    private val _fieldConfigs = MutableStateFlow<List<FieldConf>>(emptyList())
+    private val _uiMetaConfigs = MutableStateFlow<List<UIMetaConfig>>(emptyList())
 
-    private val _filedErrors = MutableStateFlow<List<FieldConfError>>(emptyList())
+    private val _errors = MutableStateFlow<List<UIMetaConfig.Error>>(emptyList())
 
-    val filedConfigs = _fieldConfigs.asStateFlow()
-    val filedErrors = _filedErrors.asStateFlow()
+    val metaConfigs = _uiMetaConfigs.asStateFlow()
+    val errors = _errors.asStateFlow()
+
 
     override fun handleEvent(event: UiEvent) {
         when (event) {
             is ConfigUiEvent.Add -> {
-                _fieldConfigs.update {
-                    it + FieldConf(bId = -1, weight = it.size)
+                _uiMetaConfigs.update {
+                    it + UIMetaConfig()
                 }
-                _filedErrors.update {
-                    it + FieldConfError()
+                _errors.update {
+                    it + UIMetaConfig.Error()
                 }
             }
 
             is ConfigUiEvent.Delete -> {
-                val field = _fieldConfigs.value[event.index]
-                if (field.fieldId < 0) {
-                    _fieldConfigs.update { it.toMutableList().apply { removeAt(event.index) } }
+                val field = _uiMetaConfigs.value[event.index]
+                if (field.metaId < 0) {
+                    _uiMetaConfigs.update { it.toMutableList().apply { removeAt(event.index) } }
                 } else {
-                    _fieldConfigs.replace(
+                    _uiMetaConfigs.replace(
                         event.index
                     ) { field.copy(isDelete = true) }
                 }
@@ -57,7 +60,7 @@ class GlobalFieldSettingScreenModel(
 
             is ConfigUiEvent.Save -> saveConfig()
 
-            is GlobalConfigUiEvent.Update -> _fieldConfigs.replace(
+            is GlobalConfigUiEvent.Update -> _uiMetaConfigs.replace(
                 event.index
             ) { event.item }
         }
@@ -65,23 +68,31 @@ class GlobalFieldSettingScreenModel(
 
     private fun saveConfig() {
         screenModelScope.launch {
-            val bf = filedConfigs.value
-            val be = mutableListOf<FieldConfError>()
-            bf.forEachIndexed { index, field ->
+            val bf = _uiMetaConfigs.value
+            val be = mutableListOf<UIMetaConfig.Error>()
+            bf.forEachIndexed { index, meta ->
+                if (meta.isDelete){
+                    be.add(UIMetaConfig.Error())
+                    return@forEachIndexed
+                }
                 var fE = ""
-                if (field.fieldName.isEmpty()) {
+                if (meta.label.isEmpty()) {
                     fE = "字段名称不能为空"
                 }
-                val error = FieldConfError(fE,  )
+                var wE = ""
+                if (meta.width <10){
+                    wE = "长度不允许小于10"
+                }
+                val error = UIMetaConfig.Error(fE, width = wE)
                 be.add(error)
             }
 
-            if (be.any { b -> b.fieldName.isNotEmpty()  }) {
-                _filedErrors.value = be
+            if (be.any { b -> b.label.isNotEmpty() || b.width.isNotEmpty() }) {
+                _errors.value = be
                 return@launch
             }
 
-            fieldService.saveGlobalFieldConfigs(_fieldConfigs.value).catchAndCollect {
+            uiMetaService.saveUIMetaConfigs(_uiMetaConfigs.value).catchAndCollect {
                 ConfigUiEffect.SaveSuccess.trigger()
             }
         }
@@ -93,28 +104,9 @@ class GlobalFieldSettingScreenModel(
 
     private fun loadFiledConfigs() {
         screenModelScope.launch {
-            fieldService.getGlobalFieldConfigs().catchAndCollect {
-                _filedErrors.value =
-                    MutableList(it.size) {
-                        FieldConfError()
-                    }
-
-                _fieldConfigs.value = it.map { field ->
-                    field.run {
-                        FieldConf(
-                            fieldId,
-                            -1,
-                            fieldName,
-                            fieldType,
-                            alias,
-                            width.toInt(),
-                            options ?: "",
-                            weight.toInt(),
-                            validationRule,
-                            forced == 1L
-                        )
-                    }
-                }.sortedBy { it.weight }
+            uiMetaService.getUIMetaConfigs().catchAndCollect {
+                _uiMetaConfigs.value = it
+                _errors.value = MutableList(it.size) { UIMetaConfig.Error() }
             }
         }
     }
