@@ -1,10 +1,13 @@
+-- 模板的字段，默认绑定的UI元数据
 CREATE TABLE TplField (
-    id INTEGER PRIMARY KEY NOT NULL ,
-    templateId INTEGER NOT NULL,
-    formFieldName TEXT NOT NULL,
-    alias TEXT NOT NULL ,
-    formFieldType TEXT NOT NULL DEFAULT "TEXT",
-    created INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+	fieldId       INTEGER PRIMARY KEY NOT NULL ,
+	templateId    INTEGER NOT NULL,
+	formFieldName TEXT    NOT NULL,
+	formFieldType TEXT    NOT NULL DEFAULT "TEXT",
+	metaId        INTEGER REFERENCES UIMeta(metaId),
+	isFixed       INTEGER NOT NULL DEFAULT 0 CHECK(isFixed IN (0,1)),
+	fixedValue    TEXT    NOT NULL DEFAULT "",
+	created       INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
 
@@ -15,14 +18,14 @@ FROM TplField
 WHERE templateId = ?;
 
 insert:
-INSERT INTO TplField(id,templateId,formFieldName,formFieldType,alias)
-VALUES (?,?,?,?,?);
+INSERT INTO TplField(fieldId,templateId,formFieldName,formFieldType,metaId,isFixed,fixedValue)
+VALUES (?,?,?,?,?,?,?);
 
 update:
-UPDATE TplField SET formFieldName=?,formFieldType=?,alias=?
-WHERE id=?;
+UPDATE TplField SET formFieldName=?,formFieldType=?,metaId=?,isFixed=?,fixedValue=?
+WHERE fieldId=?;
 
 delete:
 DELETE FROM TplField
-WHERE id=?;
+WHERE fieldId=?;
 

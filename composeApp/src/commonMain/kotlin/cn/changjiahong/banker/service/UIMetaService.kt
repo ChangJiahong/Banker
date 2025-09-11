@@ -18,6 +18,8 @@ interface UIMetaService{
      */
     fun getUIMetaConfigs(): FlowList<UIMetaConfig>
 
+    fun getUIMetaConfigsByLabel(label: String): FlowList<UIMetaConfig>
+
     /**
      * 保存UI元数据配置
      */

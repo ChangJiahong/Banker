@@ -22,6 +22,10 @@ class UIMetaRepositoryImpl(val db: BankerDb) : UIMetaRepository {
         return uiMetaQueries.selectAll().executeAsList()
     }
 
+    override fun findUIMetasByLabel(label: String): List<UIMeta> {
+        return uiMetaQueries.selectByLabel(label).executeAsList()
+    }
+
     override fun newUIMeta(
         label: String,
         metaType: String,

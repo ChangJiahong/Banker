@@ -26,6 +26,10 @@ class UIMetaServiceImpl(
         uiMetaRepository.findUIMetas().map { meta -> UIMetaConfig(meta) }
     }
 
+    override fun getUIMetaConfigsByLabel(label: String) = returnFlow {
+        uiMetaRepository.findUIMetasByLabel(label).map { meta -> UIMetaConfig(meta) }
+    }
+
     override fun saveUIMetaConfigs(uiMetaConfigs: List<UIMetaConfig>) = okFlow {
         db.transaction {
             uiMetaConfigs.forEach { fieldConfig ->

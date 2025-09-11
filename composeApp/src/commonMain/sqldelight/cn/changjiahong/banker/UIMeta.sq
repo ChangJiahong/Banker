@@ -15,6 +15,11 @@ selectAll:
 SELECT *
 FROM UIMeta;
 
+selectByLabel:
+SELECT *
+FROM UIMeta
+WHERE label LIKE '%' || ? || '%';
+
 insert:
 INSERT INTO UIMeta(metaId,label,metaType,width,options,validation,forced,isGlobal)
 VALUES (?,?,?,?,?,?,?,?);

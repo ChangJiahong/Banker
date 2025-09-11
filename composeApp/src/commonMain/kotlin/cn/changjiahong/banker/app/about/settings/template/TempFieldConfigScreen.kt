@@ -1,47 +1,31 @@
 package cn.changjiahong.banker.app.about.settings.template
 
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
-import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.add_diamond
-import banker.composeapp.generated.resources.home
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.Template
@@ -51,18 +35,23 @@ import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.composable.HoverDeleteBox
 import cn.changjiahong.banker.composable.Option
+import cn.changjiahong.banker.composable.SearchDropdown
+import cn.changjiahong.banker.composable.SwitchButton
 import cn.changjiahong.banker.composable.TextFieldDropdown
 import cn.changjiahong.banker.composable.TextFieldDropdownScope
 import cn.changjiahong.banker.composable.rememberDropdownScope
 import cn.changjiahong.banker.model.FormField
 import cn.changjiahong.banker.model.TplFieldConfigError
 import cn.changjiahong.banker.model.TplFieldConfig
+import cn.changjiahong.banker.model.UIMetaConfig
 import cn.changjiahong.banker.model.fieldTypes
 import cn.changjiahong.banker.utils.padding
+import cn.changjiahong.banker.utils.toId
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parametersOf
+import kotlin.collections.mutableListOf
 
-class TempFieldSettingScreen(val template: Template) : Screen {
+class TemplateFieldConfigScreen(val template: Template) : Screen {
     @Composable
     override fun Content() {
         val globalNavigator = GlobalNavigator.current
@@ -87,7 +76,7 @@ class TempFieldSettingScreen(val template: Template) : Screen {
 }
 
 @Composable
-fun TempFieldSettingScreen.TempFieldView(
+fun TemplateFieldConfigScreen.TempFieldView(
     modifier: Modifier,
     tempFieldConfigScreenModel: TempFieldConfigScreenModel
 ) {
@@ -98,7 +87,7 @@ fun TempFieldSettingScreen.TempFieldView(
     }) {
 
         val tempFieldConfigs by tempFieldConfigScreenModel.tempFieldConfigs.collectAsState()
-        val tempFieldConfigsError by tempFieldConfigScreenModel.tempFieldConfigsError.collectAsState()
+        val tempFieldConfigsError by tempFieldConfigScreenModel.error.collectAsState()
         Button({
             TFSUiEvent.SaveConfig.sendTo(tempFieldConfigScreenModel)
         }) {
@@ -125,9 +114,15 @@ fun TempFieldSettingScreen.TempFieldView(
 
 
                     val tempFormFields by tempFieldConfigScreenModel.tempFormFields.collectAsState()
+                    val uiMetaConfigs by tempFieldConfigScreenModel.uiMetaConfigs.collectAsState()
 
                     val scope =
                         rememberDropdownScope(tempFormFields.map { Option(it.name, it) })
+
+                    val uiMetaScope =
+                        rememberDropdownScope(uiMetaConfigs.map { Option(it.label, it) })
+
+
                     var ind = remember { 1 }
 
                     tempFieldConfigs.forEachIndexed { index, field ->
@@ -135,8 +130,11 @@ fun TempFieldSettingScreen.TempFieldView(
                             return@forEachIndexed
                         }
                         FieldConfigItem(
+                            tempFieldConfigScreenModel,
                             ind++,
-                            scope, field, tempFieldConfigsError[index],
+                            scope,
+                            uiMetaScope,
+                            field, tempFieldConfigsError[index],
                             deleteField = {
                                 ConfigUiEvent.Delete(index).sendTo(tempFieldConfigScreenModel)
                             }) {
@@ -159,17 +157,20 @@ fun TempFieldSettingScreen.TempFieldView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FieldConfigItem(
+    tempFieldConfigScreenModel: TempFieldConfigScreenModel,
     ind: Int,
     scope: TextFieldDropdownScope<FormField>,
+    uiMetaScope: TextFieldDropdownScope<UIMetaConfig>,
     tempField: TplFieldConfig,
-    tempFieldError: TplFieldConfigError,
+    tempFieldError: TplFieldConfig.Error,
     deleteField: () -> Unit,
     updateTempField: (TplFieldConfig) -> Unit,
 ) {
     var item by remember(tempField) { mutableStateOf(tempField) }
     var error by remember(tempFieldError) { mutableStateOf(tempFieldError) }
 
-    var field by remember(tempField) { mutableStateOf(scope.options.find { it.label == item.fieldName }?.value) }
+    var field by remember(tempField) { mutableStateOf(scope.options.find { it.label == item.formFieldName }?.value) }
+    var uiMeta by remember(uiMetaScope) { mutableStateOf(uiMetaScope.options.find { it.value.metaId == item.metaId }?.value) }
 
     Row(Modifier.wrapContentWidth(), verticalAlignment = Alignment.CenterVertically) {
 
@@ -185,48 +186,87 @@ private fun FieldConfigItem(
             field,
             {
                 field = it
-                item = item.copy(fieldName = it?.name ?: "")
-                if (item.fieldType != it?.type) {
-                    item = item.copy(fieldType = it?.type ?: "")
-                }
-                if (item.alias.isBlank()) {
-                    item = item.copy(alias = it?.name ?: "")
+                item = item.copy(formFieldName = it?.name ?: "")
+                if (item.formFieldType != it?.type) {
+                    item = item.copy(formFieldType = it?.type ?: "")
                 }
                 updateTempField(item)
-            }, "字段名",
+            }, "表单字段",
             enableEdit = false,
             enableCancel = true,
-            errorText = error.fieldName,
+            errorText = error.formFieldName,
             modifier = Modifier.width(200.dp)
                 .padding { paddingHorizontal(2.dp) }
         )
 
 
         TextFieldDropdown(
-            value = item.fieldType,
+            value = item.formFieldType,
             onValueChange = {
-                item = item.copy(fieldType = it)
+                item = item.copy(formFieldType = it)
                 updateTempField(item)
             },
             options = fieldTypes(),
             enableEdit = false,
             label = "字段类型",
-            errorText = error.fieldType,
+            errorText = error.formFieldType,
             modifier = Modifier.width(140.dp)
                 .padding { paddingHorizontal(2.dp) }
         )
 
-        InputView(
-            value = item.alias,
-            onValueChange = {
-                item = item.copy(alias = it)
+
+        SwitchButton(
+            Modifier.padding { paddingHorizontal(2.dp) },
+            label = "是否固定",
+            checked = item.isFixed,
+            onCheckedChange = {
+                item = item.copy(isFixed = it)
                 updateTempField(item)
-            },
-            label = "别名",
-            errorText = error.alias,
-            modifier = Modifier.width(200.dp)
-                .padding { paddingHorizontal(2.dp) }
-        )
+            })
+
+        if (item.isFixed) {
+            InputView(
+                value = item.fixedValue,
+                onValueChange = {
+                    item = item.copy(fixedValue = it)
+                    updateTempField(item)
+                },
+                label = "固定值",
+                errorText = error.fixedValue,
+                modifier = Modifier.width(200.dp)
+                    .padding { paddingHorizontal(2.dp) }
+            )
+
+        } else {
+
+            TextFieldDropdown(
+                uiMetaScope,
+                selectedValue = uiMeta,
+                onValueSelected = {
+                    item = item.copy(metaId = it?.metaId ?: -1)
+                    updateTempField(item)
+                },
+                unique = false,
+                label = "绑定UI元数据",
+                errorText = error.metaId,
+                modifier = Modifier.width(140.dp)
+                    .padding { paddingHorizontal(2.dp) }
+            )
+
+        }
+
+//        InputView(
+//            value = item.alias,
+//            onValueChange = {
+//                item = item.copy(alias = it)
+//                updateTempField(item)
+//            },
+//            label = "绑定UI元数据",
+//            errorText = error.alias,
+//            modifier = Modifier.width(200.dp)
+//                .padding { paddingHorizontal(2.dp) }
+//        )
+
 
     }
 }

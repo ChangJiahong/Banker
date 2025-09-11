@@ -15,6 +15,8 @@ interface UIMetaRepository {
      */
     fun findUIMetas(): List<UIMeta>
 
+    fun findUIMetasByLabel(label: String): List<UIMeta>
+
     fun newUIMeta(
         label: String,
         metaType: String,

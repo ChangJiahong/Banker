@@ -2,8 +2,9 @@ package cn.changjiahong.banker.service
 
 import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.TplField
-import cn.changjiahong.banker.model.NoData
+import cn.changjiahong.banker.utils.NoData
 import cn.changjiahong.banker.model.TplFieldConfig
+import cn.changjiahong.banker.utils.FlowList
 import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.Flow
 
@@ -18,8 +19,10 @@ interface TemplateService {
      */
     suspend fun getFieldsByTemplateId(id: Long): Flow<List<TplField>>
 
+    suspend fun getFieldConfigsByTid(tid: Long): FlowList<TplFieldConfig>
 
-    fun saveOrUpdateFieldsConfig(templateId: Long, fieldConfigs: List<TplFieldConfig>): Flow<NoData>
+
+    fun saveFieldConfigs(templateId: Long, fieldConfigs: List<TplFieldConfig>): Flow<NoData>
 
     suspend fun fuzzySearchByTempName(tempName: String): Flow<List<Template>>
 

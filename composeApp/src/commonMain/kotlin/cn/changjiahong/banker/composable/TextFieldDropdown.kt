@@ -90,6 +90,7 @@ inline fun <reified T> TextFieldDropdown(
     enableEdit: Boolean = true,
     enableCancel: Boolean = false,
     errorText: String = "",
+    unique: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -193,7 +194,7 @@ inline fun <reified T> TextFieldDropdown(
             onDismissRequest = { expanded = false }
         ) {
             options
-                .filterNot { optionsScope.selected.containsValue(it.value) && it.value != optionsScope.selected[id] }
+                .filterNot { (optionsScope.selected.containsValue(it.value) && it.value != optionsScope.selected[id]) && unique }
                 .filter { it.label.contains(inputText, ignoreCase = true) || !enableEdit }
 
                 .forEach { option ->

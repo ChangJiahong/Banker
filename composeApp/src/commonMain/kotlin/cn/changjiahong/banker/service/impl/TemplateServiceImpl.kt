@@ -2,21 +2,20 @@ package cn.changjiahong.banker.service.impl
 
 import cn.changjiahong.banker.BankerDb
 import cn.changjiahong.banker.Template
-import cn.changjiahong.banker.ExecuteError
 import cn.changjiahong.banker.TplField
 import cn.changjiahong.banker.model.BError
-import cn.changjiahong.banker.model.NoData
-import cn.changjiahong.banker.model.TemplateFillerItem
+import cn.changjiahong.banker.utils.NoData
 import cn.changjiahong.banker.model.TplFieldConfig
-import cn.changjiahong.banker.repository.BusinessRepository
 import cn.changjiahong.banker.repository.TemplateRepository
-import cn.changjiahong.banker.repository.UserRepository
 import cn.changjiahong.banker.service.FieldService
 import cn.changjiahong.banker.service.TemplateService
 import cn.changjiahong.banker.storage.Storage
 import cn.changjiahong.banker.storage.platformFile
 import cn.changjiahong.banker.tplview.TemplateKit
+import cn.changjiahong.banker.utils.FlowList
 import cn.changjiahong.banker.utils.okFlow
+import cn.changjiahong.banker.utils.returnFlow
+import cn.changjiahong.banker.utils.toId
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.name
 import kotlinx.coroutines.flow.Flow
@@ -38,37 +37,45 @@ class TemplateServiceImpl(
         return templateRepository.findTemplatesByBusinessId(businessId)
     }
 
-    override suspend fun getFieldsByTemplateId(id: Long): Flow<List<TplField>> {
-        return templateRepository.findTemplateFieldsById(id)
+    override suspend fun getFieldsByTemplateId(id: Long): Flow<List<TplField>> = returnFlow {
+        templateRepository.findTemplateFieldsById(id)
     }
 
-    override fun saveOrUpdateFieldsConfig(
+    override suspend fun getFieldConfigsByTid(tid: Long): FlowList<TplFieldConfig> = returnFlow {
+        templateRepository.findTemplateFieldsById(tid).map { TplFieldConfig(it) }
+    }
+
+    override fun saveFieldConfigs(
         templateId: Long,
         fieldConfigs: List<TplFieldConfig>
-    ): Flow<NoData> = flow {
+    ): Flow<NoData> = okFlow {
         db.transaction {
             fieldConfigs.forEach { tempField ->
-                if (tempField.id < 0 && !tempField.isDelete) {
-                    templateRepository.insertNewTemplateField(
-                        templateId,
-                        tempField.fieldName,
-                        tempField.alias,
-                        tempField.fieldType
-                    )
-                } else if (!tempField.isDelete) {
-                    templateRepository.updateTemplateFieldById(
-                        tempField.fieldName,
-                        tempField.fieldType,
-                        tempField.alias,
-                        tempField.id
-                    )
-                } else {
-                    templateRepository.deleteTemplateFieldById(tempField.id)
+                tempField.run {
+                    if (fieldId < 0 && !isDelete) {
+                        templateRepository.insertNewTemplateField(
+                            templateId,
+                            formFieldName,
+                            formFieldType,
+                            metaId.toId(),
+                            isFixed,
+                            fixedValue
+                        )
+                    } else if (!tempField.isDelete) {
+                        templateRepository.updateTemplateFieldById(
+                            formFieldName,
+                            formFieldType,
+                            metaId.toId(),
+                            isFixed,
+                            fixedValue,
+                            fieldId
+                        )
+                    } else {
+                        templateRepository.deleteTemplateFieldById(fieldId)
+                    }
                 }
             }
         }
-
-        emit(NoData)
     }
 
     override suspend fun fuzzySearchByTempName(tempName: String): Flow<List<Template>> {
