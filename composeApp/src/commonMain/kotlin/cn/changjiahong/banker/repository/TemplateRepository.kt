@@ -6,12 +6,27 @@ import kotlinx.coroutines.flow.Flow
 
 interface TemplateRepository {
     suspend fun findTemplatesByBusinessId(businessId: Long): Flow<List<Template>>
-    suspend fun findTemplateFieldsById(templateId: Long): Flow<List<TplField>>
+    fun findTemplateFieldsById(templateId: Long): List<TplField>
 
     suspend fun findTemplateFieldsById2(templateId: Long): List<TplField>
     suspend fun findAllDocTemps(): Flow<List<Template>>
-    fun insertNewTemplateField(templateId: Long, fieldName: String, alias: String, fieldType: String): Long
-    fun updateTemplateFieldById(fieldName: String, fieldType: String, alias: String, id: Long): Boolean
+    fun insertNewTemplateField(
+        templateId: Long,
+        formFieldName: String,
+        formFieldType: String,
+        metaId: Long?,
+        isFixed: Boolean,
+        fixedValue: String
+    ): Long
+
+    fun updateTemplateFieldById(
+        fieldName: String,
+        fieldType: String,
+        metaId: Long?,
+        isFixed: Boolean,
+        fixedValue: String,
+        id: Long
+    ): Boolean
 
     fun deleteTemplateFieldById(id: Long)
 

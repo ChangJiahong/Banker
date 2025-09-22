@@ -1,7 +1,7 @@
 package cn.changjiahong.banker.platform
 
 import cn.changjiahong.banker.model.BError
-import cn.changjiahong.banker.model.NoData
+import cn.changjiahong.banker.utils.NoData
 import cn.changjiahong.banker.utils.okFlow
 import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.Flow

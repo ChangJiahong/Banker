@@ -1,6 +1,6 @@
 package cn.changjiahong.banker.service.impl
 
-import cn.changjiahong.banker.model.NoData
+import cn.changjiahong.banker.utils.NoData
 import cn.changjiahong.banker.repository.SystemConfigRepository
 import cn.changjiahong.banker.service.SystemConfigService
 import cn.changjiahong.banker.utils.okFlow

@@ -16,10 +16,10 @@ LEFT JOIN FieldConfig fc ON fc.fieldId = fv.fieldId
 WHERE (fc.bId = ? OR fc.bId =-1) AND fv.uid = ?;
 
 selectTplFieldVals:
-SELECT tf.id tFieldId,tf.formFieldName,
+SELECT tf.fieldId tFieldId,tf.formFieldName,
 CASE WHEN rf.isFixed = 0 THEN  fv.fieldValue ELSE rf.fixedValue END AS fieldValue ,tf.formFieldType
 FROM RelFieldTplField rf
-LEFT JOIN TplField tf ON tf.id = rf.tFieldId
+LEFT JOIN TplField tf ON tf.fieldId = rf.tFieldId
 LEFT JOIN FieldValue fv ON rf.fieldId = fv.fieldId
 LEFT JOIN FieldConfig fc ON fc.fieldId  = rf.fieldId
 WHERE rf.bId = ? AND tf.templateId = ? AND (fv.uid =? OR rf.isFixed =1);

@@ -3,7 +3,7 @@ package cn.changjiahong.banker.tplview.processor
 import cn.changjiahong.banker.model.COL_TABLE
 import cn.changjiahong.banker.model.FormField
 import cn.changjiahong.banker.model.FormFieldValue
-import cn.changjiahong.banker.model.NoData
+import cn.changjiahong.banker.utils.NoData
 import cn.changjiahong.banker.model.ROW_TABLE
 import cn.changjiahong.banker.model.isRowTableType
 import cn.changjiahong.banker.model.isTableType
@@ -31,7 +31,7 @@ actual object WordTemplateProcessor : TemplateProcessor {
                 it is RunTemplate -> FormField(it.tagName, "TEXT")
                 else -> FormField(it.variable(), "")
             }
-        }
+        }.distinctBy { it.name }
     }
 
     actual override fun fillTemplateForm(

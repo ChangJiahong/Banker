@@ -1,0 +1,10 @@
+-- 自动生成，业务项下的UI元数据
+CREATE TABLE RelBizUIMeta (
+	id             INTEGER  NOT NULL ,
+	bId            INTEGER  NOT NULL REFERENCES Business(id),
+	metaId         INTEGER  REFERENCES UIMeta(metaId),
+	weight         INTEGER  NOT NULL DEFAULT 0, -- 显示排序权重
+	tag            TEXT     NOT NULL DEFAULT "", -- 分组标签
+	created        INTEGER  NOT NULL DEFAULT (strftime('%s', 'now')),
+	PRIMARY KEY (bId,metaId)
+);

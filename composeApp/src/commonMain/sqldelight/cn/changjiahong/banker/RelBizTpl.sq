@@ -1,9 +1,11 @@
+-- 业务和模板的关系
 CREATE TABLE RelBizTpl (
-    id INTEGER NOT NULL ,
-    bId INTEGER NOT NULL REFERENCES Business(id),
-    tId INTEGER NOT NULL REFERENCES Template(id),
-    created INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-    PRIMARY KEY (bId,tId)
+	id       INTEGER NOT NULL ,
+	bId      INTEGER NOT NULL REFERENCES Business(id),
+	tId      INTEGER NOT NULL REFERENCES Template(id),
+	tag      TEXT    NOT NULL DEFAULT "", -- 分组标签
+	created  INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+	PRIMARY KEY (bId,tId)
 );
 
 selectByBusinessAndTemplate:

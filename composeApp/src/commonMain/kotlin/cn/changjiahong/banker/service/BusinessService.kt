@@ -2,7 +2,7 @@ package cn.changjiahong.banker.service
 
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.model.Biz
-import cn.changjiahong.banker.model.NoData
+import cn.changjiahong.banker.utils.NoData
 import kotlinx.coroutines.flow.Flow
 
 interface BusinessService {

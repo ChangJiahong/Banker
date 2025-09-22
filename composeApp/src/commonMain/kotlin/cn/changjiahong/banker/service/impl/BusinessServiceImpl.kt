@@ -3,7 +3,7 @@ package cn.changjiahong.banker.service.impl
 import cn.changjiahong.banker.BankerDb
 import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.model.Biz
-import cn.changjiahong.banker.model.NoData
+import cn.changjiahong.banker.utils.NoData
 import cn.changjiahong.banker.repository.BusinessRepository
 import cn.changjiahong.banker.service.BusinessService
 import cn.changjiahong.banker.utils.okFlow

@@ -34,10 +34,10 @@ WHERE bId = ? OR bId = -1;
 
 --获取业务项下的某个模版的属性配置
 selectFieldConfigsForTpl:
-SELECT fc.*,tf.id tFieldId,tf.formFieldName,tf.formFieldType
+SELECT fc.*,tf.fieldId tFieldId,tf.formFieldName,tf.formFieldType
 FROM FieldConfig fc
 LEFT JOIN RelFieldTplField rftf ON rftf.fieldId  = fc.fieldId
-LEFT JOIN TplField tf ON tf.id = rftf.tFieldId
+LEFT JOIN TplField tf ON tf.fieldId = rftf.tFieldId
 WHERE rftf.bId = ? AND tf.templateId = ?;
 
 

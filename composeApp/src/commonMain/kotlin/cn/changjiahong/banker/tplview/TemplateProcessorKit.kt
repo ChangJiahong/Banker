@@ -2,7 +2,7 @@ package cn.changjiahong.banker.tplview
 
 import cn.changjiahong.banker.model.FormField
 import cn.changjiahong.banker.model.FormFieldValue
-import cn.changjiahong.banker.model.NoData
+import cn.changjiahong.banker.utils.NoData
 import cn.changjiahong.banker.storage.FileType
 import cn.changjiahong.banker.tplview.processor.ExcelTemplateProcessor
 import cn.changjiahong.banker.tplview.processor.PDFTempProcessor

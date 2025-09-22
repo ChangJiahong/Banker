@@ -1,5 +1,8 @@
 package cn.changjiahong.banker.model
 
+import cn.changjiahong.banker.TplField
+import cn.changjiahong.banker.utils.toBoolean
+
 /*
 抽象出的属性类
  */
@@ -48,10 +51,12 @@ data class FieldConfError(
     val validationRule: String = "",
 )
 
-data class RelFieldConfigTplField(
+data class FieldOverrideBinding(
     val id: Long = -1,
-    val tFieldId: Long? = null,
-    val fieldId: Long? = null,
+    val fieldId: Long = -1,
+    val metaId: Long = -1,
+    val bId: Long,
+    val tId: Long,
     val isFixed: Boolean = false,
     val fixedValue: String = "",
     val isDelete: Boolean = false
@@ -84,12 +89,31 @@ data class BasicFieldConfigError(
 
 
 data class TplFieldConfig(
-    val id: Long = -1,
-    val fieldName: String = "",
-    val alias: String = "",
-    val fieldType: String = "",
+    val fieldId: Long = -1,
+    val formFieldName: String = "",
+    val formFieldType: String = "",
+    val metaId: Long = -1,
+    val isFixed: Boolean = false,
+    val fixedValue: String = "",
     val isDelete: Boolean = false
-)
+) {
+
+    constructor(tplField: TplField) : this(
+        fieldId = tplField.fieldId,
+        formFieldName = tplField.formFieldName,
+        formFieldType = tplField.formFieldType,
+        metaId = tplField.metaId ?: -1,
+        isFixed = tplField.isFixed.toBoolean(),
+        fixedValue = tplField.fixedValue,
+    )
+
+    data class Error(
+        val formFieldName: String = "",
+        val formFieldType: String = "",
+        val metaId: String = "",
+        val fixedValue: String = ""
+    )
+}
 
 data class TplFieldConfigError(
     val fieldName: String = "",

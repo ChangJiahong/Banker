@@ -2,8 +2,9 @@ package cn.changjiahong.banker.tplview.processor
 
 import cn.changjiahong.banker.model.FormField
 import cn.changjiahong.banker.model.FormFieldValue
-import cn.changjiahong.banker.model.NoData
+import cn.changjiahong.banker.utils.NoData
 import cn.changjiahong.banker.utils.okFlow
+import cn.changjiahong.banker.utils.returnFlow
 import com.itextpdf.forms.PdfAcroForm
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfReader
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 actual object PDFTempProcessor : TemplateProcessor {
-    actual override fun getFormFields(file: PlatformFile): Flow<List<FormField>> = flow {
+    actual override fun getFormFields(file: PlatformFile): Flow<List<FormField>> = returnFlow {
         val pdfReader = PdfReader(file.file)
         val pdfDoc = PdfDocument(pdfReader)
         val form = PdfAcroForm.getAcroForm(pdfDoc, false)
@@ -28,7 +29,7 @@ actual object PDFTempProcessor : TemplateProcessor {
             }
             formFields += FormField(name, type)
         }
-        emit(formFields)
+        formFields.distinctBy { it.name }
     }
 
     actual override fun fillTemplateForm(

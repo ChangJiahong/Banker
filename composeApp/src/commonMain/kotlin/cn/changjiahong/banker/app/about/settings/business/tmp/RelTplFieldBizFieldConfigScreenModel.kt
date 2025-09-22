@@ -5,7 +5,7 @@ import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.composable.Option
-import cn.changjiahong.banker.model.RelFieldConfigTplField
+import cn.changjiahong.banker.model.FieldOverrideBinding
 import cn.changjiahong.banker.model.RelFieldConfigTplFieldError
 import cn.changjiahong.banker.model.RelTplFieldBasicFieldConfig
 import cn.changjiahong.banker.mvi.MviScreenModel
@@ -25,7 +25,7 @@ import org.koin.core.annotation.Factory
 sealed interface FieldConfigScreenUiEvent : UiEvent {
     object AddFieldConfig : FieldConfigScreenUiEvent
     object AddUFieldConfig : FieldConfigScreenUiEvent
-    class UpdateFiledConfig(val index: Int, val field: RelFieldConfigTplField) :
+    class UpdateFiledConfig(val index: Int, val field: FieldOverrideBinding) :
         FieldConfigScreenUiEvent
 
     class UpdateUFiled(val index: Int, val field: RelTplFieldBasicFieldConfig) :
@@ -55,7 +55,7 @@ class FieldConfigScreenModel(
 
     val fieldOptions = _fieldOptions.asStateFlow()
 
-    private val _fieldConfigs = MutableStateFlow<List<RelFieldConfigTplField>>(emptyList())
+    private val _fieldConfigs = MutableStateFlow<List<FieldOverrideBinding>>(emptyList())
     private val _fieldConfigsError =
         MutableStateFlow<List<RelFieldConfigTplFieldError>>(emptyList())
 
@@ -66,7 +66,7 @@ class FieldConfigScreenModel(
 
         when (event) {
             is FieldConfigScreenUiEvent.AddFieldConfig -> {
-                _fieldConfigs.update { it + RelFieldConfigTplField() }
+                _fieldConfigs.update { it + FieldOverrideBinding() }
                 _fieldConfigsError.update { it + RelFieldConfigTplFieldError() }
             }
             is ConfigUiEvent.Delete ->{
@@ -138,7 +138,7 @@ class FieldConfigScreenModel(
             fieldService.getFieldConfigAndTplFieldMap(business.id, template.id)
                 .catchAndCollect { data ->
                     _fieldConfigs.value = data.map {
-                        RelFieldConfigTplField(
+                        FieldOverrideBinding(
                             it.id, it.tFieldId, it.fieldId, it.isFixed > 0,
                             it.fixedValue
                         )
@@ -159,8 +159,8 @@ class FieldConfigScreenModel(
 
     private fun loadTemplateFields() {
         screenModelScope.launch {
-            templateService.getFieldsByTemplateId(template.id).collect { data ->
-                _tplFieldOptions.value = data.map { Option(it.alias, it.id) }
+            templateService.getFieldConfigsByTid(template.id).collect { data ->
+                _tplFieldOptions.value = data.map { Option(it.formFieldName, it.fieldId) }
             }
         }
     }

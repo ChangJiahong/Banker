@@ -8,7 +8,7 @@ import cn.changjiahong.banker.app.about.settings.business.BusinessSettingScreen
 import cn.changjiahong.banker.app.about.settings.business.tmp.BusinessFieldConfigScreen
 import cn.changjiahong.banker.app.about.settings.business.tmp.BusinessTmpDetailScreen
 import cn.changjiahong.banker.app.about.settings.business.tmp.FieldConfigScreen
-import cn.changjiahong.banker.app.about.settings.template.TempFieldSettingScreen
+import cn.changjiahong.banker.app.about.settings.template.TemplateFieldConfigScreen
 import cn.changjiahong.banker.app.business_handle.BusinessHandlerScreen
 import cn.changjiahong.banker.app.home.HomeScreen
 import cn.changjiahong.banker.app.home.OptionsDirScreen
@@ -38,7 +38,7 @@ object RR {
 
     val TEMPLATE_SETTING = TemplateSettingScreen
 
-    val TEMP_FIELD_SETTING = { t: Template -> TempFieldSettingScreen(t) }
+    val TEMP_FIELD_SETTING = { t: Template -> TemplateFieldConfigScreen(t) }
 
     val BUSINESS_SETTING = BusinessSettingScreen
     val BUSINESS_TMP_DETAIL = { b: Business -> BusinessTmpDetailScreen(b) }

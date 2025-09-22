@@ -7,8 +7,8 @@ import cn.changjiahong.banker.SelectFieldConfigsForTpl
 import cn.changjiahong.banker.model.FieldConf
 import cn.changjiahong.banker.model.FieldVal
 import cn.changjiahong.banker.model.FormFieldValue
-import cn.changjiahong.banker.model.NoData
-import cn.changjiahong.banker.model.RelFieldConfigTplField
+import cn.changjiahong.banker.utils.NoData
+import cn.changjiahong.banker.model.FieldOverrideBinding
 import cn.changjiahong.banker.repository.FieldRepository
 import cn.changjiahong.banker.repository.UserRepository
 import cn.changjiahong.banker.service.FieldService
@@ -123,22 +123,22 @@ class FieldServiceImpl(
 
     override fun saveFieldConfigAndTplFieldMap(
         bId: Long,
-        value: List<RelFieldConfigTplField>
+        value: List<FieldOverrideBinding>
     ): Flow<NoData> = okFlow {
         db.transaction {
             value.forEach { f ->
                 if (f.id < 0 && !f.isDelete) {
                     fieldRepository.newRelFieldTplField(
                         bId,
-                        f.tFieldId!!,
-                        f.fieldId,
+                        f.fieldId!!,
+                        f.metaId,
                         f.isFixed,
                         f.fixedValue
                     )
                 } else if (!f.isDelete) {
                     fieldRepository.updateRelFieldTplField(
-                        f.tFieldId!!,
-                        f.fieldId,
+                        f.fieldId!!,
+                        f.metaId,
                         f.isFixed,
                         f.fixedValue,
                         f.id

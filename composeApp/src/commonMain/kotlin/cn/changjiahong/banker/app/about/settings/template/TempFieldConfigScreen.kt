@@ -255,18 +255,5 @@ private fun FieldConfigItem(
 
         }
 
-//        InputView(
-//            value = item.alias,
-//            onValueChange = {
-//                item = item.copy(alias = it)
-//                updateTempField(item)
-//            },
-//            label = "绑定UI元数据",
-//            errorText = error.alias,
-//            modifier = Modifier.width(200.dp)
-//                .padding { paddingHorizontal(2.dp) }
-//        )
-
-
     }
 }

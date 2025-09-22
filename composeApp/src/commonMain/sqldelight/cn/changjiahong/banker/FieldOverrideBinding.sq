@@ -1,0 +1,17 @@
+-- 业务项覆盖的字段绑定元数据
+CREATE TABLE FieldOverrideBinding (
+	id             INTEGER  NOT NULL ,
+	fieldId        INTEGER  NOT NULL REFERENCES TplField(fieldId),
+	metaId         INTEGER  REFERENCES UIMeta(metaId),
+	bId            INTEGER  NOT NULL REFERENCES Business(id), -- 这里的bId表示在这个业务项下的映射关系
+	tId            INTEGER  NOT NULL REFERENCES Template(id), -- 这里的bId表示在这个业务项下的映射关系
+	isFixed        INTEGER  NOT NULL DEFAULT 0 CHECK(isFixed IN (0,1)),
+	fixedValue     TEXT     NOT NULL DEFAULT "",
+	created        INTEGER  NOT NULL DEFAULT (strftime('%s', 'now')),
+	PRIMARY KEY (fieldId,metaId,bId)
+);
+
+select:
+SELECT *
+FROM FieldOverrideBinding
+WHERE bId = ? AND tId = ?;

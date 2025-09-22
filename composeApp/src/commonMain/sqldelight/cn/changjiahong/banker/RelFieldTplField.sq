@@ -2,7 +2,7 @@
 CREATE TABLE RelFieldTplField (
  id              INTEGER  NOT NULL ,
  fieldId         INTEGER  REFERENCES FieldConfig(fieldId),
- tFieldId        INTEGER  NOT NULL REFERENCES TplField(id),
+ tFieldId        INTEGER  NOT NULL REFERENCES TplField(fieldId),
  bId             INTEGER  NOT NULL REFERENCES Business(id), -- 这里的bId表示在这个业务项下的映射关系
  isFixed         INTEGER NOT NULL ,
  fixedValue      TEXT NOT NULL DEFAULT "",
@@ -13,7 +13,7 @@ CREATE TABLE RelFieldTplField (
 selectFieldConfigAndTplFieldMap:
 SELECT ff.*
 FROM RelFieldTplField ff
-LEFT JOIN TplField t ON t.id = tFieldId
+LEFT JOIN TplField t ON t.fieldId = tFieldId
 WHERE ff.bId = ? AND t.templateId = ?;
 
 

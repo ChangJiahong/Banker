@@ -8,6 +8,7 @@ import cn.changjiahong.banker.ck
 import cn.changjiahong.banker.repository.TemplateRepository
 import cn.changjiahong.banker.utils.getSnowId
 import cn.changjiahong.banker.utils.list
+import cn.changjiahong.banker.utils.toLong
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.annotation.Factory
 
@@ -25,9 +26,9 @@ class TemplateRepositoryImpl(db: BankerDb) : TemplateRepository {
         return docTemplateQueries.selectTemplatesByBusinessId(businessId).asFlow().list()
     }
 
-    override suspend fun findTemplateFieldsById(templateId: Long): Flow<List<TplField>>  {
+    override fun findTemplateFieldsById(templateId: Long): List<TplField> {
 
-        return templateFieldQueries.selectTemplateFieldsById(templateId).asFlow().list()
+        return templateFieldQueries.selectTemplateFieldsById(templateId).executeAsList()
     }
 
     override suspend fun findTemplateFieldsById2(templateId: Long): List<TplField> {
@@ -36,22 +37,41 @@ class TemplateRepositoryImpl(db: BankerDb) : TemplateRepository {
 
     override fun insertNewTemplateField(
         templateId: Long,
-        fieldName: String,
-        alias: String,
-        fieldType: String
+        formFieldName: String,
+        formFieldType: String,
+        metaId: Long?,
+        isFixed: Boolean,
+        fixedValue: String
     ): Long {
         val id = getSnowId()
-        templateFieldQueries.insert(id, templateId, fieldName, fieldType,alias).ck()
+        templateFieldQueries.insert(
+            id,
+            templateId,
+            formFieldName,
+            formFieldType,
+            metaId,
+            isFixed.toLong(),
+            fixedValue
+        ).ck()
         return id
     }
 
     override fun updateTemplateFieldById(
         fieldName: String,
         fieldType: String,
-        alias: String,
+        metaId: Long?,
+        isFixed: Boolean,
+        fixedValue: String,
         id: Long
     ): Boolean {
-        val res = templateFieldQueries.update(fieldName, fieldType, alias,id)
+        val res = templateFieldQueries.update(
+            fieldName,
+            fieldType,
+            metaId,
+            isFixed.toLong(),
+            fixedValue,
+            id
+        )
         return res.value > 0
     }
 
