@@ -7,7 +7,7 @@ import cn.changjiahong.banker.model.FieldConf
 import cn.changjiahong.banker.model.FieldVal
 import cn.changjiahong.banker.model.FormFieldValue
 import cn.changjiahong.banker.utils.NoData
-import cn.changjiahong.banker.model.FieldOverrideBinding
+import cn.changjiahong.banker.model.FieldOverrideBindingConfig
 import kotlinx.coroutines.flow.Flow
 
 interface FieldService {
@@ -52,7 +52,7 @@ interface FieldService {
      */
     fun saveFieldConfigAndTplFieldMap(
         bId: Long,
-        value: List<FieldOverrideBinding>
+        value: List<FieldOverrideBindingConfig>
     ): Flow<NoData>
 
     /**

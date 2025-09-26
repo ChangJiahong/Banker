@@ -8,7 +8,7 @@ import cn.changjiahong.banker.model.FieldConf
 import cn.changjiahong.banker.model.FieldVal
 import cn.changjiahong.banker.model.FormFieldValue
 import cn.changjiahong.banker.utils.NoData
-import cn.changjiahong.banker.model.FieldOverrideBinding
+import cn.changjiahong.banker.model.FieldOverrideBindingConfig
 import cn.changjiahong.banker.repository.FieldRepository
 import cn.changjiahong.banker.repository.UserRepository
 import cn.changjiahong.banker.service.FieldService
@@ -123,7 +123,7 @@ class FieldServiceImpl(
 
     override fun saveFieldConfigAndTplFieldMap(
         bId: Long,
-        value: List<FieldOverrideBinding>
+        value: List<FieldOverrideBindingConfig>
     ): Flow<NoData> = okFlow {
         db.transaction {
             value.forEach { f ->

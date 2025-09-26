@@ -27,33 +27,13 @@ import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun HoverDeleteBox(text: String, modifier: Modifier, onDeleteClick: () -> Unit = {}) {
-//    val interactionSource = remember { MutableInteractionSource() }
-//    val isHovered by interactionSource.collectIsHoveredAsState()
-//
-//    Box(
-//        modifier.size(35.dp).background(
-//            color = if (isHovered) Color(0xffEA3323)
-//            else Color(91, 165, 243),
-//            shape = RoundedCornerShape(6.dp) // 圆角 16dp
-//        ).hoverable(interactionSource = interactionSource) // 支持 hover
-//        , contentAlignment = Alignment.Center
-//    ) {
-//        if (isHovered) {
-//            IconButton(onClick = onDeleteClick) {
-//                Icon(
-//                    painterResource(Res.drawable.remove),
-//                    contentDescription = "删除",
-//                    tint = Color.White
-//                )
-//            }
-//        } else {
-//            Text(text, fontSize = 18.sp, color = Color.White)
-//        }
-//    }
-
-
-    HoverBox(modifier.size(35.dp), hovered = {
+fun HoverDeleteBox(
+    text: String,
+    modifier: Modifier,
+    enable: Boolean = true,
+    onDeleteClick: () -> Unit = {}
+) {
+    HoverBox(modifier.size(35.dp), enable = enable, hovered = {
         Box(
             Modifier.fillMaxSize().background(
                 color = Color(0xffEA3323),
@@ -85,6 +65,7 @@ fun HoverDeleteBox(text: String, modifier: Modifier, onDeleteClick: () -> Unit =
 @Composable
 fun HoverBox(
     modifier: Modifier = Modifier,
+    enable: Boolean = true,
     hovered: @Composable BoxScope.() -> Unit,
     default: @Composable BoxScope.() -> Unit
 ) {
@@ -95,7 +76,7 @@ fun HoverBox(
         modifier.hoverable(interactionSource = interactionSource) // 支持 hover
         , contentAlignment = Alignment.Center
     ) {
-        if (isHovered) {
+        if (isHovered && enable) {
             hovered()
         } else {
             default()

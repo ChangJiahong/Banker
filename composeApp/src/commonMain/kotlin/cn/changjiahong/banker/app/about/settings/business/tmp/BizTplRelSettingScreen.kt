@@ -52,7 +52,7 @@ class BusinessTmpDetailScreen(val business: Business) : Screen {
             koinScreenModel<BusinessTmpDetailScreenModel> { parameterArrayOf(business) }
 
         ScaffoldWithTopBar(
-            "模版配置",
+            "【${business.businessName}】业务模版配置",
             iconPainter = painterResource(Res.drawable.forms_add),
             iconOnClick = {
                 BusinessTmpDetailUiEvent.GoBusinessFieldConfigScreen(business)

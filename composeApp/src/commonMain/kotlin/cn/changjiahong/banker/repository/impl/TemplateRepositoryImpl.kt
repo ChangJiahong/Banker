@@ -22,8 +22,8 @@ class TemplateRepositoryImpl(db: BankerDb) : TemplateRepository {
         return docTemplateQueries.selectAllDocTemps().asFlow().list()
     }
 
-    override suspend fun findTemplatesByBusinessId(businessId: Long): Flow<List<Template>> {
-        return docTemplateQueries.selectTemplatesByBusinessId(businessId).asFlow().list()
+    override suspend fun findTemplatesByBusinessId(businessId: Long): List<Template> {
+        return docTemplateQueries.selectTemplatesByBusinessId(businessId).executeAsList()
     }
 
     override fun findTemplateFieldsById(templateId: Long): List<TplField> {
@@ -33,6 +33,10 @@ class TemplateRepositoryImpl(db: BankerDb) : TemplateRepository {
 
     override suspend fun findTemplateFieldsById2(templateId: Long): List<TplField> {
         return templateFieldQueries.selectTemplateFieldsById(templateId).executeAsList()
+    }
+
+    override fun findBizInvolvedUIMeta(bid: Long): List<Long> {
+        return templateFieldQueries.selectBizInvolvedUIMeta(bid).executeAsList().filter { it.metaId != null }.map { it.metaId!! }
     }
 
     override fun insertNewTemplateField(

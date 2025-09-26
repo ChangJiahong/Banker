@@ -5,11 +5,17 @@ import cn.changjiahong.banker.TplField
 import kotlinx.coroutines.flow.Flow
 
 interface TemplateRepository {
-    suspend fun findTemplatesByBusinessId(businessId: Long): Flow<List<Template>>
+
+    suspend fun findTemplatesByBusinessId(businessId: Long): List<Template>
+
     fun findTemplateFieldsById(templateId: Long): List<TplField>
 
     suspend fun findTemplateFieldsById2(templateId: Long): List<TplField>
     suspend fun findAllDocTemps(): Flow<List<Template>>
+
+
+    fun findBizInvolvedUIMeta(bid: Long): List<Long>
+
     fun insertNewTemplateField(
         templateId: Long,
         formFieldName: String,

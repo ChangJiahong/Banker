@@ -10,7 +10,11 @@ CREATE TABLE TplField (
 	created       INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
-
+selectBizInvolvedUIMeta:
+SELECT DISTINCT tf.metaId
+FROM TplField tf
+LEFT JOIN RelBizTpl rbt ON rbt.tId = tf.templateId
+WHERE rbt.bId  = ?;
 
 selectTemplateFieldsById:
 SELECT *

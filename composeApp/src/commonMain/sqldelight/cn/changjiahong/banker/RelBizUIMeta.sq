@@ -8,3 +8,22 @@ CREATE TABLE RelBizUIMeta (
 	created        INTEGER  NOT NULL DEFAULT (strftime('%s', 'now')),
 	PRIMARY KEY (bId,metaId)
 );
+
+selectBizAndUIMetaRelList:
+SELECT id, bId,label,rb.metaId metaId,weight,tag
+FROM RelBizUIMeta rb
+LEFT JOIN UIMeta u ON u.metaId = rb.metaId
+WHERE bId = ?;
+
+insert:
+INSERT INTO RelBizUIMeta(id,bId,metaId,weight,tag)
+VALUES (?,?,?,?,?);
+
+update:
+UPDATE RelBizUIMeta
+SET weight = ?, tag = ?
+WHERE id = ?;
+
+deleteById:
+DELETE FROM RelBizUIMeta
+WHERE id = ?;

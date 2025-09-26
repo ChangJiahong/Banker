@@ -41,6 +41,7 @@ import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.composable.HoverDeleteBox
+import cn.changjiahong.banker.composable.Option
 import cn.changjiahong.banker.composable.SwitchButton
 import cn.changjiahong.banker.composable.TextFieldDropdown
 import cn.changjiahong.banker.composable.rememberDropdownScope
@@ -56,7 +57,7 @@ class FieldConfigScreen(val business: Business, val template: Template) : Screen
             koinScreenModel<FieldConfigScreenModel> { parametersOf(business, template) }
 
         ScaffoldWithTopBar(
-            "自定义配置", iconPainter = painterResource(Res.drawable.add_diamond),
+            "【${template.templateName}】模版自定义配置", iconPainter = painterResource(Res.drawable.add_diamond),
             iconOnClick = {
                 FieldConfigScreenUiEvent.AddFieldConfig.sendTo(fieldConfigScreenModel)
             }
@@ -87,15 +88,17 @@ fun FieldConfigScreen.FieldConfigView(
     Column(modifier.padding { paddingHorizontal(30.dp) }) {
 
         val tplFieldOptions by fieldConfigScreenModel.tplFieldOptions.collectAsState()
-        val fieldOptions by fieldConfigScreenModel.fieldOptions.collectAsState()
 
         val fieldConfigs by fieldConfigScreenModel.fieldConfigs.collectAsState()
         val fieldConfigsError by fieldConfigScreenModel.fieldConfigsError.collectAsState()
 
+        val uiMetaConfigs by fieldConfigScreenModel.uiMetaConfigs.collectAsState()
+
+        val uiMetaScope =
+            rememberDropdownScope(uiMetaConfigs.map { Option(it.label, it) })
+
         val tempFieldOptions =
             rememberDropdownScope(tplFieldOptions)
-        val fieldConfigOptions =
-            rememberDropdownScope(fieldOptions)
 
         Button({
             FieldConfigScreenUiEvent.SaveConfig.sendTo(fieldConfigScreenModel)
@@ -210,6 +213,7 @@ fun FieldConfigScreen.FieldConfigView(
 //                            )
 //                        }
 
+                        var uiMeta by remember(uiMetaScope) { mutableStateOf(uiMetaScope.options.find { it.value.metaId == item.metaId }?.value) }
 
                         TextFieldDropdown(
                             tempFieldOptions,
@@ -225,7 +229,7 @@ fun FieldConfigScreen.FieldConfigView(
                             "表单字段",
                             enableEdit = false,
                             enableCancel = true,
-                            errorText = itemError.tempFieldId,
+                            errorText = itemError.fieldId,
                             modifier = Modifier.width(200.dp)
                                 .padding { paddingHorizontal(2.dp) }
                         )
@@ -261,19 +265,22 @@ fun FieldConfigScreen.FieldConfigView(
 
                         } else {
 
-//                            TextFieldDropdown(
-//                                uiMetaScope,
-//                                selectedValue = uiMeta,
-//                                onValueSelected = {
-//                                    item = item.copy(metaId = it?.metaId ?: -1)
-//                                    updateTempField(item)
-//                                },
-//                                unique = false,
-//                                label = "绑定UI元数据",
-//                                errorText = error.metaId,
-//                                modifier = Modifier.width(140.dp)
-//                                    .padding { paddingHorizontal(2.dp) }
-//                            )
+                            TextFieldDropdown(
+                                uiMetaScope,
+                                selectedValue = uiMeta,
+                                onValueSelected = {
+                                    item = item.copy(metaId = it?.metaId ?: -1)
+                                    FieldConfigScreenUiEvent.UpdateFiledConfig(
+                                        index,
+                                        item
+                                    ).sendTo(fieldConfigScreenModel)
+                                },
+                                unique = false,
+                                label = "绑定UI元数据",
+                                errorText = itemError.metaId,
+                                modifier = Modifier.width(140.dp)
+                                    .padding { paddingHorizontal(2.dp) }
+                            )
 
                         }
                     }

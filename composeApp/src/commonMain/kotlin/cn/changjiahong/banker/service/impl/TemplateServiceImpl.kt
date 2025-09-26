@@ -33,9 +33,10 @@ class TemplateServiceImpl(
         return templateRepository.findAllDocTemps()
     }
 
-    override suspend fun getDocTempsByBusinessId(businessId: Long): Flow<List<Template>> {
-        return templateRepository.findTemplatesByBusinessId(businessId)
-    }
+    override suspend fun getDocTempsByBusinessId(businessId: Long): Flow<List<Template>> =
+        returnFlow {
+            templateRepository.findTemplatesByBusinessId(businessId)
+        }
 
     override suspend fun getFieldsByTemplateId(id: Long): Flow<List<TplField>> = returnFlow {
         templateRepository.findTemplateFieldsById(id)

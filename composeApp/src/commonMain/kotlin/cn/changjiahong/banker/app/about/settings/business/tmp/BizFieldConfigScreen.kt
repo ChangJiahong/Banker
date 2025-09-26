@@ -1,10 +1,8 @@
 package cn.changjiahong.banker.app.about.settings.business.tmp
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -14,8 +12,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -27,9 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import banker.composeapp.generated.resources.Res
-import banker.composeapp.generated.resources.add_diamond
+import banker.composeapp.generated.resources.sync
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cn.changjiahong.banker.Business
@@ -38,12 +33,10 @@ import cn.changjiahong.banker.InputView
 import cn.changjiahong.banker.ScaffoldWithTopBar
 import cn.changjiahong.banker.app.about.settings.ConfigUiEffect
 import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
-import cn.changjiahong.banker.app.about.settings.global.GlobalConfigUiEvent
 import cn.changjiahong.banker.composable.HoverDeleteBox
 import cn.changjiahong.banker.composable.TextFieldDropdown
 import cn.changjiahong.banker.model.fieldTypes
 import cn.changjiahong.banker.model.isTableType
-import cn.changjiahong.banker.platform.HorizontalScrollbar
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parametersOf
@@ -56,9 +49,9 @@ class BusinessFieldConfigScreen(val business: Business) : Screen {
 
         ScaffoldWithTopBar(
             "业务属性",
-            iconPainter = painterResource(Res.drawable.add_diamond),
+            iconPainter = painterResource(Res.drawable.sync),
             iconOnClick = {
-                ConfigUiEvent.Add
+                BFieldConfigScreenUiEvent.SyncConfigs
                     .sendTo(fieldConfigScreenModel)
             }) { pd ->
             FieldConfigView(Modifier.padding(pd), fieldConfigScreenModel)
@@ -104,9 +97,9 @@ fun BusinessFieldConfigScreen.FieldConfigView(
             ) {
                 var ind = remember { 1 }
                 businessFields.forEachIndexed { index, bField ->
-                    if (bField.isDelete) {
-                        return@forEachIndexed
-                    }
+//                    if (bField.isDelete) {
+//                        return@forEachIndexed
+//                    }
                     Row(
                         Modifier.wrapContentWidth(),
                         verticalAlignment = Alignment.CenterVertically
@@ -121,109 +114,31 @@ fun BusinessFieldConfigScreen.FieldConfigView(
                         HoverDeleteBox((ind++).toString(), Modifier.padding {
                             paddingHorizontal(3.dp)
                             paddingTop(5.dp)
-                        }) {
-                            ConfigUiEvent.Delete(index).sendTo(fieldConfigScreenModel)
-                        }
+                        }, enable = false)
 
                         InputView(
-                            value = item.fieldName,
-                            onValueChange = {
-                                item = item.copy(fieldName = it)
-                                BFieldConfigScreenUiEvent.UpdateBusinessFiled(
-                                    index,
-                                    item
-                                )
-                                    .sendTo(fieldConfigScreenModel)
-                            },
+                            value = item.label,
                             label = "字段名",
-                            errorText = error.fieldName,
-                            readOnly = false,
+                            readOnly = true,
                             modifier = Modifier.width(150.dp)
                                 .padding { paddingHorizontal(2.dp) }
                         )
-                        TextFieldDropdown(
-                            fieldTypes(),
-                            item.fieldType,
+                        InputView(
+                            value = item.tag,
                             onValueChange = {
-                                item = item.copy(fieldType = it)
+                                item = item.copy(tag = it)
                                 BFieldConfigScreenUiEvent.UpdateBusinessFiled(
                                     index,
                                     item
                                 )
                                     .sendTo(fieldConfigScreenModel)
                             },
-                            enableEdit = false,
-                            label = "字段类型",
-                            modifier = Modifier.width(160.dp)
-                                .padding { paddingHorizontal(2.dp) }
-                        )
-//                                InputView(
-//                                    value = item.alias,
-//                                    onValueChange = {
-//                                        item = item.copy(alias = it)
-//                                        BFieldConfigScreenUiEvent.UpdateBusinessFiled(
-//                                            index,
-//                                            item
-//                                        )
-//                                            .sendTo(fieldConfigScreenModel)
-//                                    },
-//                                    label = "描述",
-//                                    errorText = error.alias,
-//                                    modifier = Modifier.width(150.dp)
-//                                        .padding { paddingHorizontal(2.dp) }
-//                                )
-                        InputView(
-                            value = item.width.toString(),
-                            onValueChange = { newValue ->
-                                val digitsOnly = newValue.filter { it.isDigit() }
-                                // 更新状态
-                                val newWidth = digitsOnly.toIntOrNull() ?: 0
-                                item = item.copy(width = newWidth)
-
-                                BFieldConfigScreenUiEvent.UpdateBusinessFiled(
-                                    index,
-                                    item
-                                ).sendTo(fieldConfigScreenModel)
-
-                            },
-                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                            label = "长度",
-                            errorText = error.width,
-                            modifier = Modifier.width(80.dp)
-                                .padding { paddingHorizontal(2.dp) }
-                        )
-                        InputView(
-                            value = item.validationRule,
-                            onValueChange = {
-                                item = item.copy(validationRule = it)
-                                BFieldConfigScreenUiEvent.UpdateBusinessFiled(
-                                    index,
-                                    item
-                                )
-                                    .sendTo(fieldConfigScreenModel)
-                            },
-                            label = "校验规则",
+                            label = "分类标签",
                             errorText = error.validationRule,
                             modifier = Modifier.width(160.dp)
                                 .padding { paddingHorizontal(2.dp) }
                         )
-                        if (item.fieldType.isTableType()) {
-                            InputView(
-                                value = item.options,
-                                onValueChange = {
-                                    item = item.copy(options = it)
-                                    BFieldConfigScreenUiEvent.UpdateBusinessFiled(
-                                        index,
-                                        item
-                                    ).sendTo(fieldConfigScreenModel)
-                                },
-                                label = "选项列表",
-                                errorText = error.options,
-                                readOnly = false,
-                                modifier = Modifier.fillMaxWidth()
-                                    .padding { paddingHorizontal(2.dp) }
-                            )
-                        }
+
                     }
 
 

@@ -1,5 +1,7 @@
 package cn.changjiahong.banker.model
 
+import androidx.compose.ui.text.font.FontWeight
+import cn.changjiahong.banker.FieldOverrideBinding
 import cn.changjiahong.banker.TplField
 import cn.changjiahong.banker.utils.toBoolean
 
@@ -51,7 +53,7 @@ data class FieldConfError(
     val validationRule: String = "",
 )
 
-data class FieldOverrideBinding(
+data class FieldOverrideBindingConfig(
     val id: Long = -1,
     val fieldId: Long = -1,
     val metaId: Long = -1,
@@ -60,7 +62,37 @@ data class FieldOverrideBinding(
     val isFixed: Boolean = false,
     val fixedValue: String = "",
     val isDelete: Boolean = false
-)
+) {
+
+    constructor(binding: FieldOverrideBinding) : this(
+        binding.id,
+        binding.fieldId,
+        binding.metaId ?: -1,
+        binding.bId,
+        binding.tId,
+        binding.isFixed.toBoolean(),
+        binding.fixedValue
+    )
+
+    data class Error(
+        val fieldId: String = "",
+        val metaId: String = "",
+        val isFixed: String = "",
+        val fixedValue: String = "",
+    )
+}
+
+
+data class RelBizUIMetaConfig(
+    val id: Long ,
+    val bid: Long ,
+    val label: String,
+    val metaId: Long ,
+    val weight: Long ,
+    val tag : String
+){
+
+}
 
 data class RelFieldConfigTplFieldError(
     val tempFieldId: String = "",

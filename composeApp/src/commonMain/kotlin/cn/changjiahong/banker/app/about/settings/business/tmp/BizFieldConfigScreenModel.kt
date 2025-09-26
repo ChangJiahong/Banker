@@ -6,6 +6,7 @@ import cn.changjiahong.banker.app.about.settings.ConfigUiEffect
 import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.model.FieldConf
 import cn.changjiahong.banker.model.FieldConfError
+import cn.changjiahong.banker.model.RelBizUIMetaConfig
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEvent
 import cn.changjiahong.banker.mvi.replace
@@ -19,7 +20,9 @@ import org.koin.core.annotation.Factory
 
 sealed interface BFieldConfigScreenUiEvent : UiEvent {
     object AddFieldConfig : UiEvent
-    class UpdateBusinessFiled(val index: Int, val bField: FieldConf) : UiEvent
+
+    object SyncConfigs : BFieldConfigScreenUiEvent
+    class UpdateBusinessFiled(val index: Int, val bField: RelBizUIMetaConfig) : UiEvent
     object SaveFiledConfig : UiEvent
 }
 
@@ -31,40 +34,31 @@ class BusinessFieldConfigScreenModel(
 ) :
     MviScreenModel() {
 
-    private val _businessFiledConfigs = MutableStateFlow<List<FieldConf>>(emptyList())
+    private val _relBizUIMetaConfigs = MutableStateFlow<List<RelBizUIMetaConfig>>(emptyList())
 
     private val _businessFiledErrors = MutableStateFlow<List<FieldConfError>>(emptyList())
 
-    val businessFiledConfigs = _businessFiledConfigs.asStateFlow()
+    val businessFiledConfigs = _relBizUIMetaConfigs.asStateFlow()
     val businessFiledErrors = _businessFiledErrors.asStateFlow()
 
     override fun handleEvent(event: UiEvent) {
         when (event) {
-            is ConfigUiEvent.Add -> {
-                _businessFiledConfigs.update {
-                    it + FieldConf(bId = business.id, weight = it.size)
-                }
-                _businessFiledErrors.update {
-                    it + FieldConfError()
-                }
-            }
 
-            is ConfigUiEvent.Delete -> {
-                val field = _businessFiledConfigs.value[event.index]
-                if (field.fieldId < 0) {
-                    _businessFiledConfigs.update {
-                        it.toMutableList().apply { removeAt(event.index) }
-                    }
-                } else {
-                    _businessFiledConfigs.replace(
-                        event.index
-                    ) { field.copy(isDelete = true) }
-                }
+            is BFieldConfigScreenUiEvent.SyncConfigs -> {
+                syncConfigs()
             }
 
             is BFieldConfigScreenUiEvent.SaveFiledConfig -> saveConfig()
 
-            is BFieldConfigScreenUiEvent.UpdateBusinessFiled -> _businessFiledConfigs.replace(event.index) { event.bField }
+            is BFieldConfigScreenUiEvent.UpdateBusinessFiled -> _relBizUIMetaConfigs.replace(event.index) { event.bField }
+        }
+    }
+
+    private fun syncConfigs() {
+        screenModelScope.launch {
+            businessService.autoGenerateBizAndUIMetaRelList(business.id).catchAndCollect {
+                loadFiledConfigs()
+            }
         }
     }
 
@@ -72,23 +66,13 @@ class BusinessFieldConfigScreenModel(
         screenModelScope.launch {
             val bf = businessFiledConfigs.value
             val be = mutableListOf<FieldConfError>()
-            bf.forEachIndexed { index, field ->
-                var fE = ""
-                if (field.fieldName.isEmpty()) {
-                    fE = "字段名称不能为空"
-                }
-                val error = FieldConfError(fE, "")
-                be.add(error)
-            }
 
-            if (be.any { b -> b.fieldName.isNotEmpty() }) {
-                _businessFiledErrors.value = be
-                return@launch
-            }
 
-            fieldService.saveBizFieldConfigs(_businessFiledConfigs.value).catchAndCollect {
+
+            businessService.saveBizAndUIMetaRelConfigs(_relBizUIMetaConfigs.value).catchAndCollect {
                 ConfigUiEffect.SaveSuccess.trigger()
             }
+
 
         }
     }
@@ -100,28 +84,12 @@ class BusinessFieldConfigScreenModel(
     private fun loadFiledConfigs() {
         screenModelScope.launch {
 
-            fieldService.getBizFieldConfigsByBid(business.id).catchAndCollect {
+            businessService.getBizAndUIMetaRelList(business.id).catchAndCollect {
+                _relBizUIMetaConfigs.value = it
                 _businessFiledErrors.value =
                     MutableList(it.size) {
                         FieldConfError()
                     }
-
-                _businessFiledConfigs.value = it.map { field ->
-                    field.run {
-                        FieldConf(
-                            fieldId,
-                            bId,
-                            fieldName,
-                            fieldType,
-                            alias,
-                            width.toInt(),
-                            options ?: "",
-                            weight.toInt(),
-                            validationRule,
-                            field.forced > 0
-                        )
-                    }
-                }.sortedBy { it.weight }
             }
 
 

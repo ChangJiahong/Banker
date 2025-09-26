@@ -5,9 +5,9 @@ import cn.changjiahong.banker.Business
 import cn.changjiahong.banker.Template
 import cn.changjiahong.banker.app.about.settings.ConfigUiEvent
 import cn.changjiahong.banker.composable.Option
-import cn.changjiahong.banker.model.FieldOverrideBinding
-import cn.changjiahong.banker.model.RelFieldConfigTplFieldError
+import cn.changjiahong.banker.model.FieldOverrideBindingConfig
 import cn.changjiahong.banker.model.RelTplFieldBasicFieldConfig
+import cn.changjiahong.banker.model.UIMetaConfig
 import cn.changjiahong.banker.mvi.MviScreenModel
 import cn.changjiahong.banker.mvi.UiEffect
 import cn.changjiahong.banker.mvi.UiEvent
@@ -15,6 +15,7 @@ import cn.changjiahong.banker.mvi.replace
 import cn.changjiahong.banker.service.BusinessService
 import cn.changjiahong.banker.service.FieldService
 import cn.changjiahong.banker.service.TemplateService
+import cn.changjiahong.banker.service.UIMetaService
 import cn.changjiahong.banker.service.UserService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,11 +25,7 @@ import org.koin.core.annotation.Factory
 
 sealed interface FieldConfigScreenUiEvent : UiEvent {
     object AddFieldConfig : FieldConfigScreenUiEvent
-    object AddUFieldConfig : FieldConfigScreenUiEvent
-    class UpdateFiledConfig(val index: Int, val field: FieldOverrideBinding) :
-        FieldConfigScreenUiEvent
-
-    class UpdateUFiled(val index: Int, val field: RelTplFieldBasicFieldConfig) :
+    class UpdateFiledConfig(val index: Int, val field: FieldOverrideBindingConfig) :
         FieldConfigScreenUiEvent
 
     object SaveConfig : UiEvent
@@ -43,21 +40,21 @@ class FieldConfigScreenModel(
     val business: Business, val template: Template,
     val templateService: TemplateService,
     val businessService: BusinessService,
-    val fieldService: FieldService,
-    val userService: UserService,
+    val uiMetaService: UIMetaService
 ) : MviScreenModel() {
 
     private val _tplFieldOptions = MutableStateFlow<List<Option<Long>>>(emptyList())
 
     val tplFieldOptions = _tplFieldOptions.asStateFlow()
 
-    private val _fieldOptions = MutableStateFlow<List<Option<Long>>>(emptyList())
 
-    val fieldOptions = _fieldOptions.asStateFlow()
+    private val _uiMetaConfigs = MutableStateFlow<List<UIMetaConfig>>(emptyList())
 
-    private val _fieldConfigs = MutableStateFlow<List<FieldOverrideBinding>>(emptyList())
+    val uiMetaConfigs = _uiMetaConfigs.asStateFlow()
+
+    private val _fieldConfigs = MutableStateFlow<List<FieldOverrideBindingConfig>>(emptyList())
     private val _fieldConfigsError =
-        MutableStateFlow<List<RelFieldConfigTplFieldError>>(emptyList())
+        MutableStateFlow<List<FieldOverrideBindingConfig.Error>>(emptyList())
 
     val fieldConfigs = _fieldConfigs.asStateFlow()
     val fieldConfigsError = _fieldConfigsError.asStateFlow()
@@ -66,10 +63,16 @@ class FieldConfigScreenModel(
 
         when (event) {
             is FieldConfigScreenUiEvent.AddFieldConfig -> {
-                _fieldConfigs.update { it + FieldOverrideBinding() }
-                _fieldConfigsError.update { it + RelFieldConfigTplFieldError() }
+                _fieldConfigs.update {
+                    it + FieldOverrideBindingConfig(
+                        bId = business.id,
+                        tId = template.id,
+                    )
+                }
+                _fieldConfigsError.update { it + FieldOverrideBindingConfig.Error() }
             }
-            is ConfigUiEvent.Delete ->{
+
+            is ConfigUiEvent.Delete -> {
                 val field = _fieldConfigs.value[event.index]
                 if (field.id < 0) {
                     _fieldConfigs.update { it.toMutableList().apply { removeAt(event.index) } }
@@ -89,25 +92,17 @@ class FieldConfigScreenModel(
 
     private fun saveConfig() {
         val btValue = fieldConfigs.value
-        val error = mutableListOf<RelFieldConfigTplFieldError>()
+        val error = mutableListOf<FieldOverrideBindingConfig.Error>()
         var hasError = false
-        btValue.forEach { (id, tempFieldId, businessFieldId, isFixed, fixedValue) ->
+        btValue.forEach { b ->
             var tf = ""
             var bf = ""
             var fv = ""
-            if (tempFieldId == null) {
+            if (b.fieldId < 0) {
                 tf = "不能为空"
                 hasError = true
             }
-            if (!isFixed && businessFieldId == null) {
-                bf = "不能为空"
-                hasError = true
-            }
-            if (isFixed && fixedValue == null) {
-                fv = "不能为空"
-                hasError = true
-            }
-            error.add(RelFieldConfigTplFieldError(tf, bf, fv))
+            error.add(FieldOverrideBindingConfig.Error(tf, bf, fv))
         }
         _fieldConfigsError.value = error
         if (hasError) {
@@ -116,7 +111,7 @@ class FieldConfigScreenModel(
 
         screenModelScope.launch {
 
-            fieldService.saveFieldConfigAndTplFieldMap(business.id,_fieldConfigs.value).catchAndCollect {
+            businessService.saveFieldOverrideBindingConfig(_fieldConfigs.value).catchAndCollect {
                 FieldConfigScreenUiEffect.SaveSuccess.trigger()
             }
 
@@ -125,37 +120,31 @@ class FieldConfigScreenModel(
 
     init {
         loadTemplateFields()
-        loadFieldConfigs()
+        loadUIMetaConfigs()
         loadFieldMap()
     }
 
     private fun loadFieldMap() {
         screenModelScope.launch {
 
-            /*
-            获取业务项（全局）属性和模版的属性映射关系
-             */
-            fieldService.getFieldConfigAndTplFieldMap(business.id, template.id)
+            businessService.getFieldOverrideBindingConfigs(business.id, template.id)
                 .catchAndCollect { data ->
-                    _fieldConfigs.value = data.map {
-                        FieldOverrideBinding(
-                            it.id, it.tFieldId, it.fieldId, it.isFixed > 0,
-                            it.fixedValue
-                        )
-                    }
+                    _fieldConfigs.value = data
                     _fieldConfigsError.value =
-                        MutableList(data.size) { RelFieldConfigTplFieldError() }
+                        MutableList(data.size) { FieldOverrideBindingConfig.Error() }
                 }
+
         }
     }
 
-    private fun loadFieldConfigs() {
+    private fun loadUIMetaConfigs() {
         screenModelScope.launch {
-            fieldService.getFieldConfigs(business.id).catchAndCollect { data ->
-                _fieldOptions.value = data.map { Option(it.fieldName, it.fieldId) }
+            uiMetaService.getUIMetaConfigs().catchAndCollect {
+                _uiMetaConfigs.value = it
             }
         }
     }
+
 
     private fun loadTemplateFields() {
         screenModelScope.launch {

@@ -15,3 +15,21 @@ select:
 SELECT *
 FROM FieldOverrideBinding
 WHERE bId = ? AND tId = ?;
+
+selectBizOverrideInvolvedUIMeta:
+SELECT DISTINCT metaId
+FROM FieldOverrideBinding fob
+WHERE fob.bId = ?;
+
+insert:
+INSERT INTO FieldOverrideBinding(id,fieldId,metaId,bId,tId,isFixed,fixedValue)
+VALUES (?,?,?,?,?,?,?);
+
+update:
+UPDATE FieldOverrideBinding
+SET fieldId = ?, metaId = ?, isFixed = ?, fixedValue = ?
+WHERE id = ?;
+
+delete:
+DELETE FROM FieldOverrideBinding
+WHERE id = ?;
