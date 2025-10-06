@@ -3,7 +3,9 @@ package cn.changjiahong.banker.model
 import androidx.compose.ui.text.font.FontWeight
 import cn.changjiahong.banker.FieldOverrideBinding
 import cn.changjiahong.banker.TplField
+import cn.changjiahong.banker.utils.getSnowId
 import cn.changjiahong.banker.utils.toBoolean
+import kotlin.uuid.Uuid
 
 /*
 抽象出的属性类
@@ -20,10 +22,25 @@ data class Field(
     val isBasic: Boolean = false
 )
 
+data class Meta(
+    val metaId: Long,
+    val label: String,
+    val metaType: String,
+    val metaValueId: Long,
+    val metaValue: String,
+)
+
 data class FieldVal(
     val fieldId: Long,
     val fieldValueId: Long = -1,
     val fieldValue: String = "",
+)
+
+
+data class MetaVal(
+    val metaId: Long,
+    val metaValueId: Long = -1,
+    val metaValue: String = "",
 )
 
 data class Fields(
@@ -82,15 +99,19 @@ data class FieldOverrideBindingConfig(
     )
 }
 
+abstract class RelBizUIMetaItem(open val key: Int= getSnowId().toInt())
+
+data class RelBizUIMetaTag( val tagName: String) : RelBizUIMetaItem()
 
 data class RelBizUIMetaConfig(
-    val id: Long ,
-    val bid: Long ,
+    val id: Long,
+    val bid: Long,
     val label: String,
-    val metaId: Long ,
-    val weight: Long ,
-    val tag : String
-){
+    val metaId: Long,
+    val weight: Long,
+    val tag: String,
+    val tagWeight: Long
+) : RelBizUIMetaItem (){
 
 }
 

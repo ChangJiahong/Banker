@@ -1,6 +1,8 @@
 package cn.changjiahong.banker.service
 
+import cn.changjiahong.banker.model.MetaVal
 import cn.changjiahong.banker.model.UIMetaConfig
+import cn.changjiahong.banker.model.UIMetaField
 import cn.changjiahong.banker.utils.FlowList
 import cn.changjiahong.banker.utils.OkFlow
 import kotlinx.coroutines.flow.Flow
@@ -24,6 +26,9 @@ interface UIMetaService{
      * 保存UI元数据配置
      */
     fun saveUIMetaConfigs(uiMetaConfigs: List<UIMetaConfig>): OkFlow
+
+    fun getUIMetaConfigsByBid(bid: Long): FlowList<UIMetaField>
+    fun saveMetaValues(uid: Long?, bid: Long, values: List<MetaVal>): OkFlow
 
 
 }

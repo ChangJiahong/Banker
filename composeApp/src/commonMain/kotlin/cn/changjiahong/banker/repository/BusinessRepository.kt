@@ -36,9 +36,16 @@ interface BusinessRepository {
 
 
     fun findBizInvolvedUIMeta(bid: Long): List<Long>
-    fun newRelBizUIMeta(bid: Long, metaId: Long, weight: Long, tag: String): Long
+    fun newRelBizUIMeta(
+        bid: Long, metaId: Long, weight: Long, tag: String,
+        tagWeight: Long
+    ): Long
+
     fun deleteRelBizUIMetaById(id: Long)
     fun findBizAndUIMetaRelList(bid: Long): List<RelBizUIMetaConfig>
-    fun updateRelBizUIMetaById(weight: Long, tag: String, id: Long)
+    fun updateRelBizUIMetaById(
+        weight: Long, tag: String,
+        tagWeight: Long, id: Long
+    )
 
 }

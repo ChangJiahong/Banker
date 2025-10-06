@@ -105,7 +105,7 @@ class BusinessServiceImpl(
             uiMetas.forEach { metaId ->
                 if (configs.find { it.metaId == metaId } == null) {
                     //不存在 new
-                    businessRepository.newRelBizUIMeta(bid, metaId, 0L, "")
+                    businessRepository.newRelBizUIMeta(bid, metaId, 0L, "",0)
                 }
             }
 
@@ -122,7 +122,7 @@ class BusinessServiceImpl(
             configs.forEachIndexed { index, config ->
                 config.run {
                         businessRepository.updateRelBizUIMetaById(
-                            weight, tag, id
+                            weight, tag, tagWeight,id
                         )
                     }
                 }

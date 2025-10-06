@@ -5,23 +5,24 @@ CREATE TABLE RelBizUIMeta (
 	metaId         INTEGER  REFERENCES UIMeta(metaId),
 	weight         INTEGER  NOT NULL DEFAULT 0, -- 显示排序权重
 	tag            TEXT     NOT NULL DEFAULT "", -- 分组标签
+	tagWeight      INTEGER  NOT NULL DEFAULT 0, -- 显示排序权重
 	created        INTEGER  NOT NULL DEFAULT (strftime('%s', 'now')),
 	PRIMARY KEY (bId,metaId)
 );
 
 selectBizAndUIMetaRelList:
-SELECT id, bId,label,rb.metaId metaId,weight,tag
+SELECT id, bId,label,rb.metaId metaId,weight,tag,tagWeight
 FROM RelBizUIMeta rb
 LEFT JOIN UIMeta u ON u.metaId = rb.metaId
 WHERE bId = ?;
 
 insert:
-INSERT INTO RelBizUIMeta(id,bId,metaId,weight,tag)
-VALUES (?,?,?,?,?);
+INSERT INTO RelBizUIMeta(id,bId,metaId,weight,tag,tagWeight)
+VALUES (?,?,?,?,?,?);
 
 update:
 UPDATE RelBizUIMeta
-SET weight = ?, tag = ?
+SET weight = ?, tag = ?,tagWeight = ?
 WHERE id = ?;
 
 deleteById:

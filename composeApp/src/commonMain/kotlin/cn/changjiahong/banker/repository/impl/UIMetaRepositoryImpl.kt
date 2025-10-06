@@ -1,8 +1,10 @@
 package cn.changjiahong.banker.repository.impl
 
 import cn.changjiahong.banker.BankerDb
+import cn.changjiahong.banker.SelectByBid
 import cn.changjiahong.banker.UIMeta
 import cn.changjiahong.banker.ck
+import cn.changjiahong.banker.model.Meta
 import cn.changjiahong.banker.repository.UIMetaRepository
 import cn.changjiahong.banker.utils.getSnowId
 import cn.changjiahong.banker.utils.toLong
@@ -17,6 +19,7 @@ import org.koin.core.annotation.Factory
 @Factory
 class UIMetaRepositoryImpl(val db: BankerDb) : UIMetaRepository {
     val uiMetaQueries = db.uIMetaQueries
+    val metaValueQueries = db.metaValueQueries
 
     override fun findUIMetas(): List<UIMeta> {
         return uiMetaQueries.selectAll().executeAsList()
@@ -73,5 +76,35 @@ class UIMetaRepositoryImpl(val db: BankerDb) : UIMetaRepository {
 
     override fun deleteUIMetaById(metaId: Long) {
         uiMetaQueries.delete(metaId).ck()
+    }
+
+    override fun findUIMetasByBid(bid: Long): List<SelectByBid> {
+        return uiMetaQueries.selectByBid(bid).executeAsList()
+    }
+
+    override fun newMetaValue(
+        uId: Long,
+        bid: Long,
+        metaId: Long,
+        metaValue: String
+    ): Long {
+        val id = getSnowId()
+        metaValueQueries.insert(id, uId, metaId, bid, metaValue).ck()
+        return id
+    }
+
+    override fun updateMetaValueById(metaValueId: Long, metaValue: String) {
+        metaValueQueries.update(metaValue, metaValueId).ck()
+    }
+
+    override fun findMetasByUidAndBid(
+        uid: Long,
+        bid: Long
+    ): List<Meta> {
+        return metaValueQueries.selectMetasByUidAndBid(uid, bid).executeAsList().map {
+            Meta(
+                it.metaId, it.label ?: "", it.metaType!!, it.metaValueId, it.metaValue
+            )
+        }
     }
 }

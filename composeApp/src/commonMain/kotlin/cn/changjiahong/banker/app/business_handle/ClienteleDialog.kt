@@ -42,10 +42,13 @@ import banker.composeapp.generated.resources.Res
 import banker.composeapp.generated.resources.home
 import cn.changjiahong.banker.FieldConfig
 import cn.changjiahong.banker.InputView
+import cn.changjiahong.banker.UIMeta
 import cn.changjiahong.banker.composable.VisibleState
 import cn.changjiahong.banker.composable.PopupDialog
 import cn.changjiahong.banker.model.FieldVal
+import cn.changjiahong.banker.model.MetaVal
 import cn.changjiahong.banker.model.Table
+import cn.changjiahong.banker.model.UIMetaField
 import cn.changjiahong.banker.model.isTableType
 import cn.changjiahong.banker.utils.padding
 import org.jetbrains.compose.resources.painterResource
@@ -73,132 +76,93 @@ fun ClienteleDialog(
             val uiState by businessHandlerScreenModel.uiState.collectAsState()
 
             val fieldValues by businessHandlerScreenModel.fieldValues.collectAsState()
+            val metaValues by businessHandlerScreenModel.metaValues.collectAsState()
             val fieldErrorMsg = businessHandlerScreenModel.fieldErrorMsg
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("基本信息", modifier = Modifier.padding(10.dp, 0.dp), fontSize = 24.sp)
-                IconButton(onClick = {}, modifier = Modifier) {
-                    Icon(painterResource(Res.drawable.home), contentDescription = "")
+            val uiMetas by businessHandlerScreenModel.uiMetas.collectAsState()
+
+            val uiGroup = uiMetas.groupBy { metaField -> metaField.tag }
+
+            uiGroup.forEach { (tag, metaFields) ->
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(tag, modifier = Modifier.padding(10.dp, 0.dp), fontSize = 24.sp)
                 }
-            }
-            HorizontalDivider(modifier = Modifier.padding(10.dp, 0.dp))
-            FlowRow(
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth().padding(10.dp)
-            ) {
-                val basicFields by businessHandlerScreenModel.basicFields.collectAsState()
-                basicFields.forEachIndexed { index, field ->
+                HorizontalDivider(modifier = Modifier.padding(10.dp, 0.dp))
+                FlowRow(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth().padding(10.dp)
+                ) {
 
-                    var fieldVal by remember {
-                        mutableStateOf(
-                            fieldValues[field.fieldId] ?: FieldVal(
-                                field.fieldId,
-                            )
-                        )
-                    }
+                    metaFields.forEachIndexed { index, uiMeta ->
 
-                    when {
-
-                        field.fieldType == "TEXT" -> {
-                            InputView(
-                                label = field.fieldName,
-                                value = fieldVal.fieldValue,
-                                modifier = Modifier.width((field.width.toInt() * 10).dp)
-                                    .padding(10.dp, 0.dp),
-                                onValueChange = { newValue ->
-                                    fieldVal = fieldVal.copy(fieldValue = newValue)
-                                    BhUIEvent.UpdateFieldValue(
-                                        field.fieldId,
-                                        fieldVal
-                                    ).sendTo(businessHandlerScreenModel)
-
-                                },
-                                errorText = fieldErrorMsg[field.fieldId] ?: "",
+                        var fieldVal by remember {
+                            mutableStateOf(
+                                metaValues[uiMeta.metaId] ?: MetaVal(
+                                    uiMeta.metaId,
+                                )
                             )
                         }
 
-                        field.fieldType.isTableType() -> {
-                            TableHander(field, businessHandlerScreenModel)
+                        when {
+
+                            uiMeta.metaType == "TEXT" -> {
+                                InputView(
+                                    label = uiMeta.label,
+                                    value = fieldVal.metaValue,
+                                    modifier = Modifier.width((uiMeta.width.toInt() * 10).dp)
+                                        .padding(10.dp, 0.dp),
+                                    onValueChange = { newValue ->
+                                        fieldVal = fieldVal.copy(metaValue = newValue)
+                                        BhUIEvent.UpdateFieldValue(
+                                            uiMeta.metaId,
+                                            fieldVal
+                                        ).sendTo(businessHandlerScreenModel)
+
+                                    },
+                                    errorText = fieldErrorMsg[uiMeta.metaId] ?: "",
+                                )
+                            }
+
+                            uiMeta.metaType.isTableType() -> {
+                                TableHander(uiMeta, businessHandlerScreenModel)
+                            }
+
                         }
 
                     }
+
 
                 }
 
-
             }
 
-            val businessFields by businessHandlerScreenModel.businessFields.collectAsState()
-
-            Text(
-                "业务信息",
-                modifier = Modifier.padding(10.dp, 0.dp),
-                fontSize = 24.sp
-            )
-            HorizontalDivider(modifier = Modifier.padding(10.dp, 0.dp))
-            FlowRow(
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth().padding(10.dp)
-            ) {
-
-                businessFields.forEach { field ->
-                    var fieldVal by remember {
-                        mutableStateOf(
-                            fieldValues[field.fieldId] ?: FieldVal(field.fieldId)
-                        )
-                    }
-                    when {
-                        field.fieldType == "TEXT" -> {
-
-                            InputView(
-                                label = field.fieldName,
-                                modifier = Modifier.width((field.width.toInt() * 10).dp)
-                                    .padding(10.dp, 0.dp),
-                                value = fieldVal.fieldValue,
-                                onValueChange = {
-                                    fieldVal = fieldVal.copy(fieldValue = it)
-                                    BhUIEvent.UpdateFieldValue(
-                                        field.fieldId,
-                                        fieldVal
-                                    ).sendTo(businessHandlerScreenModel)
-
-                                },
-                                errorText = fieldErrorMsg[field.fieldId] ?: "",
-                            )
-                        }
-
-                        field.fieldType.isTableType() -> {
-                            TableHander(field, businessHandlerScreenModel)
-                        }
-                    }
-                }
-            }
-
+        }
 //
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Button(onClick = {
-                    BhUIEvent.SaveBhDetail.sendTo(businessHandlerScreenModel)
-                }) {
-                    Text("保存")
-                }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Button(onClick = {
+                BhUIEvent.SaveBhDetail.sendTo(businessHandlerScreenModel)
+            }) {
+                Text("保存")
             }
         }
     }
+
 }
 
 
 @Composable
 private fun TableHander(
-    field: FieldConfig,
+    field: UIMetaField,
     businessHandlerScreenModel: BusinessHandlerScreenModel
 ) {
     val optionsFields by businessHandlerScreenModel.optionsFields.collectAsState()
     val optionsKey by businessHandlerScreenModel.optionsKey.collectAsState()
 
-    if (!optionsKey.containsKey(field.fieldId)) {
+    if (!optionsKey.containsKey(field.metaId)) {
         return
     }
     Spacer(modifier = Modifier.fillMaxWidth())
@@ -210,12 +174,12 @@ private fun TableHander(
         border = BorderStroke(1.dp, Color.Gray)
     ) {
         Column(Modifier.padding(5.dp)) {
-            val options = optionsKey[field.fieldId]!!
+            val options = optionsKey[field.metaId]!!
             var table by remember(optionsFields) {
                 mutableStateOf(
-                    optionsFields[field.fieldId] ?: Table(
+                    optionsFields[field.metaId] ?: Table(
                         options,
-                        field.fieldId
+                        field.metaId
                     )
                 )
             }
@@ -224,10 +188,10 @@ private fun TableHander(
                     Modifier.height(30.dp)
                         .padding { paddingHorizontal(10.dp) }, contentAlignment = Alignment.Center
                 ) {
-                    Text(field.fieldName)
+                    Text(field.label)
                 }
                 IconButton({
-                    BhUIEvent.UpdateOptionV(field.fieldId, table.copy { createRow() })
+                    BhUIEvent.UpdateOptionV(field.metaId, table.copy { createRow() })
                         .sendTo(businessHandlerScreenModel)
                 }, Modifier.height(30.dp)) {
                     Icon(Icons.Default.Add, "")
@@ -285,7 +249,7 @@ private fun TableHander(
                                 onValueChange = { newValue ->
                                     va = newValue
                                     BhUIEvent.UpdateOptionV(
-                                        field.fieldId,
+                                        field.metaId,
                                         table.copy {
                                             updateRow(row.copy(key, newValue))
                                         }).sendTo(businessHandlerScreenModel)

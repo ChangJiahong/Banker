@@ -1,6 +1,6 @@
 -- 元数据值
 CREATE TABLE MetaValue (
-	metaValueId   INTEGER,
+	metaValueId   INTEGER NOT NULL,
 	uid           INTEGER NOT NULL REFERENCES User(id),
 	metaId        INTEGER NOT NULL REFERENCES UIMeta(metaId),
 	bId           INTEGER REFERENCES Business(id), -- NULL 表示全局共享
@@ -8,3 +8,20 @@ CREATE TABLE MetaValue (
 	created       INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
 	PRIMARY KEY (uid,metaId,bId)
 );
+
+
+selectMetasByUidAndBid:
+SELECT mv.metaId,u.label,u.metaType,mv.metaValueId,mv.metaValue
+FROM MetaValue mv
+LEFT JOIN UIMeta u ON u.metaId = mv.metaId
+WHERE mv.uid = ? AND (bId = ? OR bId = '');
+
+
+insert:
+INSERT INTO MetaValue(metaValueId,uid,metaId,bId,metaValue)
+VALUES (?,?,?,?,?);
+
+update:
+UPDATE MetaValue
+SET metaValue=?
+WHERE metaValueId = ?;

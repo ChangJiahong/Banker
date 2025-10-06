@@ -113,15 +113,19 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
         bid: Long,
         metaId: Long,
         weight: Long,
-        tag: String
+        tag: String,
+        tagWeight: Long
     ): Long {
         val id = getSnowId()
-        relBizUIMetaQueries.insert(id, bid, metaId, weight, tag).ck()
+        relBizUIMetaQueries.insert(id, bid, metaId, weight, tag, tagWeight).ck()
         return id
     }
 
-    override fun updateRelBizUIMetaById(weight: Long, tag: String, id: Long) {
-        relBizUIMetaQueries.update(weight, tag, id).ck()
+    override fun updateRelBizUIMetaById(
+        weight: Long, tag: String,
+        tagWeight: Long, id: Long
+    ) {
+        relBizUIMetaQueries.update(weight, tag, tagWeight, id).ck()
     }
 
     override fun deleteRelBizUIMetaById(id: Long) {
@@ -130,7 +134,15 @@ class BusinessRepositoryImpl(db: BankerDb) : BusinessRepository {
 
     override fun findBizAndUIMetaRelList(bid: Long): List<RelBizUIMetaConfig> {
         return relBizUIMetaQueries.selectBizAndUIMetaRelList(bid).executeAsList().map {
-            RelBizUIMetaConfig(it.id, it.bId, it.label ?: "", it.metaId ?: -1, it.weight, it.tag)
+            RelBizUIMetaConfig(
+                it.id,
+                it.bId,
+                it.label ?: "",
+                it.metaId ?: -1,
+                it.weight,
+                it.tag,
+                it.tagWeight
+            )
         }
     }
 

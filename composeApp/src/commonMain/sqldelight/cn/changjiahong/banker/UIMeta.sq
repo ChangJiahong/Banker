@@ -20,6 +20,12 @@ SELECT *
 FROM UIMeta
 WHERE label LIKE '%' || ? || '%';
 
+selectByBid:
+SELECT u.metaId metaId,u.label,metaType,width,options,validation,forced,isGlobal,weight,tag
+FROM UIMeta u
+LEFT JOIN RelBizUIMeta rbu ON u.metaId = rbu.metaId
+WHERE rbu.bId = ?;
+
 insert:
 INSERT INTO UIMeta(metaId,label,metaType,width,options,validation,forced,isGlobal)
 VALUES (?,?,?,?,?,?,?,?);

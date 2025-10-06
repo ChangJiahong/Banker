@@ -1,6 +1,8 @@
 package cn.changjiahong.banker.repository
 
+import cn.changjiahong.banker.SelectByBid
 import cn.changjiahong.banker.UIMeta
+import cn.changjiahong.banker.model.Meta
 
 /**
  *
@@ -39,6 +41,11 @@ interface UIMetaRepository {
     )
 
     fun deleteUIMetaById(metaId: Long)
+    fun findUIMetasByBid(bid: Long): List<SelectByBid>
+    fun newMetaValue(uId: Long,bid: Long, metaId: Long, metaValue: String): Long
+    fun updateMetaValueById(metaValueId: Long, metaValue: String)
+
+    fun findMetasByUidAndBid(uid: Long, bid: Long): List<Meta>
 
 
 }

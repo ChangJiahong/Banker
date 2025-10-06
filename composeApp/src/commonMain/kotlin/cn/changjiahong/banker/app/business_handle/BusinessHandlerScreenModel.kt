@@ -9,7 +9,9 @@ import cn.changjiahong.banker.app.RR
 import cn.changjiahong.banker.composable.AlertDialogState
 import cn.changjiahong.banker.composable.VisibleState
 import cn.changjiahong.banker.model.FieldVal
+import cn.changjiahong.banker.model.MetaVal
 import cn.changjiahong.banker.model.Table
+import cn.changjiahong.banker.model.UIMetaField
 import cn.changjiahong.banker.model.UserInfo
 import cn.changjiahong.banker.model.isTableType
 import cn.changjiahong.banker.mvi.MviScreenModel
@@ -19,6 +21,7 @@ import cn.changjiahong.banker.platform.SystemPrinter
 import cn.changjiahong.banker.platform.systemOpen
 import cn.changjiahong.banker.service.FieldService
 import cn.changjiahong.banker.service.TemplateService
+import cn.changjiahong.banker.service.UIMetaService
 import cn.changjiahong.banker.service.UserService
 import cn.changjiahong.banker.storage.FileType
 import cn.changjiahong.banker.storage.FileType.DOCX
@@ -34,25 +37,23 @@ import org.koin.core.annotation.Factory
 class BusinessHandlerScreenModel(
     val business: Business,
     val userService: UserService,
-    val fieldService: FieldService,
-    val templateService: TemplateService
+    val templateService: TemplateService,
+    val uiMetaService: UIMetaService
 ) : MviScreenModel() {
     private val _clientelesData = MutableStateFlow<List<UserInfo>>(listOf())
     val clientelesData = _clientelesData.asStateFlow()
 
-    private var dataFields = listOf<FieldConfig>()
-
-    /**
-     * 基本信息
-     */
-    private val _basicFields = MutableStateFlow<List<FieldConfig>>(listOf())
-    val basicFields = _basicFields.asStateFlow()
+    private val _uiMetas = MutableStateFlow<List<UIMetaField>>(listOf())
+    val uiMetas = _uiMetas.asStateFlow()
 
     private val _templatesData = MutableStateFlow<List<Template>>(listOf())
     val templatesData = _templatesData.asStateFlow()
 
     private val _fieldValues = MutableStateFlow<Map<Long, FieldVal>>(emptyMap())
     val fieldValues = _fieldValues.asStateFlow()
+
+    private val _metaValues = MutableStateFlow<Map<Long, MetaVal>>(emptyMap())
+    val metaValues = _metaValues.asStateFlow()
 
     val fieldErrorMsg = mutableStateMapOf<Long, String>()
 
@@ -64,12 +65,6 @@ class BusinessHandlerScreenModel(
         MutableStateFlow<Map<Long, Table>>(emptyMap())
     val optionsFields = _optionsFields.asStateFlow()
 
-
-    /**
-     * 业务信息
-     */
-    private val _bizFields = MutableStateFlow<List<FieldConfig>>(emptyList())
-    val businessFields = _bizFields.asStateFlow()
 
     private val _currentlySelected = MutableStateFlow<UserInfo?>(null)
     val currentlySelected = _currentlySelected.asStateFlow()
@@ -88,7 +83,7 @@ class BusinessHandlerScreenModel(
             is BhUIEvent.EditClientele -> editClientele()
 
             is BhUIEvent.UpdateFieldValue -> {
-                _fieldValues.replace(event.fieldId) { event.fieldValue }
+                _metaValues.replace(event.fieldId) { event.fieldValue }
             }
 
             is BhUIEvent.SaveBhDetail -> {
@@ -164,7 +159,23 @@ class BusinessHandlerScreenModel(
     private fun load() {
         loadClientele()
         loadTemplates()
-        loadFieldConfigs()
+//        loadFieldConfigs()
+        loadUIMetas()
+    }
+
+    private fun loadUIMetas() {
+        screenModelScope.launch {
+            uiMetaService.getUIMetaConfigsByBid(business.id).catchAndCollect {data->
+                _uiMetas.value = data
+
+                val tableFields = data.filter { f ->
+                    f.metaType.isTableType()
+                }
+
+                _optionsKey.value =
+                    tableFields.associate { it.metaId to (it.options).split(",") }
+            }
+        }
     }
 
     private fun loadTemplates() {
@@ -188,63 +199,39 @@ class BusinessHandlerScreenModel(
     }
 
 
-    fun loadFieldConfigs() {
-        screenModelScope.launch {
-            fieldService.getFieldConfigsForBiz(business.id).catchAndCollect { data ->
-                dataFields = data
-
-                _basicFields.value = data.filter { f -> f.bId == -1L }.sortedBy { it.weight }
-
-                val tableFields = data.filter { f ->
-                    f.fieldType.isTableType()
-                }
-
-                _optionsKey.value =
-                    tableFields.associate { it.fieldId to (it.options ?: "").split(",") }
-
-                _bizFields.value = data.filterNot { f -> f.bId == -1L }.sortedBy { it.weight }
-            }
-
-        }
-    }
 
     fun saveBhDetail() {
-//        if (!checkUsername() || !checkIdNum() || !checkPhone()
-//            || !checkBAddress() || !checkBScope() || !checkBankerNum()
-//        ) {
-//            return
-//        }
+
         fieldErrorMsg.clear()
 
-        _fieldValues.value.values.forEach { v ->
-            if (v.fieldValue.isNotBlank()) {
-                val config = dataFields.find { it.fieldId == v.fieldId }
-                if (config==null||config.validationRule.isBlank()){
+        _metaValues.value.values.forEach { v ->
+            if (v.metaValue.isNotBlank()) {
+                val config = _uiMetas.value.find { it.metaId == v.metaId }
+                if (config == null || config.validation.isBlank()) {
                     return@forEach
                 }
-                if (!v.fieldValue.matches(config.validationRule.toRegex())){
-                    fieldErrorMsg[v.fieldId] = "格式错误"
+                if (!v.metaValue.matches(config.validation.toRegex())) {
+                    fieldErrorMsg[v.metaId] = "格式错误"
                 }
             }
         }
 
-        if (fieldErrorMsg.isNotEmpty()){
+        if (fieldErrorMsg.isNotEmpty()) {
             return
         }
 
         screenModelScope.launch {
 
-            val fv = _fieldValues.value.toMutableMap()
+            val fv = _metaValues.value.toMutableMap()
 
             _optionsFields.value.forEach { (key, value) ->
-                fv[key] = FieldVal(value.fieldIds, value.fieldValueId, value.toFieldValue())
+                fv[key] = MetaVal(value.fieldIds, value.fieldValueId, value.toFieldValue())
             }
 
-
-
-            fieldService.saveFieldValues(
+            uiMetaService.saveMetaValues(
                 currentlySelected.value?.uid,
-                business.id, fv.values.toList()
+                business.id,
+                fv.values.toList()
             ).catchAndCollect {
                 toast("OK")
                 loadClientele()
@@ -258,7 +245,7 @@ class BusinessHandlerScreenModel(
 
     private fun newClientele() {
 
-        _fieldValues.value = emptyMap()
+        _metaValues.value = emptyMap()
         _currentlySelected.value = null
 
         _optionsFields.value = emptyMap()
@@ -276,21 +263,31 @@ class BusinessHandlerScreenModel(
 
         val currentUser = currentlySelected.value!!
 
+//        _optionsFields.value =
+//            currentUser.fields.values.filter { it.fieldType.isTableType() }.associate {
+//                it.fieldId to Table(
+//                    optionsKey.value[it.fieldId]!!,
+//                    it.fieldId,
+//                    it.fieldValueId,
+//                    it.fieldValue
+//                )
+//            }
+
         _optionsFields.value =
-            currentUser.fields.values.filter { it.fieldType.isTableType() }.associate {
-                it.fieldId to Table(
-                    optionsKey.value[it.fieldId]!!,
-                    it.fieldId,
-                    it.fieldValueId,
-                    it.fieldValue
+            currentUser.metas.filter { it.metaType.isTableType() }.associate {
+                it.metaId to Table(
+                    optionsKey.value[it.metaId]!!,
+                    it.metaId,
+                    it.metaValueId,
+                    it.metaValue
                 )
             }
 
-        _fieldValues.value = currentUser.fields.values.associate {
-            it.fieldId to FieldVal(
-                it.fieldId,
-                it.fieldValueId,
-                it.fieldValue
+        _metaValues.value = currentUser.metas.associate {
+            it.metaId to MetaVal(
+                it.metaId,
+                it.metaValueId,
+                it.metaValue
             )
         }
 
